@@ -1,1 +1,82 @@
-{"players":[{"id":"500000000000","ganadas":0,"perdidas":0,"entrada":0}],"animes":{"names":["Fullmetal Alchemist: Brotherhood","Demon Slayer: Kimetsu no Yaiba","Jujutsu Kaisen","Hunter x Hunter","Neon Genesis Evangelion","Cowboy Bebop","Code Geass: Lelouch of the Rebellion","Steins;Gate","Kaguya-sama: Love Is War","Konosuba: God's Blessing on This Wonderful World!","One Punch Man","Saiki Kusuo no Psi-nan","Gintama","Mob Psycho 100","Nichijou","Anohana: The Flower We Saw That Day","Your Name. (Kimi no Na wa)","Violet Evergarden","Clannad: After Story","Your Lie in April (Shigatsu wa Kimi no Uso)","Fruits Basket","Toradora!","Horimiya","Ghost in the Shell (1995)","Neon Genesis Evangelion","Cowboy Bebop","Serial Experiments Lain","Akira","Steins;Gate","Psycho-Pass","The End of Evangelion","Mobile Suit Gundam: Iron-Blooded Orphans","Demon Slayer: Kimetsu no Yaiba","Jujutsu Kaisen","Inuyasha","Naruto","Bleach","Fullmetal Alchemist: Brotherhood","Hunter x Hunter","Neon Genesis Evangelion","Spirited Away (Sen to Chihiro no Kamikakushi)","K-On!","Yuru Camp","Non Non Biyori","Flying Witch","Barakamon","The Melancholy of Haruhi Suzumiya","Anohana: The Flower We Saw That Day","Clannad","Your Lie in April (Shigatsu wa Kimi no Uso)","Ghibli movies","Studio Ghibli movies","Satoshi Kon movies","Makoto Shinkai movies","A Silent Voice (Koe no Katachi)","Your Name. (Kimi no Na wa)","Violet Evergarden","Attack on Titan (Shingeki no Kyojin)","Demon Slayer: Kimetsu no Yaiba"]},"GroupList":{"id":"325253413825824.ac"}}
+{
+    "players": [
+        {
+            "id": "500000000000",
+            "ganadas": 0,
+            "perdidas": 0,
+            "entrada": 0
+        },
+        {
+            "id": "18098972404",
+            "ganadas": 0,
+            "perdidas": 0,
+            "entrada": 0
+        }
+    ],
+    "animes": {
+        "names": [
+            "Fullmetal Alchemist: Brotherhood",
+            "Demon Slayer: Kimetsu no Yaiba",
+            "Jujutsu Kaisen",
+            "Hunter x Hunter",
+            "Neon Genesis Evangelion",
+            "Cowboy Bebop",
+            "Code Geass: Lelouch of the Rebellion",
+            "Steins;Gate",
+            "Kaguya-sama: Love Is War",
+            "Konosuba: God's Blessing on This Wonderful World!",
+            "One Punch Man",
+            "Saiki Kusuo no Psi-nan",
+            "Gintama",
+            "Mob Psycho 100",
+            "Nichijou",
+            "Anohana: The Flower We Saw That Day",
+            "Your Name. (Kimi no Na wa)",
+            "Violet Evergarden",
+            "Clannad: After Story",
+            "Your Lie in April (Shigatsu wa Kimi no Uso)",
+            "Fruits Basket",
+            "Toradora!",
+            "Horimiya",
+            "Ghost in the Shell (1995)",
+            "Neon Genesis Evangelion",
+            "Cowboy Bebop",
+            "Serial Experiments Lain",
+            "Akira",
+            "Steins;Gate",
+            "Psycho-Pass",
+            "The End of Evangelion",
+            "Mobile Suit Gundam: Iron-Blooded Orphans",
+            "Demon Slayer: Kimetsu no Yaiba",
+            "Jujutsu Kaisen",
+            "Inuyasha",
+            "Naruto",
+            "Bleach",
+            "Fullmetal Alchemist: Brotherhood",
+            "Hunter x Hunter",
+            "Neon Genesis Evangelion",
+            "Spirited Away (Sen to Chihiro no Kamikakushi)",
+            "K-On!",
+            "Yuru Camp",
+            "Non Non Biyori",
+            "Flying Witch",
+            "Barakamon",
+            "The Melancholy of Haruhi Suzumiya",
+            "Anohana: The Flower We Saw That Day",
+            "Clannad",
+            "Your Lie in April (Shigatsu wa Kimi no Uso)",
+            "Ghibli movies",
+            "Studio Ghibli movies",
+            "Satoshi Kon movies",
+            "Makoto Shinkai movies",
+            "A Silent Voice (Koe no Katachi)",
+            "Your Name. (Kimi no Na wa)",
+            "Violet Evergarden",
+            "Attack on Titan (Shingeki no Kyojin)",
+            "Demon Slayer: Kimetsu no Yaiba"
+        ]
+    },
+    "GroupList": {
+        "id": "325253413825824.ac"
+    }
+}

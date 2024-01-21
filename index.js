@@ -50,11 +50,17 @@ function jsonread(player){
     }
     if (encuentra === false) {
         data.players.push(dataplayer);
-        fs.writeFileSync('data.json', JSON.stringify(data) , 'utf-8');
+        fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
     }
     return encuentra;
 }
 
+/**
+ * actualiza la entrada del jugador
+ * 
+ * @param {string} player - id del jugador pasar como string el numero de telefono
+ * @param {string} entrada  - la entrada que se le va a asignar al jugador si esta jugando o no
+ */
 function updateEntrada(player, entrada) {
     let jsonfile = fs.readFileSync('data.json', 'utf-8');
     let data = JSON.parse(jsonfile);
@@ -81,7 +87,7 @@ function addgroup(group){
     }
     if (encuentra === false) {
         data.GroupList.push(datagroup);
-        fs.writeFileSync('data.json', JSON.stringify(data) , 'utf-8');
+        fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
     }
 }
 function getEntrada(player) {
@@ -97,7 +103,13 @@ function getEntrada(player) {
 
 client.on('message', async (message) => {
     const chat = await message.getChat();
+        /**
+        * Verifica si el usuario es admin o no, no necesita parametros
+        * 
+        * @returns {boolean}  si el usuario es admin devuelve true si no false
+        */
     function participantes(){
+ 
         let participantes = [];
             chat.participants.forEach((participant) => {
                 participantes.push(participant);
@@ -109,37 +121,26 @@ client.on('message', async (message) => {
     if (message.from === "120363123428242054@g.us") { 
         if(message.body === 'hola') {
             message.reply('Bienvenid@ a Anime Fan Site');
-        }
-        if(message.body === '!todos') {
-            const chat = await message.getChat();
-            
-            let text = "";
-            let mentions = [];
-    
-            for(let participant of chat.participants) {
-                mentions.push(`${participant.id.user}@c.us`);
-                text += `@${participant.id.user} `;
-            }
-            console.log(text);
-            await message.reply('Mencionando a todos los participantes:');
-            await chat.sendMessage(text, { mentions });
-        }
-        
+        }    
     }
     if(message.body.toLocaleLowerCase() === '!todos') {
         if(chat.isGroup){
-            const chat = await message.getChat();
-            
-            let text = "";
-            let mentions = [];
+            if(participantes()){
+                const chat = await message.getChat();
+                
+                let text = "";
+                let mentions = [];
 
-            for(let participant of chat.participants) {
-                mentions.push(`${participant.id.user}@c.us`);
-                text += `@${participant.id.user} `;
+                for(let participant of chat.participants) {
+                    mentions.push(`${participant.id.user}@c.us`);
+                    text += `@${participant.id.user} `;
+                }
+                console.log(text);
+
+                await chat.sendMessage(text, { mentions });
+            }else{
+                message.reply('Solo los administradores pueden usar este comando');
             }
-            console.log(text);
-
-            await chat.sendMessage(text, { mentions });
         }else{
             message.reply('Este comando solo funciona en grupos');
         }
@@ -150,7 +151,7 @@ client.on('message', async (message) => {
         *Opciones*
 
         📋  menu...
-        👨‍👨‍👧‍👦 — !todos (mencionar a todos los participantes).
+        👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).
         🧟 — recomienda un anime (rnu).
         🎮 — jugar.
         🃏 — sticker(st) (adjunta la imagen).
@@ -277,20 +278,26 @@ client.on('message', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp'){
         if(chat.isGroup){
-            let participantes = [];
-            let pareja = [];
-            chat.participants.forEach((participant) => {
-                participantes.push(participant.id.user);
-            });  
-            let random = RandomTwoIndex(participantes);
-            pareja.push(participantes[random[0]]);
-            pareja.push(participantes[random[1]]);
-            let mensaje = 
-            `                *¡Felicidades a* 
-            *esta hermosa pareja!*
-                (ɔ ˘⌣˘)˘⌣˘ c)
-            @${pareja[0]} ❤️ @${pareja[1]}`;
-            chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`]});  
+            if(participantes()){
+                let participantes = [];
+                let pareja = [];
+                chat.participants.forEach((participant) => {
+                    participantes.push(participant.id.user);
+                });  
+                let random = RandomTwoIndex(participantes);
+                pareja.push(participantes[random[0]]);
+                pareja.push(participantes[random[1]]);
+                let mensaje = 
+                `                *¡Felicidades a* 
+                *esta hermosa pareja!*
+                    (ɔ ˘⌣˘)˘⌣˘ c)
+                @${pareja[0]} ❤️ @${pareja[1]}`;
+                chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`]});  
+            }else{
+                message.reply('Solo los administradores pueden usar este comando');
+            }
+        }else{
+            message.reply('Este comando solo funciona en grupos');
         }
     }
     
