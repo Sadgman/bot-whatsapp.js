@@ -1,11 +1,13 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const { Client, LocalAuth, MessageMedia, Poll } = require('whatsapp-web.js');
-const { measureMemory } = require('vm');
+const { Console } = require('console');
+
 
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
+        // args: ['-no-sandbox'],
         executablePath: '/usr/bin/google-chrome-stable',
     },
     ffmpegPath: '/usr/bin/ffmpeg'
@@ -71,25 +73,88 @@ function updateEntrada(player, entrada) {
         }
     }
 }
+/**
+ * 
+ * @param {string} group recibe el id del grupo en formato string
+ */
 function addgroup(group){
     let jsonfile = fs.readFileSync('data.json', 'utf-8');
     let data = JSON.parse(jsonfile);
-    datagroup = 
+    let datagroup = 
     {
         id: group,
+        juegos: [{"todos": true, baneados: []}]
     }
-    encuentra = false;
-    for (let i = 0; i < data.GroupList.length; i++) {
-        if (data.GroupList[i].id === group) {
-            encuentra = true;
-            break;
+    let encuentra = false;
+
+    // Comprueba si grouplist existe antes de intentar acceder a su longitud
+    if (data.grouplist) {
+        for (let i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === group) {
+                encuentra = true;
+                break;
+            }
         }
+    } else {
+        // Si grouplist no existe, inicialízalo como un array vacío
+        data.grouplist = [];
     }
+
     if (encuentra === false) {
-        data.GroupList.push(datagroup);
+        data.grouplist.push(datagroup);
         fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
     }
 }
+/**
+ * 
+ * @param {string} id_group recibe el id del grupo en formato string 
+ * @param {string} game recibe el nombre del juego a banear en formato string 
+ */
+function Bangame(id_group, game) {
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let data = JSON.parse(jsonfile);
+    let i;
+    for (i = 0; i < data.grouplist.length; i++) {
+        if (data.grouplist[i].id === id_group) {
+            data.grouplist[i].juegos[0].todos = false;
+            fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
+            break;
+        }
+    }
+    if(data.grouplist[i].juegos[0].todos == false && !data.grouplist[i].juegos[0].baneados.includes(game)){
+        data.grouplist[i].juegos[0].baneados.push(game);
+        fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
+    }   
+}
+/**
+ * 
+ * @param {string} id_group id del grupo 
+ * @param {string} game nombre del juego
+ * @returns retorna true si el juego no esta baneado y false si esta baneado
+ */
+function watchBan(id_group, game){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let data = JSON.parse(jsonfile);
+    let i;
+    for (i = 0; i < data.grouplist.length; i++) {
+        if (data.grouplist[i].id === id_group) {
+            if(data.grouplist[i].juegos[0].todos == true){
+                return true
+            }else{
+                if(data.grouplist[i].juegos[0].baneados.includes(game)){
+                    return false
+                }else{
+                    return true
+                }
+            }
+        }
+    }
+}
+/**
+ * 
+ * @param {string} player recibe el id del jugador(numero de telefono) en formato string 
+ * @returns devuelve la entrada del jugador si esta jugando sino se encuentra devuelve null
+ */
 function getEntrada(player) {
     let jsonfile = fs.readFileSync('data.json', 'utf-8');
     let data = JSON.parse(jsonfile);
@@ -100,14 +165,31 @@ function getEntrada(player) {
     }
     return null;
 }
+    let option = {
+        juego:0,
+        ajustes:0
+    } ;
+    let menu = `
+    *Opciones*
 
+    📋  menu...
+    👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).
+    🧟 — recomienda un anime (rnu).
+    🎮 — jugar.
+    🃏 — sticker(st) (adjunta la imagen).
+    📝 — ajustes(as).
+    👨🏻‍💻 — creador.
+
+    Estas son todas las opciones disponibles por el momento
+    `;
 client.on('message', async (message) => {
     const chat = await message.getChat();
-        /**
-        * Verifica si el usuario es admin o no, no necesita parametros
-        * 
-        * @returns {boolean}  si el usuario es admin devuelve true si no false
-        */
+
+    /**
+    * Verifica si el usuario es admin o no, no necesita parametros
+    * 
+    * @returns {boolean}  si el usuario es admin devuelve true si no false
+    */
     function participantes(){
  
         let participantes = [];
@@ -147,18 +229,12 @@ client.on('message', async (message) => {
     }
     
     if(message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú'){
-        message.reply(`
-        *Opciones*
-
-        📋  menu...
-        👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).
-        🧟 — recomienda un anime (rnu).
-        🎮 — jugar.
-        🃏 — sticker(st) (adjunta la imagen).
-        👨🏻‍💻 — creador.
-
-        Estas son todas las opciones disponibles por el momento
-        `);
+        if(watchBan(chat.id._serialized, 'todos') == false){
+            menu = menu.replace('🎮 — jugar.', '');
+            message.reply(menu);
+        }else{
+            message.reply(menu);
+        }
     }
     if (message.body.toLocaleLowerCase() === 'recomienda un anime' || message.body.toLocaleLowerCase() === 'rnu' ) {
         file = fs.readFileSync('data.json', 'utf-8')
@@ -166,7 +242,7 @@ client.on('message', async (message) => {
         const randomIndex = Math.floor(Math.random() * data.animes.names.length);
         message.reply(data.animes.names[randomIndex]);
     }
-    if(message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt'){
+    if((message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt') && watchBan(chat.id._serialized, 'ppt') == true && watchBan(chat.id._serialized, 'todos') == true){
         let contact = await message.getContact();
         jsonread(contact.id.user);
         updateEntrada(contact.id.user, 1);
@@ -182,6 +258,7 @@ client.on('message', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'ppt piedra'){
         let contact = await message.getContact();
+        
         if (getEntrada(contact.id.user) === 1){
             const options = ['piedra', 'papel', 'tijera'];
             const randomIndex = Math.floor(Math.random() * options.length);
@@ -225,7 +302,7 @@ client.on('message', async (message) => {
         }
         updateEntrada(contact.id.user, 0);
     }
-    if(message.body.toLocaleLowerCase() === 'jugar'){
+    if(message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true){
         let contact = await message.getContact();
         jsonread(contact.id.user);
         message.reply(`estos son los juegos disponibles por el momento:
@@ -276,7 +353,7 @@ client.on('message', async (message) => {
             }
         }
     }
-    if(message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp'){
+    if((message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp') && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos')){
         if(chat.isGroup){
             if(participantes()){
                 let participantes = [];
@@ -305,34 +382,45 @@ client.on('message', async (message) => {
         if(chat.isGroup){
             addgroup(message.from); 
             if (participantes()) {
-                message.reply(`
-                *Opciones*
-
-                Juego (j)
-                Comandos (cd)
-                Desactivar bot (db)
-                Activar bot (ab)
-                `)
+                option.ajustes = 1;
+                message.reply(
+                "*Opciones*\n\n"+
+                "Juego (j)\n"+
+                "Comandos (cd)\n"+
+                "Desactivar bot (db)\n"+
+                "Activar bot (ab)")
             }
         }
         
     }
+    
     else if(message.body.toLocaleLowerCase() == 'juego' || message.body.toLocaleLowerCase() == 'j'){
         if(chat.isGroup){
-        
-            if (participantes()) {
-                message.reply(`
-                *Opciones*
+            if(option.ajustes == 1){
+                if (participantes()) {
+                    option.juego = 1;
+                    option.ajustes = 0;
+                    message.reply(` 
+                    *Opciones*
 
-            1. Quitar la opción Juego
-            2. Quitar los Juegos con menciones
-            3. Solo los admins pueden utilizar los juegos con menciones
-                
-            usar juego o j + el número de la opción que desea cambiar
-                `)
+                1. Quitar la opción Juego
+                2. Quitar los Juegos con menciones
+                3. Solo los admins pueden utilizar los juegos con menciones
+                    
+                usar juego o j + el número de la opción que desea cambiar
+                    `)
+                }
             }
         }
     }
+    if(message.body.toLocaleLowerCase() == '1'){
+        if(option.juego == 1){
+            Bangame(message.from, 'todos');
+            option.juego = 0;
+            message.reply('Se ha quitado la opción Juego');
+        }
+    }
+    
 
     if(message.body.toLocaleLowerCase() === 'creador'|| message.body.toLocaleLowerCase() === 'como se crea un bot'){
     message.reply(`                 

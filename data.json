@@ -76,7 +76,20 @@
             "Demon Slayer: Kimetsu no Yaiba"
         ]
     },
-    "GroupList": {
-        "id": "325253413825824.ac"
-    }
+    "grouplist": [
+        {
+            "id": "325253413825824.ac"
+        },
+        {
+            "id": "120363225170788370@g.us",
+            "juegos": [
+                {
+                    "todos": false,
+                    "baneados": [
+                        "todos"
+                    ]
+                }
+            ]
+        }
+    ]
 }
