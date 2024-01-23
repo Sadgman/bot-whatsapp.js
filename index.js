@@ -76,6 +76,7 @@ function updateEntrada(player, entrada) {
 /**
  * 
  * @param {string} group recibe el id del grupo en formato string
+ * @returns retorna true si el grupo ya esta en la lista de grupos y si no esta lo crea y retorna true
  */
 function addgroup(group){
     let jsonfile = fs.readFileSync('data.json', 'utf-8');
@@ -85,25 +86,20 @@ function addgroup(group){
         id: group,
         juegos: [{"todos": true, baneados: []}]
     }
-    let encuentra = false;
-
     // Comprueba si grouplist existe antes de intentar acceder a su longitud
     if (data.grouplist) {
         for (let i = 0; i < data.grouplist.length; i++) {
             if (data.grouplist[i].id === group) {
-                encuentra = true;
-                break;
+                return true;
             }
         }
     } else {
         // Si grouplist no existe, inicialízalo como un array vacío
         data.grouplist = [];
     }
-
-    if (encuentra === false) {
-        data.grouplist.push(datagroup);
-        fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
-    }
+    data.grouplist.push(datagroup);
+    fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
+    return true;
 }
 /**
  * 
@@ -169,19 +165,17 @@ function getEntrada(player) {
         juego:0,
         ajustes:0
     } ;
-    let menu = `
-    *Opciones*
+    let menu = 
+    "*Opciones*\n\n" +
+    "📋  menu...\n"+
+    "👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+
+    "🧟 — recomienda un anime (rnu).\n"+
+    "🎮 — jugar.\n"+
+    "🃏 — sticker(st) (adjunta la imagen).\n"+
+    "📝 — ajustes(as)."+
+    "👨🏻‍💻 — creador.\n\n"+
+    "Estas son todas las opciones disponibles por el momento";
 
-    📋  menu...
-    👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).
-    🧟 — recomienda un anime (rnu).
-    🎮 — jugar.
-    🃏 — sticker(st) (adjunta la imagen).
-    📝 — ajustes(as).
-    👨🏻‍💻 — creador.
-
-    Estas son todas las opciones disponibles por el momento
-    `;
 client.on('message', async (message) => {
     const chat = await message.getChat();
 
@@ -229,10 +223,15 @@ client.on('message', async (message) => {
     }
     
     if(message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú'){
-        if(watchBan(chat.id._serialized, 'todos') == false){
-            menu = menu.replace('🎮 — jugar.', '');
-            message.reply(menu);
+        if(chat.isGroup){
+            if(watchBan(chat.id._serialized, 'todos') == false){
+                menu = menu.replace('🎮 — jugar.', '');
+                message.reply(menu);
+            }else{
+                message.reply(menu);
+            }
         }else{
+            menu = menu.replace('📝 — ajustes(as).', '');
             message.reply(menu);
         }
     }
@@ -242,19 +241,25 @@ client.on('message', async (message) => {
         const randomIndex = Math.floor(Math.random() * data.animes.names.length);
         message.reply(data.animes.names[randomIndex]);
     }
-    if((message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt') && watchBan(chat.id._serialized, 'ppt') == true && watchBan(chat.id._serialized, 'todos') == true){
+    if(message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt'){
         let contact = await message.getContact();
-        jsonread(contact.id.user);
-        updateEntrada(contact.id.user, 1);
-        message.reply(`Piedra 🪨, papel 🧻 o tiejeras ✂️
-        
-        Usa los siguientes comandos para jugar:
-
-        ppt piedra 
-        ppt papel
-        ppt tijera
-        `);
-        
+        ppt_menu =
+        "Piedra 🪨, papel 🧻 o tiejeras ✂️\n\n"+
+        "Usa los siguientes comandos para jugar:\n\n"+
+        "ppt piedra\n"+
+        "ppt papel\n"+
+        "ppt tijera\n";
+        if(chat.isGroup){
+            if(addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'ppt') && watchBan(chat.id._serialized, 'todos')){           
+                jsonread(contact.id.user);
+                updateEntrada(contact.id.user, 1);
+                message.reply(ppt_menu);
+            }
+        }else{
+            jsonread(contact.id.user);
+            updateEntrada(contact.id.user, 1);
+            message.reply(ppt_menu);
+        }
     }
     if(message.body.toLocaleLowerCase() === 'ppt piedra'){
         let contact = await message.getContact();
@@ -302,12 +307,19 @@ client.on('message', async (message) => {
         }
         updateEntrada(contact.id.user, 0);
     }
-    if(message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true){
-        let contact = await message.getContact();
-        jsonread(contact.id.user);
-        message.reply(`estos son los juegos disponibles por el momento:
-        Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)
-        formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻 `);
+    if(message.body.toLocaleLowerCase() === 'jugar'){
+        if(chat.isGroup){
+            addgroup(message.from);
+            if(watchBan(chat.id._serialized, 'todos') == true){
+                let contact = await message.getContact();
+                jsonread(contact.id.user);
+                message.reply(`estos son los juegos disponibles por el momento:
+                Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)
+                formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻 `);
+            }
+        }else{
+
+        }
     }
     if(message.body.toLocaleLowerCase() === 'sticker' || message.body.toLocaleLowerCase() === 'st'){
 
@@ -353,25 +365,27 @@ client.on('message', async (message) => {
             }
         }
     }
-    if((message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp') && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos')){
+    if(message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp'){
         if(chat.isGroup){
-            if(participantes()){
-                let participantes = [];
-                let pareja = [];
-                chat.participants.forEach((participant) => {
-                    participantes.push(participant.id.user);
-                });  
-                let random = RandomTwoIndex(participantes);
-                pareja.push(participantes[random[0]]);
-                pareja.push(participantes[random[1]]);
-                let mensaje = 
-                `                *¡Felicidades a* 
-                *esta hermosa pareja!*
-                    (ɔ ˘⌣˘)˘⌣˘ c)
-                @${pareja[0]} ❤️ @${pareja[1]}`;
-                chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`]});  
-            }else{
-                message.reply('Solo los administradores pueden usar este comando');
+            if(addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos')){
+                if(participantes()){
+                    let participantes = [];
+                    let pareja = [];
+                    chat.participants.forEach((participant) => {
+                        participantes.push(participant.id.user);
+                    });  
+                    let random = RandomTwoIndex(participantes);
+                    pareja.push(participantes[random[0]]);
+                    pareja.push(participantes[random[1]]);
+                    let mensaje = 
+                    `                *¡Felicidades a* 
+                    *esta hermosa pareja!*
+                        (ɔ ˘⌣˘)˘⌣˘ c)
+                    @${pareja[0]} ❤️ @${pareja[1]}`;
+                    chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`]});  
+                }else{
+                    message.reply('Solo los administradores pueden usar este comando');
+                }
             }
         }else{
             message.reply('Este comando solo funciona en grupos');
@@ -388,7 +402,8 @@ client.on('message', async (message) => {
                 "Juego (j)\n"+
                 "Comandos (cd)\n"+
                 "Desactivar bot (db)\n"+
-                "Activar bot (ab)")
+                "Activar bot (ab)\n\n"+
+                "Este menu aun esta en desarrollo por lo que puede que no funcione correctamente")
             }
         }
         
@@ -407,7 +422,6 @@ client.on('message', async (message) => {
                 2. Quitar los Juegos con menciones
                 3. Solo los admins pueden utilizar los juegos con menciones
                     
-                usar juego o j + el número de la opción que desea cambiar
                     `)
                 }
             }
