@@ -69,6 +69,7 @@ function updateEntrada(player, entrada) {
     for (let i = 0; i < data.players.length; i++) {
         if (data.players[i].id === player) {
             data.players[i].entrada = entrada;
+            fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
             break;
         }
     }
