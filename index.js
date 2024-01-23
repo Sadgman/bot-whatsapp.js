@@ -184,7 +184,7 @@ function getEntrada(player) {
     `;
 client.on('message', async (message) => {
     const chat = await message.getChat();
-    addgroup(message.from);
+
     /**
     * Verifica si el usuario es admin o no, no necesita parametros
     * 
@@ -229,7 +229,6 @@ client.on('message', async (message) => {
     }
     
     if(message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú'){
-        
         if(watchBan(chat.id._serialized, 'todos') == false){
             menu = menu.replace('🎮 — jugar.', '');
             message.reply(menu);
