@@ -3,17 +3,28 @@ const fs = require('fs');
 const { Client, LocalAuth, MessageMedia, Poll } = require('whatsapp-web.js');
 const { Console } = require('console');
 
+let client;
 
-const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        // args: ['-no-sandbox'],
-        executablePath: '/usr/bin/google-chrome-stable',
-    },
-    ffmpegPath: '/usr/bin/ffmpeg'
+if((process.arch === 'arm' || process.arch === "arm64") && process.execPath === '/usr/bin/node'){
+    client = new Client({
+        authStrategy: new LocalAuth(),
+        puppeteer: {
+            args: ['-no-sandbox'],
+            executablePath: '/usr/bin/chromium-browser'
+        },
+        ffmpegPath: '/usr/bin/ffmpeg'
 
-});
+    });
+}else{
+    client = new Client({
+        authStrategy: new LocalAuth(),
+        puppeteer: {
+            executablePath: '/usr/bin/google-chrome-stable'
+        },
+        ffmpegPath: '/usr/bin/ffmpeg'
 
+    });
+}
 client.on('qr', qr => {
     qrcode.generate(qr, {small: true});
 });
@@ -162,23 +173,15 @@ function getEntrada(player) {
     }
     return null;
 }
-    let option = {
-        juego:0,
-        ajustes:0
-    } ;
-    let menu = 
-    "*Opciones*\n\n" +
-    "📋  menu...\n"+
-    "👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+
-    "🧟 — recomienda un anime (rnu).\n"+
-    "🎮 — jugar.\n"+
-    "🃏 — sticker(st) (adjunta la imagen).\n"+
-    "📝 — ajustes(as).\n"+
-    "👨🏻‍💻 — creador.\n\n"+
-    "Estas son todas las opciones disponibles por el momento";
-
+let option = {
+    juego:0,
+    ajustes:0
+};
+const menu = "*Opciones*\n\n" +"📋  menu...\n"+"👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+"🧟 — recomienda un anime (rnu).\n"+"🎮 — jugar.\n"+"🃏 — sticker(st) (adjunta la imagen).\n"+"📝 — ajustes(as).\n"+"👨🏻‍💻 — creador.\n\n"+"Estas son todas las opciones disponibles por el momento";
+const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n"+ "3. Solo los admins pueden utilizar los juegos con menciones";
 client.on('message', async (message) => {
     const chat = await message.getChat();
+    
     /**
     * Verifica si el usuario es admin o no, no necesita parametros
     * 
@@ -436,14 +439,13 @@ client.on('message', async (message) => {
                 if (participantes()) {
                     option.juego = 1;
                     option.ajustes = 0;
-                    message.reply(` 
-                    *Opciones*
-
-                1. Quitar la opción Juego
-                2. Quitar los Juegos con menciones
-                3. Solo los admins pueden utilizar los juegos con menciones
-                    
-                    `)
+                    let menu_juego = option_game;
+                    if(watchBan(chat.id._serialized, 'todos') == false){
+                        menu_juego = menu_juego.replace('1. Quitar la opción Juego\n', '1. Devolver la opción Juego\n');
+                        menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '');
+                        menu_juego = menu_juego.replace('3. Solo los admins pueden utilizar los juegos con menciones', '');
+                    }
+                     message.reply(menu_juego);
                 }
             }
         }
@@ -452,7 +454,7 @@ client.on('message', async (message) => {
         if(option.juego == 1){
             Bangame(message.from, 'todos');
             option.juego = 0;
-            message.reply('Se ha quitado la opción Juego');
+            message.reply("Se ha quitado la opción Juego");
         }
     }
     
