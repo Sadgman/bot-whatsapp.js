@@ -172,13 +172,12 @@ function getEntrada(player) {
     "🧟 — recomienda un anime (rnu).\n"+
     "🎮 — jugar.\n"+
     "🃏 — sticker(st) (adjunta la imagen).\n"+
-    "📝 — ajustes(as)."+
+    "📝 — ajustes(as).\n"+
     "👨🏻‍💻 — creador.\n\n"+
     "Estas son todas las opciones disponibles por el momento";
 
 client.on('message', async (message) => {
     const chat = await message.getChat();
-
     /**
     * Verifica si el usuario es admin o no, no necesita parametros
     * 
@@ -221,20 +220,23 @@ client.on('message', async (message) => {
             message.reply('Este comando solo funciona en grupos');
         }
     }
-    
     if(message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú'){
-        if(chat.isGroup){
-            if(watchBan(chat.id._serialized, 'todos') == false){
-                menu = menu.replace('🎮 — jugar.', '');
-                message.reply(menu);
-            }else{
-                message.reply(menu);
-            }
+    let tempMenu = menu;
+    await chat.sendSeen();
+    await chat.sendStateTyping();
+    if(chat.isGroup){
+        if(watchBan(chat.id._serialized, 'todos' === false)){
+            tempMenu = tempMenu.replace('🎮 — jugar.', '');
+            message.reply(tempMenu);
         }else{
-            menu = menu.replace('📝 — ajustes(as).', '');
-            message.reply(menu);
+            message.reply(tempMenu);
         }
+    }else{
+        tempMenu = tempMenu.replace('📝 — ajustes(as).\n', '');
+        tempMenu = tempMenu.replace('👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n', '');
+        message.reply(tempMenu);
     }
+}
     if (message.body.toLocaleLowerCase() === 'recomienda un anime' || message.body.toLocaleLowerCase() === 'rnu' ) {
         file = fs.readFileSync('data.json', 'utf-8')
         data =  JSON.parse(file)
@@ -243,6 +245,8 @@ client.on('message', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt'){
         let contact = await message.getContact();
+        await chat.sendSeen();
+        await chat.sendStateTyping();
         ppt_menu =
         "Piedra 🪨, papel 🧻 o tiejeras ✂️\n\n"+
         "Usa los siguientes comandos para jugar:\n\n"+
@@ -263,7 +267,8 @@ client.on('message', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'ppt piedra'){
         let contact = await message.getContact();
-        
+        await chat.sendSeen();
+        await chat.sendStateTyping();
         if (getEntrada(contact.id.user) === 1){
             const options = ['piedra', 'papel', 'tijera'];
             const randomIndex = Math.floor(Math.random() * options.length);
@@ -279,6 +284,8 @@ client.on('message', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'ppt papel'){
         let contact = await message.getContact();
+        await chat.sendSeen();
+        await chat.sendStateTyping();
         if (getEntrada(contact.id.user) === 1){
             const options = ['piedra', 'papel', 'tijera'];
             const randomIndex = Math.floor(Math.random() * options.length);
@@ -293,6 +300,8 @@ client.on('message', async (message) => {
         updateEntrada(contact.id.user, 0);
     }
     if(message.body.toLocaleLowerCase() === 'ppt tijera'){
+        await chat.sendSeen();
+        await chat.sendStateTyping();
         let contact = await message.getContact();
         if (getEntrada(contact.id.user) === 1){
             const options = ['piedra', 'papel', 'tijera'];
@@ -308,6 +317,8 @@ client.on('message', async (message) => {
         updateEntrada(contact.id.user, 0);
     }
     if(message.body.toLocaleLowerCase() === 'jugar'){
+        await chat.sendSeen();
+        await chat.sendStateTyping();
         if(chat.isGroup){
             addgroup(message.from);
             if(watchBan(chat.id._serialized, 'todos') == true){
@@ -318,12 +329,15 @@ client.on('message', async (message) => {
                 formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻 `);
             }
         }else{
-
+            let contact = await message.getContact();
+            jsonread(contact.id.user);
+            message.reply(`estos son los juegos disponibles por el momento:
+            Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)`);
         }
     }
     if(message.body.toLocaleLowerCase() === 'sticker' || message.body.toLocaleLowerCase() === 'st'){
-
-
+        await chat.sendSeen();
+        await chat.sendStateTyping();
         if (message.hasQuotedMsg) {
             const mensaje_citado = await message.getQuotedMessage();
             if (mensaje_citado.hasMedia) {
@@ -368,6 +382,8 @@ client.on('message', async (message) => {
     if(message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp'){
         if(chat.isGroup){
             if(addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos')){
+                await chat.sendSeen();
+                await chat.sendStateTyping();
                 if(participantes()){
                     let participantes = [];
                     let pareja = [];
@@ -394,6 +410,8 @@ client.on('message', async (message) => {
     
     if(message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as'){
         if(chat.isGroup){
+            await chat.sendSeen();
+            await chat.sendStateTyping();
             addgroup(message.from); 
             if (participantes()) {
                 option.ajustes = 1;
@@ -412,6 +430,8 @@ client.on('message', async (message) => {
     else if(message.body.toLocaleLowerCase() == 'juego' || message.body.toLocaleLowerCase() == 'j'){
         if(chat.isGroup){
             if(option.ajustes == 1){
+                await chat.sendSeen();
+                await chat.sendStateTyping();
                 if (participantes()) {
                     option.juego = 1;
                     option.ajustes = 0;
@@ -437,20 +457,22 @@ client.on('message', async (message) => {
     
 
     if(message.body.toLocaleLowerCase() === 'creador'|| message.body.toLocaleLowerCase() === 'como se crea un bot'){
-    message.reply(`                 
-          *INFORMACIÓN*
-      *SOBRE EL CREADOR*
-           *DEL BOT 𖠌*
+        await chat.sendSeen();
+        await chat.sendStateTyping();
+        message.reply(`                 
+            *INFORMACIÓN*
+        *SOBRE EL CREADOR*
+            *DEL BOT 𖠌*
 
-  ¡Hola! ◡̈
-  Puedes comunicarte con mi creador desde este link:
- 
-   wa.me/18098972404
-   
-  𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
-  Puedes comunicarte con la socia del creador en caso de que el creador no se encuentre disponible o algún otro inconveniente:
-   
-   wa.me/14846507434`);
+    ¡Hola! ◡̈
+    Puedes comunicarte con mi creador desde este link:
+    
+    wa.me/18098972404
+    
+    𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
+    Puedes comunicarte con la socia del creador en caso de que el creador no se encuentre disponible o algún otro inconveniente:
+    
+    wa.me/14846507434`);
     }
 });
 
