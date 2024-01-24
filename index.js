@@ -538,11 +538,11 @@ client.on('message', async (message) => {
                 if(watchBan(chat.id._serialized, 'admins') == true){
                     Bangame(message.from, ['admins']);
                     option.juego = 0;
-                    message.reply("Solo los administradores pueden utilizar los juegos con menciones");
+                    message.reply("Ahora solo los administradores pueden utilizar los juegos con menciones");
                 }else{
                     QuitBan(chat.id._serialized, 'admins');
                     option.juego = 0;
-                    message.reply("Todos pueden utilizar los juegos con menciones");
+                    message.reply("Ahora todos pueden utilizar los juegos con menciones");
                 }
             }
         }
