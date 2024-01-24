@@ -96,7 +96,7 @@ function addgroup(group){
     let datagroup = 
     {
         id: group,
-        juegos: [{"todos": true, baneados: []}]
+        juegos: [{"todos": true, baneados: ["admins"]}]
     }
     // Comprueba si grouplist existe antes de intentar acceder a su longitud
     if (data.grouplist) {
@@ -206,7 +206,7 @@ let option = {
     ajustes:0
 };
 const menu = "*Opciones*\n\n" +"📋  menu...\n"+"👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+"🧟 — recomienda un anime (rnu).\n"+"🎮 — jugar.\n"+"🃏 — sticker(st) (adjunta la imagen).\n"+"📝 — ajustes(as).\n"+"👨🏻‍💻 — creador.\n\n"+"Estas son todas las opciones disponibles por el momento";
-const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n"+ "3. Solo los admins pueden utilizar los juegos con menciones";
+const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n"+ "3. Todos pueden utilizar los juegos con menciones";
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻"
 client.on('message', async (message) => {
     const chat = await message.getChat();
@@ -416,10 +416,10 @@ client.on('message', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp'){
         if(chat.isGroup){
-            if(addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos')){
-                await chat.sendSeen();
-                await chat.sendStateTyping();
-                if(participantes()){
+            if(addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos') && watchBan(chat.id._serialized, 'menciones')){
+                if(watchBan(chat.id._serialized, 'admins') == false && participantes()){
+                    await chat.sendSeen();
+                    await chat.sendStateTyping();
                     let participantes = [];
                     let pareja = [];
                     chat.participants.forEach((participant) => {
@@ -434,8 +434,24 @@ client.on('message', async (message) => {
                         (ɔ ˘⌣˘)˘⌣˘ c)
                     @${pareja[0]} ❤️ @${pareja[1]}`;
                     chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`]});  
-                }else{
-                    message.reply('Solo los administradores pueden usar este comando');
+                }else if(watchBan(chat.id._serialized, 'admins') == true){
+                    await chat.sendSeen();
+                    await chat.sendStateTyping();
+                    
+                    let participantes = [];
+                    let pareja = [];
+                    chat.participants.forEach((participant) => {
+                        participantes.push(participant.id.user);
+                    });  
+                    let random = RandomTwoIndex(participantes);
+                    pareja.push(participantes[random[0]]);
+                    pareja.push(participantes[random[1]]);
+                    let mensaje = 
+                    `                *¡Felicidades a* 
+                    *esta hermosa pareja!*
+                        (ɔ ˘⌣˘)˘⌣˘ c)
+                    @${pareja[0]} ❤️ @${pareja[1]}`;
+                    chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`]});
                 }
             }
         }else{
@@ -445,10 +461,10 @@ client.on('message', async (message) => {
     
     if(message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as'){
         if(chat.isGroup){
-            await chat.sendSeen();
-            await chat.sendStateTyping();
             addgroup(message.from); 
             if (participantes()) {
+                await chat.sendSeen();
+                await chat.sendStateTyping();
                 option.ajustes = 1;
                 message.reply(
                 "*Opciones*\n\n"+
@@ -474,11 +490,14 @@ client.on('message', async (message) => {
                     if(watchBan(chat.id._serialized, 'todos') == false){
                         menu_juego = menu_juego.replace('1. Quitar la opción Juego\n', '1. Devolver la opción Juego\n');
                         menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '');
-                        menu_juego = menu_juego.replace('3. Solo los admins pueden utilizar los juegos con menciones', '');
+                        menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '');
                     }
                     if(watchBan(chat.id._serialized, 'menciones') == false){
                         menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '2. Devolver los Juegos con menciones\n');
-                        menu_juego = menu_juego.replace('3. Solo los admins pueden utilizar los juegos con menciones', '');
+                        menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '');
+                    }
+                    if(watchBan(chat.id._serialized, 'admins') == false){
+                        menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '3. Solo los administradores pueden utilizar los juegos con menciones');
                     }
                     message.reply(menu_juego);
                 }
@@ -509,6 +528,21 @@ client.on('message', async (message) => {
                     QuitBan(chat.id._serialized, 'menciones');
                     option.juego = 0;
                     message.reply("Se han devuelto los juegos con menciones");
+                }
+            }
+        }
+    }
+    if(message.body.toLocaleLowerCase() == '3'){
+        if(option.juego == 1){
+            if(watchBan(chat.id._serialized, 'todos') == true){
+                if(watchBan(chat.id._serialized, 'admins') == true){
+                    Bangame(message.from, ['admins']);
+                    option.juego = 0;
+                    message.reply("Solo los administradores pueden utilizar los juegos con menciones");
+                }else{
+                    QuitBan(chat.id._serialized, 'admins');
+                    option.juego = 0;
+                    message.reply("Todos pueden utilizar los juegos con menciones");
                 }
             }
         }
