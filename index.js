@@ -129,9 +129,11 @@ function Bangame(id_group, game) {
             break;
         }
     }
-    if(data.grouplist[i].juegos[0].todos == false && !data.grouplist[i].juegos[0].baneados.includes(game)){
-        data.grouplist[i].juegos[0].baneados.push(game);
-        fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
+    for(let games of game){
+        if(data.grouplist[i].juegos[0].todos == false && !data.grouplist[i].juegos[0].baneados.includes(games)){
+            data.grouplist[i].juegos[0].baneados.push(games);
+            fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
+        }
     }   
 }
 /**
@@ -205,6 +207,7 @@ let option = {
 };
 const menu = "*Opciones*\n\n" +"📋  menu...\n"+"👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+"🧟 — recomienda un anime (rnu).\n"+"🎮 — jugar.\n"+"🃏 — sticker(st) (adjunta la imagen).\n"+"📝 — ajustes(as).\n"+"👨🏻‍💻 — creador.\n\n"+"Estas son todas las opciones disponibles por el momento";
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n"+ "3. Solo los admins pueden utilizar los juegos con menciones";
+const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻"
 client.on('message', async (message) => {
     const chat = await message.getChat();
     
@@ -347,22 +350,24 @@ client.on('message', async (message) => {
         updateEntrada(contact.id.user, 0);
     }
     if(message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true){
+        let tempmenu_game = menu_game;
         await chat.sendSeen();
         await chat.sendStateTyping();
         if(chat.isGroup){
+            let contact = await message.getContact();
+            jsonread(contact.id.user);
             addgroup(message.from);
-            if(watchBan(chat.id._serialized, 'todos') == true){
-                let contact = await message.getContact();
-                jsonread(contact.id.user);
-                message.reply(`estos son los juegos disponibles por el momento:
-                Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)
-                formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻 `);
+            if(watchBan(chat.id._serialized, 'menciones') == false && watchBan(chat.id._serialized, 'todos') == true){
+                tempmenu_game = tempmenu_game.replace('formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻', '');
+                message.reply(tempmenu_game);
+            }else{
+                message.reply(tempmenu_game);   
             }
         }else{
             let contact = await message.getContact();
             jsonread(contact.id.user);
-            message.reply(`estos son los juegos disponibles por el momento:
-            Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)`);
+            tempmenu_game = tempmenu_game.replace('formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻', '');
+            message.reply(tempmenu_game);
         }
     }
     if(message.body.toLocaleLowerCase() === 'sticker' || message.body.toLocaleLowerCase() === 'st'){
@@ -471,7 +476,11 @@ client.on('message', async (message) => {
                         menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '');
                         menu_juego = menu_juego.replace('3. Solo los admins pueden utilizar los juegos con menciones', '');
                     }
-                     message.reply(menu_juego);
+                    if(watchBan(chat.id._serialized, 'menciones') == false){
+                        menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '2. Devolver los Juegos con menciones\n');
+                        menu_juego = menu_juego.replace('3. Solo los admins pueden utilizar los juegos con menciones', '');
+                    }
+                    message.reply(menu_juego);
                 }
             }
         }
@@ -483,14 +492,27 @@ client.on('message', async (message) => {
                 option.juego = 0;
                 message.reply("Se ha devuelto la opción Juego");
             }else{
-                Bangame(message.from, 'todos');
+                Bangame(message.from, ['todos']);
                 option.juego = 0;
                 message.reply("Se ha quitado la opción Juego");
             }
         }
     }
-    
-
+    if(message.body.toLocaleLowerCase() == '2'){
+        if(option.juego == 1){
+            if(watchBan(chat.id._serialized, 'todos') == true){
+                if(watchBan(chat.id._serialized, 'menciones') == true){
+                    Bangame(message.from, ['menciones']);
+                    option.juego = 0;
+                    message.reply("Se han quitado los juegos con menciones");
+                }else{
+                    QuitBan(chat.id._serialized, 'menciones');
+                    option.juego = 0;
+                    message.reply("Se han devuelto los juegos con menciones");
+                }
+            }
+        }
+    }
     if(message.body.toLocaleLowerCase() === 'creador'|| message.body.toLocaleLowerCase() === 'como se crea un bot'){
         await chat.sendSeen();
         await chat.sendStateTyping();
