@@ -173,6 +173,32 @@ function getEntrada(player) {
     }
     return null;
 }
+/**
+ * 
+ * @param {string} id_group el id del grupo 
+ * @param {string} game el juego que se quiere quitar de la lista de baneados
+ * @returns retorna true si se pudo quitar el juego de la lista de baneados, false si no se pudo
+ */
+function QuitBan(id_group, game){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let data = JSON.parse(jsonfile);
+    for (i = 0; i < data.grouplist.length; i++) {
+        if (data.grouplist[i].id === id_group) {
+            if(data.grouplist[i].juegos[0].todos == false){ 
+                if(data.grouplist[i].juegos[0].baneados.includes(game)){
+                    let index = data.grouplist[i].juegos[0].baneados.indexOf(game);
+                    data.grouplist[i].juegos[0].baneados.splice(index, 1);
+                    fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
+                    return true
+                }else{
+                    return false
+                }
+            }else{
+                return false
+            }
+        }
+    }
+}
 let option = {
     juego:0,
     ajustes:0
@@ -320,7 +346,7 @@ client.on('message', async (message) => {
         }
         updateEntrada(contact.id.user, 0);
     }
-    if(message.body.toLocaleLowerCase() === 'jugar'){
+    if(message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true){
         await chat.sendSeen();
         await chat.sendStateTyping();
         if(chat.isGroup){
@@ -452,9 +478,15 @@ client.on('message', async (message) => {
     }
     if(message.body.toLocaleLowerCase() == '1'){
         if(option.juego == 1){
-            Bangame(message.from, 'todos');
-            option.juego = 0;
-            message.reply("Se ha quitado la opción Juego");
+            if(watchBan(chat.id._serialized, 'todos') == false){
+                QuitBan(chat.id._serialized, 'todos');
+                option.juego = 0;
+                message.reply("Se ha devuelto la opción Juego");
+            }else{
+                Bangame(message.from, 'todos');
+                option.juego = 0;
+                message.reply("Se ha quitado la opción Juego");
+            }
         }
     }
     
