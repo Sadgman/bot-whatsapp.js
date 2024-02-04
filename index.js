@@ -1,6 +1,6 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia, GroupChat } = require('whatsapp-web.js');
 
 let client;
 
@@ -204,35 +204,42 @@ let option = {
     juego:0,
     ajustes:0
 };
-const menu = "*Opciones*\n\n" +"📋  menu...\n"+"👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+"🧟 — recomienda un anime (rnu).\n"+"🎮 — jugar.\n"+"🃏 — sticker(st) (adjunta la imagen).\n"+"📝 — ajustes(as).\n"+"👨🏻‍💻 — creador.\n\n"+"Estas son todas las opciones disponibles por el momento";
+client.on('group_join', (notification) => {
+    const { groupMetadata, participant, invite } = notification;
+    console.log(`${participant.id.user} se ha unido al grupo ${groupMetadata.id._serialized}`);
+    client.sendMessage(groupMetadata.id._serialized, `Bienvenido/a ${participant.pushname} al grupo ${groupMetadata.subject}!`);
+});
+const menu = "*Opciones*\n\n" +"📋  menu...\n"+"👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+"🧟 — recomienda un anime (rnu).\n"+"🎮 — jugar.\n"+"🃏 — sticker(st) (adjunta la imagen).\n"+"📸 — foto o video de una sola vez(sf)\n"+"Borrar un mensaje enviado por el bot(br)\n"+"🧊 — Minecraft Server(MS)\n"+"📝 — ajustes(as).\n"+"👨🏻‍💻 — creador.\n\n"+"Estas son todas las opciones disponibles por el momento";
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n"+ "3. Todos pueden utilizar los juegos con menciones";
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻"
+const links_baneados = ["https://is.gd/LOVELY_WORLD", "https://is.gd/Sex_adult_girl", "https://is.gd/Sex_adult_girl"] 
 client.on('message', async (message) => {
     const chat = await message.getChat();
     
     /**
     * Verifica si el usuario es admin o no, no necesita parametros
-    * 
+    * @param {string} author  id del usuario que envio el mensaje
     * @returns {boolean}  si el usuario es admin devuelve true si no false
     */
-    function participantes(){
+    function participantes(author){
  
         let participantes = [];
             chat.participants.forEach((participant) => {
                 participantes.push(participant);
             });  
-            const sender = participantes.find(participant => participant.id._serialized === message.author);
+            const sender = participantes.find(participant => participant.id._serialized === author);
             return sender.isAdmin;
     }
 
-    if (message.from === "120363123428242054@g.us") { 
+    if (message.from === "120363123428242054@g.us") {
+
         if(message.body === 'hola') {
             message.reply('Bienvenid@ a Anime Fan Site');
         }    
     }
     if(message.body.toLocaleLowerCase() === '!todos') {
         if(chat.isGroup){
-            if(participantes()){
+            if(participantes(message.author)){
                 const chat = await message.getChat();
                 
                 let text = "";
@@ -252,28 +259,44 @@ client.on('message', async (message) => {
             message.reply('Este comando solo funciona en grupos');
         }
     }
+/*     if(message.links.length > 0){
+        if (participantes(client.info.wid._serialized)) {
+            message.links.forEach((link) => {
+                console.log(link);
+                if (links_baneados.includes(link)) {
+                    console.log('link baneado');
+                    chat.removeParticipant(message.author);
+                }
+            });
+        }
+    } */
     if(message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú'){
-    let tempMenu = menu;
-    await chat.sendSeen();
-    await chat.sendStateTyping();
-    if(chat.isGroup){
-        if(watchBan(chat.id._serialized, 'todos' === false)){
-            tempMenu = tempMenu.replace('🎮 — jugar.', '');
-            message.reply(tempMenu);
+        let tempMenu = menu;
+        await chat.sendSeen();
+        await chat.sendStateTyping();
+        if(chat.isGroup){
+            if(watchBan(chat.id._serialized, 'todos' === false)){
+                tempMenu = tempMenu.replace('🎮 — jugar.', '');
+                message.reply(tempMenu);
+            }else{
+                message.reply(tempMenu);
+            }
         }else{
+            tempMenu = tempMenu.replace('📝 — ajustes(as).\n', '');
+            tempMenu = tempMenu.replace('👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n', '');
             message.reply(tempMenu);
         }
-    }else{
-        tempMenu = tempMenu.replace('📝 — ajustes(as).\n', '');
-        tempMenu = tempMenu.replace('👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n', '');
-        message.reply(tempMenu);
     }
-}
     if (message.body.toLocaleLowerCase() === 'recomienda un anime' || message.body.toLocaleLowerCase() === 'rnu' ) {
         file = fs.readFileSync('data.json', 'utf-8')
         data =  JSON.parse(file)
         const randomIndex = Math.floor(Math.random() * data.animes.names.length);
         message.reply(data.animes.names[randomIndex]);
+    }
+    if (message.body.toLocaleLowerCase() === 'minecraft server' || message.body.toLocaleLowerCase() === 'ms') {
+        await chat.sendSeen();
+        await chat.sendStateTyping();
+        message.reply('Aqui tienes el ip del servidor: AFSI.aternos.me\n' + "puerto: 55545\n"+ "link del server: https://add.aternos.org/AFSI\n\n"+ "Apk del juego: https://www.mediafire.com/file/g7tcnqaw53viyei/Minecraft-1.20.51.01-apktodo.io.apk/file");
     }
     if(message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt'){
         let contact = await message.getContact();
@@ -416,7 +439,7 @@ client.on('message', async (message) => {
     if(message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp'){
         if(chat.isGroup){
             if(addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos') && watchBan(chat.id._serialized, 'menciones')){
-                if(watchBan(chat.id._serialized, 'admins') == false && participantes()){
+                if(watchBan(chat.id._serialized, 'admins') == false && participantes(message.author)){
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     let participantes = [];
@@ -457,11 +480,64 @@ client.on('message', async (message) => {
             message.reply('Este comando solo funciona en grupos');
         }
     }
-    
+    if(message.body.toLocaleLowerCase() == 'foto de una sola vez' || message.body.toLocaleLowerCase() == 'sf'){
+        await chat.sendSeen();
+        await chat.sendStateTyping();
+        if (message.hasQuotedMsg) {
+            const mensaje_citado = await message.getQuotedMessage();
+            if (mensaje_citado.hasMedia) {
+                try {
+                    if(mensaje_citado.type === 'image'){
+                        const d = await mensaje_citado.downloadMedia();
+                        fs.writeFileSync('sticker.png', d.data, {encoding: 'base64'});
+                        const image = new MessageMedia('image/png', fs.readFileSync('sticker.png').toString('base64'), 'sticker');
+                        chat.sendMessage(image); 
+                    }
+                    else if(mensaje_citado.type === 'video'){
+                        const d = await mensaje_citado.downloadMedia();
+                        fs.writeFileSync('sticker.mp4', d.data, {encoding: 'base64'});
+                        const video = new MessageMedia('video/mp4', fs.readFileSync('sticker.mp4').toString('base64'), 'sticker');
+                        chat.sendMessage(video); 
+                    }
+                } catch (err) {
+                    message.reply('No se pudo enviar la foto');
+                } 
+            }
+        }
+
+        if (message.hasMedia === true) {
+            try {
+                if(message.type === 'image'){
+                    const d = await message.downloadMedia();
+                    fs.writeFileSync('sticker.png', d.data, {encoding: 'base64'});
+                    const image = new MessageMedia('image/png', fs.readFileSync('sticker.png').toString('base64'), 'sticker');
+                    chat.sendMessage(image); 
+                }
+                else if(message.type === 'video'){
+                    const d = await message.downloadMedia();
+                    fs.writeFileSync('sticker.mp4', d.data, {encoding: 'base64'});
+                    const video = new MessageMedia('video/mp4', fs.readFileSync('sticker.mp4').toString('base64'), 'sticker');
+                    chat.sendMessage(video); 
+                }      
+            } catch (err) {
+                message.reply('No se pudo enviar la foto o video');
+            }
+        }
+    }
+    if(message.body.toLocaleLowerCase() == 'br'){
+        if (message.hasQuotedMsg) {
+            const quotedMsg = await message.getQuotedMessage();
+            if (quotedMsg.fromMe) {
+                quotedMsg.delete(true);
+            } else {
+                message.reply('Solo puedo borrar mensajes enviados por mi');
+            }
+        }
+    }
     if(message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as'){
         if(chat.isGroup){
             addgroup(message.from); 
-            if (participantes()) {
+            if (participantes(message.author)) {
                 await chat.sendSeen();
                 await chat.sendStateTyping();
                 option.ajustes = 1;
@@ -482,7 +558,7 @@ client.on('message', async (message) => {
             if(option.ajustes == 1){
                 await chat.sendSeen();
                 await chat.sendStateTyping();
-                if (participantes()) {
+                if (participantes(message.author)) {
                     option.juego = 1;
                     option.ajustes = 0;
                     let menu_juego = option_game;
@@ -560,9 +636,8 @@ client.on('message', async (message) => {
     wa.me/18098972404
     
     𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
-    Puedes comunicarte con la socia del creador en caso de que el creador no se encuentre disponible o algún otro inconveniente:
-    
-    wa.me/14846507434`);
+    se siente solo y tal vez se suicide`
+    );
     }
 });
 
