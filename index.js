@@ -1,5 +1,6 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
+const googleTTS = require('google-tts-api');
 const { Client, LocalAuth, MessageMedia, GroupChat } = require('whatsapp-web.js');
 
 let client;
@@ -95,6 +96,7 @@ function addgroup(group){
     let datagroup = 
     {
         id: group,
+        bot_activado: true,
         juegos: [{"todos": true, baneados: ["admins"]}]
     }
     // Comprueba si grouplist existe antes de intentar acceder a su longitud
@@ -200,6 +202,26 @@ function QuitBan(id_group, game){
         }
     }
 }
+function watchBot(id_group){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let data = JSON.parse(jsonfile);
+    for (i = 0; i < data.grouplist.length; i++) {
+        if (data.grouplist[i].id === id_group) {
+            return data.grouplist[i].bot_activado
+        }
+    }
+}
+function activeBot(id_group, boolean){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let data = JSON.parse(jsonfile);
+    for (i = 0; i < data.grouplist.length; i++) {
+        if (data.grouplist[i].id === id_group) {
+            data.grouplist[i].bot_activado = boolean;
+            fs.writeFileSync('data.json', JSON.stringify(data, null, 4) , 'utf-8');
+            break;
+        }
+    }
+}
 let option = {
     juego:0,
     ajustes:0
@@ -209,7 +231,7 @@ client.on('group_join', (notification) => {
     console.log(`${participant.id.user} se ha unido al grupo ${groupMetadata.id._serialized}`);
     client.sendMessage(groupMetadata.id._serialized, `Bienvenido/a ${participant.pushname} al grupo ${groupMetadata.subject}!`);
 });
-const menu = "*Opciones*\n\n" +"📋  menu...\n"+"👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+"🧟 — recomienda un anime (rnu).\n"+"🎮 — jugar.\n"+"🃏 — sticker(st) (adjunta la imagen).\n"+"📸 — foto o video de una sola vez(sf)\n"+"Borrar un mensaje enviado por el bot(br)\n"+"🧊 — Minecraft Server(MS)\n"+"📝 — ajustes(as).\n"+"👨🏻‍💻 — creador.\n\n"+"Estas son todas las opciones disponibles por el momento";
+const menu = "*Opciones*\n\n" +"📋  menu...\n"+"👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n"+"🧟 — recomienda un anime (rnu).\n"+"🎮 — jugar.\n"+"🃏 — sticker(st) (adjunta la imagen).\n"+"🔊 — crea un audio con el bot(tv)\n"+"📸 — foto o video de una sola vez(sf)\n"+"Borrar un mensaje enviado por el bot(br)\n"+"🧊 — Minecraft Server(MS)\n"+"📝 — ajustes(as).\n"+"👨🏻‍💻 — creador.\n\n"+"Estas son todas las opciones disponibles por el momento";
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n"+ "3. Todos pueden utilizar los juegos con menciones";
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻"
 const links_baneados = ["https://is.gd/LOVELY_WORLD", "https://is.gd/Sex_adult_girl", "https://is.gd/Sex_adult_girl"] 
@@ -230,7 +252,26 @@ client.on('message', async (message) => {
             const sender = participantes.find(participant => participant.id._serialized === author);
             return sender.isAdmin;
     }
+    if(chat.isGroup){
+        addgroup(chat.id._serialized);
 
+
+        if(message.body.toLocaleLowerCase() === 'activar bot' || message.body.toLocaleLowerCase() === 'ab'){
+            if (participantes(message.author)) {
+                activeBot(chat.id._serialized, true);
+                message.reply('El bot ha sido activado');
+            }
+        }
+        if(watchBot(chat.id._serialized) == false){
+            return;
+        }
+        if(message.body.toLocaleLowerCase() === 'desactivar bot' || message.body.toLocaleLowerCase() === 'db'){
+            if (participantes(message.author)) {
+                activeBot(chat.id._serialized, false);
+                message.reply('El bot ha sido desactivado');
+            }
+        }
+    }
     if (message.from === "120363123428242054@g.us") {
 
         if(message.body === 'hola') {
@@ -247,10 +288,8 @@ client.on('message', async (message) => {
 
                 for(let participant of chat.participants) {
                     mentions.push(`${participant.id.user}@c.us`);
-                    text += `@${participant.id.user} `;
+                    text += `@${participant.id.user} \n`;
                 }
-                console.log(text);
-
                 await chat.sendMessage(text, { mentions });
             }else{
                 message.reply('Solo los administradores pueden usar este comando');
@@ -395,46 +434,89 @@ client.on('message', async (message) => {
     if(message.body.toLocaleLowerCase() === 'sticker' || message.body.toLocaleLowerCase() === 'st'){
         await chat.sendSeen();
         await chat.sendStateTyping();
+        let d;
         if (message.hasQuotedMsg) {
             const mensaje_citado = await message.getQuotedMessage();
+            try {
+                d = await mensaje_citado.downloadMedia();
+            } catch (err) {
+                message.reply('No pude descargar eso');
+            }
+            let media;
             if (mensaje_citado.hasMedia) {
                 try {
-                    if(mensaje_citado.type === 'image'){
-                        const d = await mensaje_citado.downloadMedia();
-                        fs.writeFileSync('sticker.png', d.data, {encoding: 'base64'});
-                        const sticker = new MessageMedia('image/png', fs.readFileSync('sticker.png').toString('base64'), 'sticker');
-                        chat.sendMessage(sticker, { sendMediaAsSticker: true }); 
+                    switch (mensaje_citado.type) {
+                        case 'image':         
+                            media = new MessageMedia('image/png', d.data, 'sticker');
+                            chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Nasla bot', stickerName: ''});
+                            break;
+                        case 'video':
+                            media = new MessageMedia('video/mp4', d.data, 'sticker');
+                            chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Nasla bot', stickerName: ''});
+                            break;
                     }
-                    else if(mensaje_citado.type === 'video'){
-                        const d = await mensaje_citado.downloadMedia();
-                        fs.writeFileSync('sticker.mp4', d.data, {encoding: 'base64'});
-                        const sticker = new MessageMedia('video/mp4', fs.readFileSync('sticker.mp4').toString('base64'), 'sticker');
-                        chat.sendMessage(sticker, { sendMediaAsSticker: true }); 
-                    }
+
                 } catch (err) {
                     message.reply('No se pudo crear el sticker');
                 } 
             }
-        }
-
-        if (message.hasMedia === true) {
+        }else if (message.hasMedia === true) {
+            try{
+                d = await message.downloadMedia();
+            }catch(err){
+                message.reply('No pude descargar eso');
+            }
             try {
-                if(message.type === 'image'){
-                    const d = await message.downloadMedia();
-                    fs.writeFileSync('sticker.png', d.data, {encoding: 'base64'});
-                    const sticker = new MessageMedia('image/png', fs.readFileSync('sticker.png').toString('base64'), 'sticker');
-                    chat.sendMessage(sticker, { sendMediaAsSticker: true }); 
+                switch(message.type){
+                    case 'image':
+                        media = new MessageMedia('image/png', d.data, 'sticker');
+                        chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Nasla bot', stickerName: ''});
+                        break;
+                    case 'video':
+                        media = new MessageMedia('video/mp4', d.data, 'sticker');
+                        chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Nasla bot', stickerName: ''});
+                        break;
                 }
-                else if(message.type === 'video'){
-                    const d = await message.downloadMedia();
-                    fs.writeFileSync('sticker.mp4', d.data, {encoding: 'base64'});
-                    const sticker = new MessageMedia('video/mp4', fs.readFileSync('sticker.mp4').toString('base64'), 'sticker');
-                    chat.sendMessage(sticker, { sendMediaAsSticker: true }); 
-                }      
             } catch (err) {
                 message.reply('No se pudo crear el sticker');
             }
+        }else{
+            message.reply('No pusiste una foto o video, nisiquiera citaste uno');
         }
+    }
+    if(message.body.toLowerCase().startsWith("tv ")) {
+        let parts = message.body.split(' ');
+        let text;
+        valid_language_codes = ['in', 'es', 'fr', 'de', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'zh','pt'];
+        if(parts.length <= 2){
+            text = parts.slice(1).join(' ');
+        }else{
+            if(valid_language_codes.includes(parts[1])){
+                text = parts.slice(2).join(' ');
+            }else{
+                text = parts.slice(1).join(' ');
+            }
+        }
+        let language;
+        language = parts.length < 3 ? 'es' : parts[1];
+
+        if (valid_language_codes.includes(language)) {
+            // message.reply('el idioma no es valido los idiomas validos son:\n\n en\n es\n fr\n de\n it\n ja\n ko\n nl\n pl\n pt\n ru\n zh\n pt');
+            if(language == 'in'){
+                language = 'en';
+            }
+        }else{
+            language = 'es';
+        }
+    
+
+        googleTTS.getAudioBase64(text, { lang: language, slow: false })
+            .then((base64) => {
+                const medi = new MessageMedia('audio/mp3', base64.toString('base64'), 'audio');
+                chat.sendMessage(medi);
+            }).catch((err) => {
+                message.reply('No pude crear el audio');
+            });
     }
     if(message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp'){
         if(chat.isGroup){
@@ -487,41 +569,52 @@ client.on('message', async (message) => {
             const mensaje_citado = await message.getQuotedMessage();
             if (mensaje_citado.hasMedia) {
                 try {
-                    if(mensaje_citado.type === 'image'){
-                        const d = await mensaje_citado.downloadMedia();
-                        fs.writeFileSync('sticker.png', d.data, {encoding: 'base64'});
-                        const image = new MessageMedia('image/png', fs.readFileSync('sticker.png').toString('base64'), 'sticker');
-                        chat.sendMessage(image); 
+                    const d = await mensaje_citado.downloadMedia();
+                    let media;
+                    switch (mensaje_citado.type) {
+                        case 'image':
+                            media = new MessageMedia('image/png', d.data, 'sticker');
+                            break;
+                        case 'video':
+                            media = new MessageMedia('video/mp4', d.data, 'sticker');
+                            break;
+                        case 'ptt':
+                            media = new MessageMedia('audio/mp3', d.data, 'sticker');
+                            break;
+                        case 'sticker':
+                            media = new MessageMedia('image/webp', d.data, 'sticker');
+                            break;
                     }
-                    else if(mensaje_citado.type === 'video'){
-                        const d = await mensaje_citado.downloadMedia();
-                        fs.writeFileSync('sticker.mp4', d.data, {encoding: 'base64'});
-                        const video = new MessageMedia('video/mp4', fs.readFileSync('sticker.mp4').toString('base64'), 'sticker');
-                        chat.sendMessage(video); 
+                    if (media) {
+                        chat.sendMessage(media);
                     }
                 } catch (err) {
-                    message.reply('No se pudo enviar la foto');
+                    message.reply('No pude enviar la foto, video o audio');
                 } 
             }
-        }
-
-        if (message.hasMedia === true) {
+        }else if (message.hasMedia === true) {
+            const f = await message.downloadMedia();
             try {
-                if(message.type === 'image'){
-                    const d = await message.downloadMedia();
-                    fs.writeFileSync('sticker.png', d.data, {encoding: 'base64'});
-                    const image = new MessageMedia('image/png', fs.readFileSync('sticker.png').toString('base64'), 'sticker');
-                    chat.sendMessage(image); 
+               switch(message.type){
+                    case 'image':
+                        media = new MessageMedia('image/png', f.data, 'sticker');
+                        chat.sendMessage(media);
+                        break;
+                    case 'video':
+                        media = new MessageMedia('video/mp4', f.data, 'sticker');
+                        chat.sendMessage(media);
+                        break;
+                    case 'ptt':
+                        media = new MessageMedia('audio/mp3', f.data, 'sticker');
+                        chat.sendMessage(media);
+                        break;
                 }
-                else if(message.type === 'video'){
-                    const d = await message.downloadMedia();
-                    fs.writeFileSync('sticker.mp4', d.data, {encoding: 'base64'});
-                    const video = new MessageMedia('video/mp4', fs.readFileSync('sticker.mp4').toString('base64'), 'sticker');
-                    chat.sendMessage(video); 
-                }      
+                     
             } catch (err) {
                 message.reply('No se pudo enviar la foto o video');
             }
+        }else{
+            message.reply('No pusiste una foto o video, nisiquiera citaste una');
         }
     }
     if(message.body.toLocaleLowerCase() == 'br'){
