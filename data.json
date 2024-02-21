@@ -1,95 +1,514 @@
 {
-    "players": [
-        {
-            "id": "500000000000",
-            "ganadas": 0,
-            "perdidas": 0,
-            "entrada": 0
-        },
-        {
-            "id": "18098972404",
-            "ganadas": 0,
-            "perdidas": 0,
-            "entrada": 0
-        }
-    ],
-    "animes": {
-        "names": [
-            "Fullmetal Alchemist: Brotherhood",
-            "Demon Slayer: Kimetsu no Yaiba",
-            "Jujutsu Kaisen",
-            "Hunter x Hunter",
-            "Neon Genesis Evangelion",
-            "Cowboy Bebop",
-            "Code Geass: Lelouch of the Rebellion",
-            "Steins;Gate",
-            "Kaguya-sama: Love Is War",
-            "Konosuba: God's Blessing on This Wonderful World!",
-            "One Punch Man",
-            "Saiki Kusuo no Psi-nan",
-            "Gintama",
-            "Mob Psycho 100",
-            "Nichijou",
-            "Anohana: The Flower We Saw That Day",
-            "Your Name. (Kimi no Na wa)",
-            "Violet Evergarden",
-            "Clannad: After Story",
-            "Your Lie in April (Shigatsu wa Kimi no Uso)",
-            "Fruits Basket",
-            "Toradora!",
-            "Horimiya",
-            "Ghost in the Shell (1995)",
-            "Neon Genesis Evangelion",
-            "Cowboy Bebop",
-            "Serial Experiments Lain",
-            "Akira",
-            "Steins;Gate",
-            "Psycho-Pass",
-            "The End of Evangelion",
-            "Mobile Suit Gundam: Iron-Blooded Orphans",
-            "Demon Slayer: Kimetsu no Yaiba",
-            "Jujutsu Kaisen",
-            "Inuyasha",
-            "Naruto",
-            "Bleach",
-            "Fullmetal Alchemist: Brotherhood",
-            "Hunter x Hunter",
-            "Neon Genesis Evangelion",
-            "Spirited Away (Sen to Chihiro no Kamikakushi)",
-            "K-On!",
-            "Yuru Camp",
-            "Non Non Biyori",
-            "Flying Witch",
-            "Barakamon",
-            "The Melancholy of Haruhi Suzumiya",
-            "Anohana: The Flower We Saw That Day",
-            "Clannad",
-            "Your Lie in April (Shigatsu wa Kimi no Uso)",
-            "Ghibli movies",
-            "Studio Ghibli movies",
-            "Satoshi Kon movies",
-            "Makoto Shinkai movies",
-            "A Silent Voice (Koe no Katachi)",
-            "Your Name. (Kimi no Na wa)",
-            "Violet Evergarden",
-            "Attack on Titan (Shingeki no Kyojin)",
-            "Demon Slayer: Kimetsu no Yaiba"
-        ]
+  "players": [
+    {
+      "id": "500000000000",
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0
     },
-    "grouplist": [
-        {
-            "id": "325253413825824.ac"
-        },
-        {
-            "id": "120363225170788370@g.us",
-            "juegos": [
-                {
-                    "todos": false,
-                    "baneados": [
-                        "todos"
-                    ]
-                }
-            ]
-        }
+    {
+      "id": "18098972404",
+      "casado": "51970028877",
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 3
+    },
+    {
+      "id": "573158202463",
+      "casado": "",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 14
+    },
+    {
+      "id": "573147447214",
+      "casado": "",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 6
+    },
+    {
+      "id": "51945195551",
+      "casado": "",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 2
+    },
+    {
+      "id": "593989042262",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 17
+    },
+    {
+      "id": "5492915724479",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 5
+    },
+    {
+      "id": "50586184552",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 14
+    },
+    {
+      "id": "51907310352",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 1
+    },
+    {
+      "id": "51978097808",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 0
+    },
+    {
+      "id": "56950735289",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 1
+    },
+    {
+      "id": "5492236680291",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 15
+    },
+    {
+      "id": "5492235940026",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 3
+    },
+    {
+      "id": "5493813927537",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 0
+    },
+    {
+      "id": "56944212834",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 4
+    },
+    {
+      "id": "5491155664490",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 1
+    },
+    {
+      "id": "5493725468129",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 8
+    },
+    {
+      "id": "5215623973751",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 0
+    },
+    {
+      "id": "51917524556",
+      "casado": "nadie :(",
+      "nivel": 0,
+      "ganadas": 0,
+      "perdidas": 0,
+      "entrada": 0,
+      "mensajes": 4
+    }
+  ],
+  "animes": {
+    "names": [
+      "Fullmetal Alchemist: Brotherhood",
+      "Demon Slayer: Kimetsu no Yaiba",
+      "Jujutsu Kaisen",
+      "Hunter x Hunter",
+      "Neon Genesis Evangelion",
+      "Cowboy Bebop",
+      "Code Geass: Lelouch of the Rebellion",
+      "Steins;Gate",
+      "Kaguya-sama: Love Is War",
+      "Konosuba: God's Blessing on This Wonderful World!",
+      "One Punch Man",
+      "Saiki Kusuo no Psi-nan",
+      "Gintama",
+      "Mob Psycho 100",
+      "Nichijou",
+      "Anohana: The Flower We Saw That Day",
+      "Your Name. (Kimi no Na wa)",
+      "Violet Evergarden",
+      "Clannad: After Story",
+      "Your Lie in April (Shigatsu wa Kimi no Uso)",
+      "Fruits Basket",
+      "Toradora!",
+      "Horimiya",
+      "Ghost in the Shell (1995)",
+      "Neon Genesis Evangelion",
+      "Cowboy Bebop",
+      "Serial Experiments Lain",
+      "Akira",
+      "Steins;Gate",
+      "Psycho-Pass",
+      "The End of Evangelion",
+      "Mobile Suit Gundam: Iron-Blooded Orphans",
+      "Demon Slayer: Kimetsu no Yaiba",
+      "Jujutsu Kaisen",
+      "Inuyasha",
+      "Naruto",
+      "Bleach",
+      "Fullmetal Alchemist: Brotherhood",
+      "Hunter x Hunter",
+      "Neon Genesis Evangelion",
+      "Spirited Away (Sen to Chihiro no Kamikakushi)",
+      "K-On!",
+      "Yuru Camp",
+      "Non Non Biyori",
+      "Flying Witch",
+      "Barakamon",
+      "The Melancholy of Haruhi Suzumiya",
+      "Anohana: The Flower We Saw That Day",
+      "Clannad",
+      "Your Lie in April (Shigatsu wa Kimi no Uso)",
+      "Ghibli movies",
+      "Studio Ghibli movies",
+      "Satoshi Kon movies",
+      "Makoto Shinkai movies",
+      "A Silent Voice (Koe no Katachi)",
+      "Your Name. (Kimi no Na wa)",
+      "Violet Evergarden",
+      "Attack on Titan (Shingeki no Kyojin)",
+      "Demon Slayer: Kimetsu no Yaiba"
     ]
+  },
+  "grouplist": [
+    {
+      "id": "325253413825824.ac"
+    },
+    {
+      "id": "120363225170788370@g.us",
+      "juegos": [
+        {
+          "todos": false,
+          "baneados": [
+            "todos"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363237344496083@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363200576775738@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "51928059495-1599705606@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "51944988438-1629229758@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363045018167476@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363222247936465@g.us",
+      "bot_activado": false,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363231629975549@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363047428125108@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363203754028704@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363235362344278@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363237809382676@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363205141028271@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363232090202238@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363213382267593@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363123428242054@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363236978621520@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363218254549017@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363240286670476@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363224472397238@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363222203091039@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363242399520556@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "120363225177323860@g.us",
+      "bot_activado": true,
+      "juegos": [
+        {
+          "todos": true,
+          "baneados": [
+            "admins"
+          ]
+        }
+      ]
+    }
+  ]
 }
