@@ -65,6 +65,7 @@ function jsonread(player) {
     {
         id: player,
         casado: "nadie :(",
+        dias: 0,
         nivel: 0,
         ganadas: 0,
         dinero: 0,
@@ -92,25 +93,7 @@ function jsonread(player) {
  * @param {int} opcion 
  * @returns retorna false si los dias no son iguales y true si son iguales
  */
-function update_dias(dias, opcion) {
-    try {
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
-        if(opcion === 1){    
-            data.informacion.dias = dias;
-            fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
-        }else if(opcion === 2){
-            if(data.informacion.dias !== dias){
-                return false;
-            }else{
-                return true;
-            }
-        }
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
-}
+
 /**
  * 
  * @param {string} group recibe el id del grupo en formato string
@@ -178,6 +161,13 @@ function getAllInfoPlayer(player) {
         return null;
     }
 }
+/**
+ * @param {id} player el id del jugador
+ * @param {string} type el tipo de dato que se quiere actualizar
+ * @param {string} value el valor que se quiere agregar
+ * @param {boolean} rem si es true se reemplaza el valor si es false se agrega al array
+ *   
+ */
 function update_info_player(player, type, value, rem) {
     try {
         let jsonfile = fs.readFileSync('data.json', 'utf-8');
@@ -300,6 +290,22 @@ function activeBot(id_group, boolean) {
         }
     }
 }
+function update_dias(player ,dias, opcion) {
+    try {
+        if(opcion === 1){    
+            update_info_player(player, "dias", dias, true);
+        }else if(opcion === 2){
+            if(getAllInfoPlayer(player).dias !== dias){
+                return false;
+            }else{
+                return true;
+            }
+        }
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
 let option = {
     juego: 0,
     ajustes: 0
@@ -316,7 +322,6 @@ client.on('group_admin_changed', (notification) => {
             if(notification.recipientIds[0] === client.info.wid._serialized){
                 botIsAdmin(chat.id._serialized, 2);
             }
-            console.log(`You were promoted by ${notification.author}`);
         } else if (notification.type === 'demote'){
             if(notification.recipientIds[0] === client.info.wid._serialized){
                 botIsAdmin(chat.id._serialized, 3);
@@ -684,11 +689,11 @@ client.on('message_create', async (message) => {
         }
     }
     if(getAllInfoPlayer(contact.id.user).roles === "ama"){
-        let day = dayjs().tz("America/Santo_Domingo").format('D');
-        if(update_dias(day, 2) === false){
+        let day = parseInt(dayjs().tz("America/Santo_Domingo").format('D'))
+        if(update_dias(contact.id.user,day, 2) === false){
             update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 10, true);
             update_info_player(getAllInfoPlayer(contact.id.user).casado, "dinero", getAllInfoPlayer(getAllInfoPlayer(contact.id.user).casado).dinero - 10, true);
-            update_dias(day, 1);
+            update_dias(contact.id.user,day, 1);
             message.reply("Has recibido 10 monedas por ser ama de casa");
         }
     }
