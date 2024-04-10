@@ -12,7 +12,8 @@ const { constrainedMemory } = require('process');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-
+const quest = require('quest');
+const Jimp = require('jimp');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -25,6 +26,10 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
         puppeteer: {
             args: ['-no-sandbox'],
             executablePath: '/usr/bin/chromium-browser'
+        },       
+        webVersionCache: {
+       		type: 'remote',
+        	remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.0.html`,
         },
         ffmpegPath: '/usr/bin/ffmpeg'
 
@@ -32,6 +37,10 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
 } else {
     client = new Client({
         authStrategy: new LocalAuth(),
+       	webVersionCache: {
+       	    type: 'remote',
+            remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.0.html`,
+       },
         puppeteer: {
             executablePath: '/usr/bin/google-chrome-stable'
         },
@@ -311,9 +320,11 @@ let option = {
     ajustes: 0
 };
 client.on('group_join', (notification) => {
-    notification.reply(`Bienvenido al grupo, @${notification.recipientIds[0].replace('@c.us', '')}`, {
-        mentions: [notification.recipientIds[0]]
-    });
+    notification.getChat().then((chat) => {
+        notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}`, {
+            mentions: [notification.recipientIds[0]]
+        });
+    })
 });
 client.on('group_admin_changed', (notification) => {
     notification.getChat().then((chat) => {
@@ -363,13 +374,15 @@ let menu = `
 
 📝⚙️🪛 | As (Ajustes).
 
+🎁 🎉— donar
+
 👨🏻‍💻👀 🛐— creador.
 
 ¡Por ahora estas son todas las opciones que puedes disfrutar! Sigue apoyando.
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
-const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲"
-const links_baneados = ["https://is.gd/LOVELY_WORLD", "https://is.gd/Sex_adult_girl", "https://is.gd/Sex_adult_girl"]
+const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)"
+const links_baneados = ["https://is.gd/LOVELY_WORLD", "https://is.gd/Sex_adult_girl", "https://is.gd/Sex_adult_girl", "https://5ne.co/0jej"]
 let golpear;
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
@@ -417,7 +430,7 @@ client.on('message_create', async (message) => {
 
 
         if (message.body.toLocaleLowerCase() === 'activar bot' || message.body.toLocaleLowerCase() === 'ab') {
-            if (participantes(message.author)) {
+            if ((participantes(message.author) || contact.id.user === "32466905630") && watchBot(chat.id._serialized) === false) {
                 activeBot(chat.id._serialized, true);
                 message.reply('El bot ha sido activado');
             }
@@ -426,47 +439,26 @@ client.on('message_create', async (message) => {
             return;
         }
         if (message.body.toLocaleLowerCase() === 'desactivar bot' || message.body.toLocaleLowerCase() === 'db') {
-            if (participantes(message.author)) {
+            if (participantes(message.author) || contact.id.user === "32466905630") {
                 activeBot(chat.id._serialized, false);
                 message.reply('El bot ha sido desactivado');
             }
         }
     }
     if (message.from === "120363123428242054@g.us") {
-
         if (message.body === 'hola') {
             message.reply('Bienvenid@ a Anime Fan Site');
         }
     }
-    if (message.body.toLocaleLowerCase() === '!todos') {
-        if (chat.isGroup) {
-            if (participantes(message.author)) {
-                const chat = await message.getChat();
-
-                let text = "";
-                let mentions = [];
-
-                for (let participant of chat.participants) {
-                    mentions.push(`${participant.id.user}@c.us`);
-                    text += `@${participant.id.user} \n`;
-                }
-                await chat.sendMessage(text, { mentions });
-            } else {
-                message.reply('Solo los administradores pueden usar este comando');
-            }
-        } else {
-            message.reply('Este comando solo funciona en grupos');
-        }
-    }
     if (botIsAdmin(chat.id._serialized, 1) === true) {
         let mmsg = message.body
+        addgroup(chat.id._serialized);
         for (let i = 0; i < links_baneados.length; i++) {
             if (mmsg.includes(links_baneados[i])) {
                 message.delete(true);
-                message.reply('No puedes enviar ese tipo de links');
             }
         }
-        if(mmsg.includes("https://chat.whatsapp.com/")){
+        if(mmsg.includes("https://chat.whatsapp.com/") || mmsg.includes("https://t.me/")){
             message.delete(true);
         }
     } 
@@ -559,7 +551,6 @@ client.on('message_create', async (message) => {
 
         }
     }
-    
     if (message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú') {
         let tempMenu = menu;
         await chat.sendSeen();
@@ -688,6 +679,7 @@ client.on('message_create', async (message) => {
             }
         }
     }
+
     if(getAllInfoPlayer(contact.id.user).roles === "ama"){
         let day = parseInt(dayjs().tz("America/Santo_Domingo").format('D'))
         if(update_dias(contact.id.user,day, 2) === false){
@@ -755,7 +747,6 @@ client.on('message_create', async (message) => {
         if(getAllInfoPlayer(contact.id.user).roles === "stripper"){
             let part = message.body.split(" ");
             part = part[2];
-            console.log(part);
             if(part === undefined){
                 let respuestas = [
                     "le paraste el pene y te dio 2 monedas",
@@ -841,7 +832,9 @@ client.on('message_create', async (message) => {
             message.reply(tempmenu_game);
         }
     }
-    if (message.body.toLocaleLowerCase() === 'sticker' || message.body.toLocaleLowerCase() === 'st') {
+    if (message.body.toLocaleLowerCase().startsWith('sticker ') || message.body.toLocaleLowerCase().startsWith('st')) {
+        let part = message.body.split(' ');
+        part = part.slice(1)
         await chat.sendSeen();
         await chat.sendStateTyping();
         let d;
@@ -890,8 +883,30 @@ client.on('message_create', async (message) => {
             } catch (err) {
                 message.reply('No se pudo crear el sticker');
             }
-        } else {
-            message.reply('No pusiste una foto o video, nisiquiera citaste uno');
+        } else if(part.length > 0){
+            async function createStickerWithText(text) {
+                const image = new Jimp(512, 512, 0x00000000);
+                const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK); 
+
+                const textImage = new Jimp(image.bitmap.width, image.bitmap.height);
+                textImage.print(font, 0, 0, {
+                    text: text,
+                    alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+                    alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
+                }, image.bitmap.width, image.bitmap.height);
+                textImage.color([{ apply: 'xor', params: ['#800000'] }]);
+                image.composite(textImage, 0, 0);
+
+                const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+                const sticker = new MessageMedia('image/png', buffer.toString('base64'), 'sticker');
+                return sticker;
+            }
+            
+            async function sendSticker(to, text) {
+                const sticker = await createStickerWithText(text);
+                chat.sendMessage(sticker, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+            }
+            sendSticker(message.from, part.join(' '));
         }
     }
     if (message.body.toLowerCase().startsWith("tv ")) {
@@ -939,6 +954,16 @@ client.on('message_create', async (message) => {
         }
 
         processAudio();
+    }
+    if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
+        quest.newIndexP();
+        if(chat.isGroup){
+            if(watchBan(chat.id._serialized, 'todos') === true){
+                message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
+            }
+        }else{
+            message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
+        }
     }
     if (message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp') {
         if (chat.isGroup) {
@@ -1173,7 +1198,7 @@ client.on('message_create', async (message) => {
         }
     }
     //-------------------------------------------------------------------------------------------------
-    if(message.body.toLocaleLowerCase().startsWith('sex') || message.body.toLocaleLowerCase().startsWith('sexo')){
+    if(message.body.toLocaleLowerCase().startsWith('!sex') || message.body.toLocaleLowerCase().startsWith('!sexo')){
         let parts = message.body.split(' ');
         try{
             let pareja1 = parts[1];
@@ -1268,14 +1293,6 @@ client.on('message_create', async (message) => {
             } else {
                 message.reply('Solo puedo borrar mensajes enviados por mi');
             }
-        }
-    }
-    if (message.body.toLocaleLowerCase() == 'b') {
-        if (message.hasQuotedMsg) {
-            const quotedMsg = await message.getQuotedMessage();
-            quotedMsg.delete(true);
-            message.reply('Solo puedo borrar mensajes enviados por mi');
-            
         }
     }
     if (message.body.toLowerCase().startsWith("musica ") || message.body.toLowerCase().startsWith("m ") || message.body.toLowerCase().startsWith("música ")) {
@@ -1408,6 +1425,9 @@ client.on('message_create', async (message) => {
             }
         }
     }
+    if(message.body.toLocaleLowerCase() == 'donacion' || message.body.toLocaleLowerCase() == 'donar'){
+        message.reply(`*Puedes donar a este link:* https://wa.me/p/7261583283931686/15202868941`);
+    }
     if (message.body.toLocaleLowerCase() === 'creador' || message.body.toLocaleLowerCase() === 'como se crea un bot') {
         await chat.sendSeen();
         await chat.sendStateTyping();
@@ -1419,7 +1439,7 @@ client.on('message_create', async (message) => {
     ¡Hola! ◡̈
     Puedes comunicarte con mi creador desde este link:
     
-    wa.me/18098972404
+    tengo muchos numeros puede que Mr Alastor este en tu grupo
     
     𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
     Aquí puedes Contactar con el diseñador del menu:
@@ -1429,9 +1449,4 @@ client.on('message_create', async (message) => {
         );
     }
 });
-
-try {
-    client.initialize();
-} catch (err) {
-    console.log(err);
-}
+client.initialize()
