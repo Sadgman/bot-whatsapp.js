@@ -20,34 +20,31 @@ dayjs.extend(timezone);
 let client;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath === '/usr/bin/node') {
+function activateClientBot(browserPath){
     client = new Client({
         authStrategy: new LocalAuth(),
         puppeteer: {
             args: ['-no-sandbox'],
-            executablePath: '/usr/bin/chromium-browser'
+            executablePath: browserPath
         },       
         webVersionCache: {
        		type: 'remote',
         	remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.0.html`,
         },
-        ffmpegPath: '/usr/bin/ffmpeg'
-
-    });
-} else {
-    client = new Client({
-        authStrategy: new LocalAuth(),
-       	webVersionCache: {
-       	    type: 'remote',
-            remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.0.html`,
-       },
-        puppeteer: {
-            executablePath: '/usr/bin/google-chrome-stable'
-        },
-        ffmpegPath: '/usr/bin/ffmpeg'
+        ffmpegPath: ffmpegPath
 
     });
 }
+
+if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath === '/usr/bin/node') {
+    activateClientBot('/usr/bin/chromium-browser');
+}else if(process.platform === 'win32'){
+    activateClientBot('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
+}
+else{
+    activateClientBot('/usr/bin/google-chrome-stable');
+}
+
 client.on('qr', qr => {
     qrcode.generate(qr, { small: true });
 });
