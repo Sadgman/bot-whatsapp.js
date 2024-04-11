@@ -12,7 +12,7 @@ const { constrainedMemory } = require('process');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const quest = require('quest');
+const quest = require('preguntas');
 const Jimp = require('jimp');
 dayjs.extend(utc);
 dayjs.extend(timezone);
