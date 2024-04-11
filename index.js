@@ -379,7 +379,7 @@ let menu = `
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)"
-const links_baneados = ["https://is.gd/LOVELY_WORLD", "https://is.gd/Sex_adult_girl", "https://is.gd/Sex_adult_girl", "https://5ne.co/0jej"]
+const links_baneados = ["https://is.gd/", "https://chat.whatsapp.com/", "https://5ne.co/", "https://t.me/"]
 let golpear;
 let pregunt;
 client.on('message_create', async (message) => {
@@ -455,9 +455,6 @@ client.on('message_create', async (message) => {
             if (mmsg.includes(links_baneados[i])) {
                 message.delete(true);
             }
-        }
-        if(mmsg.includes("https://chat.whatsapp.com/") || mmsg.includes("https://t.me/")){
-            message.delete(true);
         }
     } 
     if (message.body.toLocaleLowerCase() === 'io') {
