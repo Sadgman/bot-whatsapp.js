@@ -1380,6 +1380,12 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '1') {
+        if(message.hasQuotedMsg){
+            const quotedMsg = await message.getQuotedMessage();
+            if(quotedMsg.fromMe){
+                quest.isCorrect(1);
+            }
+        }
         if (option.juego == 1) {
             if (watchBan(chat.id._serialized, 'todos') == false) {
                 QuitBan(chat.id._serialized, 'todos');
@@ -1393,6 +1399,12 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '2') {
+        if(message.hasQuotedMsg){
+            const quotedMsg = await message.getQuotedMessage();
+            if(quotedMsg.fromMe){
+                quest.isCorrect(2);
+            }
+        }
         if (option.juego == 1) {
             if (watchBan(chat.id._serialized, 'todos') == true) {
                 if (watchBan(chat.id._serialized, 'menciones') == true) {
@@ -1408,6 +1420,12 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '3') {
+        if(message.hasQuotedMsg){
+            const quotedMsg = await message.getQuotedMessage();
+            if(quotedMsg.fromMe){
+                quest.isCorrect(3);
+            }
+        }
         if (option.juego == 1) {
             if (watchBan(chat.id._serialized, 'todos') == true) {
                 if (watchBan(chat.id._serialized, 'admins') == true) {
