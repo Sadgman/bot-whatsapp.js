@@ -381,6 +381,7 @@ const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quit
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)"
 const links_baneados = ["https://is.gd/LOVELY_WORLD", "https://is.gd/Sex_adult_girl", "https://is.gd/Sex_adult_girl", "https://5ne.co/0jej"]
 let golpear;
+let pregunt;
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
     let contact = await message.getContact();
@@ -954,6 +955,7 @@ client.on('message_create', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
         quest.newIndexP();
+        pregunt = 1;
         if(chat.isGroup){
             if(watchBan(chat.id._serialized, 'todos') === true){
                 message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
@@ -1379,11 +1381,19 @@ client.on('message_create', async (message) => {
             }
         }
     }
+    function comp(resp){ 
+        pregunt = 0;
+        if(quest.isCorrect(resp)){
+            message.reply("Respuesta correcta");
+        }else{
+            message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswer()}`);
+        }
+    }
     if (message.body.toLocaleLowerCase() == '1') {
-        if(message.hasQuotedMsg){
+        if(message.hasQuotedMsg && pregunt === 1){
             const quotedMsg = await message.getQuotedMessage();
             if(quotedMsg.fromMe){
-                quest.isCorrect(1);
+                comp(1);
             }
         }
         if (option.juego == 1) {
@@ -1399,10 +1409,10 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '2') {
-        if(message.hasQuotedMsg){
+        if(message.hasQuotedMsg && pregunt === 1){
             const quotedMsg = await message.getQuotedMessage();
             if(quotedMsg.fromMe){
-                quest.isCorrect(2);
+                comp(2);
             }
         }
         if (option.juego == 1) {
@@ -1420,10 +1430,10 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '3') {
-        if(message.hasQuotedMsg){
+        if(message.hasQuotedMsg && pregunt === 1){
             const quotedMsg = await message.getQuotedMessage();
             if(quotedMsg.fromMe){
-                quest.isCorrect(3);
+                comp(3);
             }
         }
         if (option.juego == 1) {
