@@ -436,8 +436,8 @@ let menu = `
 ¡Por ahora estas son todas las opciones que puedes disfrutar! Sigue apoyando.
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
-const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)"
-const links_baneados = ["https://is.gd/", "https://chat.whatsapp.com/", "https://5ne.co/", "https://t.me/"]
+const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)\n!q crea una pregunta"
+const links_baneados = ["https://is.gd/", "https://chat.whatsapp.com/", "https://5ne.co/", "https://t.me/", "xxnx", "pornhub"]
 let golpear;
 let pregunt;
 client.on('message_create', async (message) => {
@@ -515,7 +515,7 @@ client.on('message_create', async (message) => {
             }
         }
     } 
-    if (message.body.toLocaleLowerCase() === 'io') {
+    if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
         let info;
         let casadoContact;
         try {
