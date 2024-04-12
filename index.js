@@ -7,7 +7,6 @@ const { obtenerPais } = require('./prefix.js');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const { get } = require('http');
 const { constrainedMemory } = require('process');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -95,13 +94,6 @@ function jsonread(player) {
 }
 /**
  * 
- * @param {int} dias 
- * @param {int} opcion 
- * @returns retorna false si los dias no son iguales y true si son iguales
- */
-
-/**
- * 
  * @param {string} group recibe el id del grupo en formato string
  * @returns retorna true si el grupo ya esta en la lista de grupos y si no esta lo crea y retorna true
  */
@@ -113,6 +105,9 @@ function addgroup(group) {
         id: group,
         bot_admin: false,
         bot_activado: true,
+        index_p: 0,
+        activate_quest: false,
+        correctAnswer: 0,
         juegos: [{ "todos": false, baneados: ["admins", "menciones"] }]
     }
     // Comprueba si grouplist existe antes de intentar acceder a su longitud
@@ -254,6 +249,69 @@ function watchBot(id_group) {
     for (i = 0; i < data.grouplist.length; i++) {
         if (data.grouplist[i].id === id_group) {
             return data.grouplist[i].bot_activado
+        }
+    }
+}
+/**
+ * @param {number} option si es 1 retorna el estado de la pregunta si es 2 activa o desactiva la pregunta si es 3 pone el indice de respuesta correcta, si es 4 retorna el indice de la respuesta correcta si es 5 retorna el indice de la pregunta si es 6 pone el indice de la pregunta
+ * @param {*} boolean si es true activa la pregunta si es false la desactiva, tambien se puede usar para poner el indice de la respuesta correcta
+ * @param {string} id_group el id del grupo
+ * @returns retorna true si la pregunta esta activa y false si no lo esta 
+*/
+function groupActiveQuestions(option, id_group, boolean) {   
+    if(option === 1){
+        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let data = JSON.parse(jsonfile);
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                return data.grouplist[i].activate_quest
+            }
+        }
+    }else if(option === 2){
+        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let data = JSON.parse(jsonfile);
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                data.grouplist[i].activate_quest = boolean;
+                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
+                break;
+            }
+        }
+    }else if(option === 3){
+        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let data = JSON.parse(jsonfile);
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                data.grouplist[i].correctAnswer = boolean;
+                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
+                break;
+            }
+        }
+    }else if(option === 4){
+        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let data = JSON.parse(jsonfile);
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                return data.grouplist[i].correctAnswer;
+            }
+        }
+    }else if(option === 5){
+        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let data = JSON.parse(jsonfile);
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                return data.grouplist[i].index_p;
+            }
+        }
+    }else if(option === 6){
+        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let data = JSON.parse(jsonfile);
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                data.grouplist[i].index_p = boolean;
+                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
+                break;
+            }
         }
     }
 }
@@ -674,7 +732,6 @@ client.on('message_create', async (message) => {
             }
         }
     }
-
     if(getAllInfoPlayer(contact.id.user).roles === "ama"){
         let day = parseInt(dayjs().tz("America/Santo_Domingo").format('D'))
         if(update_dias(contact.id.user,day, 2) === false){
@@ -951,14 +1008,20 @@ client.on('message_create', async (message) => {
         processAudio();
     }
     if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
-        quest.newIndexP();
-        pregunt = 1;
-        if(chat.isGroup){
-            if(watchBan(chat.id._serialized, 'todos') === true){
-                message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
+        if(groupActiveQuestions(1 ,chat.id._serialized) === false){
+            let indexp = quest.newIndexP();
+            groupActiveQuestions(6, chat.id._serialized, indexp);
+            groupActiveQuestions(2, chat.id._serialized, true);
+            groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
+            if(chat.isGroup){
+                if(watchBan(chat.id._serialized, 'todos') === true){
+                    message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
+                }
+            }else{
+                message.reply("Esto solo se puede jugar en grupos");
             }
         }else{
-            message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
+            message.reply('Ya hay una pregunta activa');
         }
     }
     if (message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp') {
@@ -1379,15 +1442,15 @@ client.on('message_create', async (message) => {
         }
     }
     function comp(resp){ 
-        pregunt = 0;
-        if(quest.isCorrect(resp)){
+        groupActiveQuestions(2, chat.id._serialized, false);
+        if(resp === groupActiveQuestions(4, chat.id._serialized)){
             message.reply("Respuesta correcta");
         }else{
-            message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswer()}`);
+            message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(groupActiveQuestions(5, chat.id._serialized), groupActiveQuestions(4, chat.id._serialized))}`);
         }
     }
     if (message.body.toLocaleLowerCase() == '1') {
-        if(message.hasQuotedMsg && pregunt === 1){
+        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
             const quotedMsg = await message.getQuotedMessage();
             if(quotedMsg.fromMe){
                 comp(1);
@@ -1406,7 +1469,7 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '2') {
-        if(message.hasQuotedMsg && pregunt === 1){
+        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
             const quotedMsg = await message.getQuotedMessage();
             if(quotedMsg.fromMe){
                 comp(2);
@@ -1427,7 +1490,7 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '3') {
-        if(message.hasQuotedMsg && pregunt === 1){
+        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
             const quotedMsg = await message.getQuotedMessage();
             if(quotedMsg.fromMe){
                 comp(3);
