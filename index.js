@@ -1013,21 +1013,21 @@ client.on('message_create', async (message) => {
         processAudio();
     }
     if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
-        if(groupActiveQuestions(1 ,chat.id._serialized) === false){
-            let indexp = quest.newIndexP();
-            groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
-            groupActiveQuestions(6, chat.id._serialized, indexp);
-            groupActiveQuestions(2, chat.id._serialized, true);
-            groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
-            if(chat.isGroup){
+        if(chat.isGroup){
+            if(groupActiveQuestions(1 ,chat.id._serialized) === false){
+                let indexp = quest.newIndexP();
+                groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
+                groupActiveQuestions(6, chat.id._serialized, indexp);
+                groupActiveQuestions(2, chat.id._serialized, true);
+                groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
                 if(watchBan(chat.id._serialized, 'todos') === true){
                     message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
                 }
             }else{
-                message.reply("Esto solo se puede jugar en grupos");
+                message.reply('Ya hay una pregunta activa');
             }
         }else{
-            message.reply('Ya hay una pregunta activa');
+            message.reply('Este juego solo funciona en grupos');
         }
     }
     if (message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp') {
@@ -1447,20 +1447,20 @@ client.on('message_create', async (message) => {
             }
         }
     }
-    function comp(resp){ 
-        groupActiveQuestions(2, chat.id._serialized, false);
-        if(resp === groupActiveQuestions(4, chat.id._serialized)){
-            message.reply("Respuesta correcta");
-        }else{
-            message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(groupActiveQuestions(5, chat.id._serialized), groupActiveQuestions(4, chat.id._serialized))}`);
+    async function comp(resp){ 
+        const quotedMsg = await message.getQuotedMessage();
+        if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
+            groupActiveQuestions(2, chat.id._serialized, false);
+            if(resp === groupActiveQuestions(4, chat.id._serialized)){
+                message.reply("Respuesta correcta");
+            }else{
+                message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(groupActiveQuestions(5, chat.id._serialized), groupActiveQuestions(4, chat.id._serialized))}`);
+            }
         }
     }
     if (message.body.toLocaleLowerCase() == '1') {
-        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
-            const quotedMsg = await message.getQuotedMessage();
-            if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
-                comp(1);
-            }
+        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){      
+            comp(1);     
         }
         if (option.juego == 1) {
             if (watchBan(chat.id._serialized, 'todos') == false) {
@@ -1476,10 +1476,7 @@ client.on('message_create', async (message) => {
     }
     if (message.body.toLocaleLowerCase() == '2') {
         if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
-            const quotedMsg = await message.getQuotedMessage();
-            if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
-                comp(2);
-            }
+            comp(2);
         }
         if (option.juego == 1) {
             if (watchBan(chat.id._serialized, 'todos') == true) {
@@ -1497,10 +1494,7 @@ client.on('message_create', async (message) => {
     }
     if (message.body.toLocaleLowerCase() == '3') {
         if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
-            const quotedMsg = await message.getQuotedMessage();
-            if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
-                comp(3);
-            }
+            comp(3);
         }
         if (option.juego == 1) {
             if (watchBan(chat.id._serialized, 'todos') == true) {
