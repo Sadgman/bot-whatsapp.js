@@ -444,7 +444,6 @@ const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quit
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)\n!q crea una pregunta"
 const links_baneados = ["https://is.gd/", "https://chat.whatsapp.com/", "https://5ne.co/", "https://t.me/", "xxnx", "pornhub"]
 let golpear;
-let pregunt;
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
     let contact = await message.getContact();
@@ -1452,9 +1451,11 @@ client.on('message_create', async (message) => {
         if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
             groupActiveQuestions(2, chat.id._serialized, false);
             if(resp === groupActiveQuestions(4, chat.id._serialized)){
-                message.reply("Respuesta correcta");
+                message.reply("Respuesta correcta ganaste 1 punto 👍 ");
+                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
             }else{
-                message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(groupActiveQuestions(5, chat.id._serialized), groupActiveQuestions(4, chat.id._serialized))}`);
+                message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(groupActiveQuestions(5, chat.id._serialized), groupActiveQuestions(4, chat.id._serialized))} perdiste dos puntos 👎👎`);
+                update_info_player(contact.id.user, "perdidas", getAllInfoPlayer(contact.id.user).perdidas + 2, true);
             }
         }
     }
