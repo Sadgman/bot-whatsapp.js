@@ -106,6 +106,7 @@ function addgroup(group) {
         bot_admin: false,
         bot_activado: true,
         index_p: 0,
+        title_quest: "",
         activate_quest: false,
         correctAnswer: 0,
         juegos: [{ "todos": false, baneados: ["admins", "menciones"] }]
@@ -253,23 +254,21 @@ function watchBot(id_group) {
     }
 }
 /**
- * @param {number} option si es 1 retorna el estado de la pregunta si es 2 activa o desactiva la pregunta si es 3 pone el indice de respuesta correcta, si es 4 retorna el indice de la respuesta correcta si es 5 retorna el indice de la pregunta si es 6 pone el indice de la pregunta
+ * @param {number} option si es 1 retorna el estado de la pregunta si es 2 activa o desactiva la pregunta si es 3 pone el indice de respuesta correcta, si es 4 retorna el indice de la respuesta correcta si es 5 retorna el indice de la pregunta si es 6 pone el indice de la pregunta si es 7 retorna el titulo de la pregunta si es 8 pone el titulo de la pregunta
  * @param {*} boolean si es true activa la pregunta si es false la desactiva, tambien se puede usar para poner el indice de la respuesta correcta
  * @param {string} id_group el id del grupo
  * @returns retorna true si la pregunta esta activa y false si no lo esta 
 */
-function groupActiveQuestions(option, id_group, boolean) {   
+function groupActiveQuestions(option, id_group, boolean) {  
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let data = JSON.parse(jsonfile);
     if(option === 1){
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
         for (i = 0; i < data.grouplist.length; i++) {
             if (data.grouplist[i].id === id_group) {
                 return data.grouplist[i].activate_quest
             }
         }
     }else if(option === 2){
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
         for (i = 0; i < data.grouplist.length; i++) {
             if (data.grouplist[i].id === id_group) {
                 data.grouplist[i].activate_quest = boolean;
@@ -278,8 +277,6 @@ function groupActiveQuestions(option, id_group, boolean) {
             }
         }
     }else if(option === 3){
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
         for (i = 0; i < data.grouplist.length; i++) {
             if (data.grouplist[i].id === id_group) {
                 data.grouplist[i].correctAnswer = boolean;
@@ -288,27 +285,35 @@ function groupActiveQuestions(option, id_group, boolean) {
             }
         }
     }else if(option === 4){
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
         for (i = 0; i < data.grouplist.length; i++) {
             if (data.grouplist[i].id === id_group) {
                 return data.grouplist[i].correctAnswer;
             }
         }
     }else if(option === 5){
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
         for (i = 0; i < data.grouplist.length; i++) {
             if (data.grouplist[i].id === id_group) {
                 return data.grouplist[i].index_p;
             }
         }
     }else if(option === 6){
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
         for (i = 0; i < data.grouplist.length; i++) {
             if (data.grouplist[i].id === id_group) {
                 data.grouplist[i].index_p = boolean;
+                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
+                break;
+            }
+        }
+    }else if(option === 7){
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                return data.grouplist[i].title_quest;
+            }
+        }
+    }else if(option === 8){
+        for (i = 0; i < data.grouplist.length; i++) {
+            if (data.grouplist[i].id === id_group) {
+                data.grouplist[i].title_quest = boolean;
                 fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
                 break;
             }
@@ -1010,6 +1015,7 @@ client.on('message_create', async (message) => {
     if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
         if(groupActiveQuestions(1 ,chat.id._serialized) === false){
             let indexp = quest.newIndexP();
+            groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
             groupActiveQuestions(6, chat.id._serialized, indexp);
             groupActiveQuestions(2, chat.id._serialized, true);
             groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
@@ -1452,7 +1458,7 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase() == '1') {
         if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
             const quotedMsg = await message.getQuotedMessage();
-            if(quotedMsg.fromMe){
+            if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
                 comp(1);
             }
         }
@@ -1471,7 +1477,7 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase() == '2') {
         if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
             const quotedMsg = await message.getQuotedMessage();
-            if(quotedMsg.fromMe){
+            if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
                 comp(2);
             }
         }
@@ -1492,7 +1498,7 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase() == '3') {
         if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
             const quotedMsg = await message.getQuotedMessage();
-            if(quotedMsg.fromMe){
+            if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
                 comp(3);
             }
         }
