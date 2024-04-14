@@ -1416,6 +1416,32 @@ client.on('message_create', async (message) => {
             }
         }
     }
+    async function mentionAll(text){
+        if(chat.isGroup){
+            try{
+                if(participantes(message.author)){
+                    let mention = [];
+
+                    for(let participant of chat.participants) {
+                        mention.push(`${participant.id.user}@c.us`);
+                    }
+                    await chat.sendMessage(text, { mentions: mention });
+                }else{
+                    message.reply('Solo los administradores pueden usar este comando');
+                }
+            }catch(err){
+                message.reply('No pude mencionar a todos');
+            }
+        }
+    }
+    if(message.body.toLocaleLowerCase() === '!todos' || message.body.startsWith('!todos')){
+        const parts = message.body.split(' ');
+        if(parts.length > 1 && !parts.slice(1).join(' ') === '!todos'){
+            mentionAll(parts.slice(1).join(' '));
+        }else{
+            mentionAll('Hola a todos, activense!!');
+        }
+    }    
     if (message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as') {
         if (chat.isGroup) {
             addgroup(message.from);
