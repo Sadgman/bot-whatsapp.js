@@ -444,6 +444,8 @@ const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quit
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)\n!q crea una pregunta"
 const links_baneados = ["https://is.gd/", "https://chat.whatsapp.com/", "https://5ne.co/", "https://t.me/", "xxnx", "pornhub"]
 let golpear;
+let listRequestmusic = [];
+let counterListRequestMusic = 0;
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
     let contact = await message.getContact();
@@ -1359,46 +1361,59 @@ client.on('message_create', async (message) => {
             }
         }
     }
+
     if (message.body.toLowerCase().startsWith("musica ") || message.body.toLowerCase().startsWith("m ") || message.body.toLowerCase().startsWith("música ")) {
-            try {
-                const parts = message.body.split(' ');
-                const search = parts.slice(1).join(' ');
-                let stream;
-                await chat.sendSeen();
-                await chat.sendStateTyping();
-                youtube.search(search, { limit: 1 }).then(x => {
+            counterListRequestMusic++;
+            if(counterListRequestMusic <= 1 && getAllInfoPlayer(contact.id.user).dinero >= 5){
                 try {
-                    if (x.length === 0) {
-                        message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
-                        return;
-                    } else {
-                        if (!/^https?:\/\/(www\.)?youtube\.com\//.test(search)) {
-                            stream = ytdl(x[0].url, { filter: 'audioonly' });
+                    const parts = message.body.split(' ');
+                    const search = parts.slice(1).join(' ');
+                    let stream;
+                    await chat.sendSeen();
+                    await chat.sendStateTyping();
+                    youtube.search(search, { limit: 1 }).then(x => {
+                    try {
+                        if (x.length === 0) {
+                            message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
+                            return;
                         } else {
-                            stream = ytdl(search, { filter: 'audioonly' });
+                            listRequestmusic.push(search);
+                            if (!/^https?:\/\/(www\.)?youtube\.com\//.test(search)) {
+                                stream = ytdl(x[0].url, { filter: 'audioonly' });
+                            } else {
+                                stream = ytdl(search, { filter: 'audioonly' });
+                            }
+                            ffmpeg()
+                                .input(stream)
+                                .audioBitrate(128)
+                                .save('n.mp3')
+                                .on('end', () => {
+                                    const file = fs.readFileSync('n.mp3');
+                                    const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+                                    listRequestmusic.push(search);
+                                    client.sendMessage(message.from, media, { quotedMessageId: message.id._serialized });
+                                    counterListRequestMusic = 0;
+                                })
+                                .on('error', console.error);
                         }
-                        ffmpeg()
-                            .input(stream)
-                            .audioBitrate(128)
-                            .save('n.mp3')
-                            .on('end', () => {
-                                const file = fs.readFileSync('n.mp3');
-                                const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                                client.sendMessage(message.from, media, { quotedMessageId: message.id._serialized });
-                            })
-                            .on('error', console.error);
+                    } catch (error) {
+                        console.error('Ocurrió un error:', error);
+                        message.reply('No pude descargar la música');
                     }
-                } catch (error) {
-                    console.error('Ocurrió un error:', error);
-                    message.reply('No pude descargar la música');
-                }
-            }).catch(err => {
-                console.error('Ocurrió un error en youtube.search:', err);
-                message.reply('No pude buscar la música');
-            });
-        } catch (error) {
-            console.error('Ocurrió un error:', error);
-            message.reply('No pude descargar la música');
+                }).catch(err => {
+                    console.error('Ocurrió un error en youtube.search:', err);
+                    message.reply('No pude buscar la música');
+                });
+            } catch (error) {
+                console.error('Ocurrió un error:', error);
+                message.reply('No pude descargar la música');
+            }
+        }else{
+            if(getAllInfoPlayer(contact.id.user).dinero < 5){
+                message.reply('Necesitas dinero para poder comprar canciones. Juega para poder ganar dinero');
+            }else{
+                message.reply('Espera un momento estoy ocupado enviando una canción');
+            }
         }
     }
     if (message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as') {
