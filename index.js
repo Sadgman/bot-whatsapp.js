@@ -1553,7 +1553,20 @@ client.on('message_create', async (message) => {
         }
     }
     if(message.body.toLocaleLowerCase() == 'donacion' || message.body.toLocaleLowerCase() == 'donar'){
-        message.reply(`*Puedes donar a este link:* https://wa.me/p/7261583283931686/15202868941`);
+        message.reply(`
+        🌟 *Apoya Mi Trabajo* 🌟
+
+        Cada contribución es un gran apoyo para continuar desarrollando el bot que tanto disfrutas.
+        
+        *Opciones de Donación:*
+        
+        ☕ Café para el Creador - Con solo $1, puedes ofrecerme un café que me ayudará a mantenerme programando con energía.
+        💻 Gastos del Servidor y Desarrollo - Con $10 al mes, apoyas directamente los costos del servidor y el desarrollo continuo del bot.
+        ¿Quieres contribuir?
+        
+        Haz clic aquí y elige cómo quieres apoyar: 
+        Donar Ahora 💖 https://www.patreon.com/alastor782/membership
+        `);
     }
     if (message.body.toLocaleLowerCase() === 'creador' || message.body.toLocaleLowerCase() === 'como se crea un bot') {
         await chat.sendSeen();
