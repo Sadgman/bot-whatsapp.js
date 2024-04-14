@@ -1434,7 +1434,7 @@ client.on('message_create', async (message) => {
             }
         }
     }
-    if(message.body.toLocaleLowerCase() === '!todos' || message.body.startsWith('!todos')){
+    if(message.body.toLocaleLowerCase() === '!todos' || message.body.toLocaleLowerCase().startsWith('!todos')){
         const parts = message.body.split(' ');
         if(parts.length > 1 && !parts.slice(1).join(' ').toLocaleLowerCase().includes('!todos')){
             mentionAll(parts.slice(1).join(' '));
