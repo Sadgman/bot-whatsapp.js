@@ -19,13 +19,13 @@ Para instalar Alastor Bot en Ubuntu u otros sistemas Linux, sigue estos pasos:
 1. Clona el repositorio de Alastor Bot:
 
     ```sh
-    git clone https://github.com/tu-nombre-de-usuario/alastor-bot.git
+    git clone https://github.com/Sadgman/bot-whatsapp.js.git
     ```
 
 2. Navega hasta el directorio del proyecto:
 
     ```sh
-    cd alastor-bot
+    cd bot-whatsapp.js
     ```
 
 3. Ejecuta el script de instalación:
