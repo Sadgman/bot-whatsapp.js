@@ -17,10 +17,10 @@ if ! dpkg -l | grep -q wget; then
     sudo apt install wget -y
 fi
 
-if ! dpkg -l | grep -q chromium-browser; then
-    wget https://dl.google.com/linux/direct/chromium-browser_current_amd64.deb
-    chmod +x chromium-browser_current_amd64.deb
-    sudo dpkg -i chromium-browser_current_amd64.deb
+if ! dpkg -l | grep -q google-chrome-stable; then
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    chmod +x google-chrome-stable_current_amd64.deb
+    sudo dpkg -i google-chrome-stable_current_amd64.deb
     sudo apt-get install -f
 fi
 

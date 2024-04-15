@@ -41,7 +41,7 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
     activateClientBot('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
 }
 else{
-    activateClientBot('/usr/bin/chromium-browser');
+    activateClientBot('/usr/bin/google-chrome-stable');
 }
 
 client.on('qr', qr => {
