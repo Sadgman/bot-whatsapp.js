@@ -445,6 +445,7 @@ const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Pied
 const links_baneados = ["https://is.gd/", "https://chat.whatsapp.com/", "https://5ne.co/", "https://t.me/", "xxnx", "pornhub"]
 let golpear;
 let counterListRequestMusic = 0;
+
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
     let contact = await message.getContact();
@@ -1370,7 +1371,7 @@ client.on('message_create', async (message) => {
                     let stream;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
-                    youtube.search(search, { limit: 1 }).then(x => {
+                    await youtube.search(search, { limit: 1 }).then(x => {
                     try {
                         if (x.length === 0) {
                             message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
@@ -1554,6 +1555,7 @@ client.on('message_create', async (message) => {
         *Opciones de Donación:*
         
         ☕ Café para el Creador - Con solo $1, puedes ofrecerme un café que me ayudará a mantenerme programando con energía.
+        
         💻 Gastos del Servidor y Desarrollo - Con $10 al mes, apoyas directamente los costos del servidor y el desarrollo continuo del bot.
         ¿Quieres contribuir?
         
