@@ -31,8 +31,7 @@ clear
 echo -e "Instalación completa\n"
 
 if [ -f "data.json" ]; then
-    echo -e "Iniciando bot\n"
-    node index.js
+    echo -e "Para Iniciar el bot escribe\n node index.js"
 else
     echo "No se encontró el archivo data.json"
 fi
