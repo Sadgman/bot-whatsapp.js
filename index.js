@@ -19,6 +19,9 @@ dayjs.extend(timezone);
 let client;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
+// Alastor Bot
+// Version 1.0.0
+
 function activateClientBot(browserPath){
     client = new Client({
         authStrategy: new LocalAuth(),
