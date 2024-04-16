@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Deno
         uses: denoland/setup-deno@v1
@@ -24,7 +24,7 @@ jobs:
           deno-version: v1.x
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
@@ -35,5 +35,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "mr-red-bot-whatsap-24"
-          entrypoint: "node index.js"
+          entrypoint: "/home/runner/work/bot-whatsapp.js/index.js"
           root: ""
