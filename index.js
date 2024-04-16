@@ -1114,9 +1114,7 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase().startsWith('banco ')) {
         let parts = message.body.split(' ');
         let opcion = parts[1];
-        if(parts.length > 1 || !isNaN(opcion)){
-            message.reply('> Las opciones del banco son:\n\n> Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)');
-        }
+        
         if (opcion === 'depositar' || opcion === 'dp') {
             let cantidad = parts[2];
             if (cantidad > 0 && cantidad <= getAllInfoPlayer(contact.id.user).dinero) {
@@ -1169,6 +1167,8 @@ client.on('message_create', async (message) => {
             }catch(err){
                 console.error(err);
             }
+        }else{
+            message.reply('> Las opciones del banco son:\n\n> Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)');
         }
     }
     if (message.body.toLocaleLowerCase() === 'tienda') {
