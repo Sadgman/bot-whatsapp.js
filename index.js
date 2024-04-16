@@ -616,7 +616,7 @@ client.on('message_create', async (message) => {
         prometido = prometido.replace('@', '');
         prometido = prometido + '@c.us';
         if(prometido.replace('@c.us', '') != contact.id.user){
-            client.getContactById(prometido).then((contact) => {
+            client.getContactById(prometido).then((c) => {
                 chat.sendMessage(`¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}\nsi tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
             }).catch(error => {
                 message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
