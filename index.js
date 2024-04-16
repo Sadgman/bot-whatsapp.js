@@ -592,15 +592,11 @@ client.on('message_create', async (message) => {
         if (regex.test(prometido)) {
             try {
                 if (chat.isGroup) {
-                    if (getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
-                        jsonread(prometido);
-                        if (getAllInfoPlayer(prometido).casado === "nadie :(") {
-                            update_info_player(contact.id.user, "casado", prometido, true);
-                            update_info_player(prometido, "casado", contact.id.user, true);
-                            message.reply("*🎉Felicidades ahora casad@!!*");
-                        }
-                    } else {
-                        message.reply('*Ya estabas casad@ infiel 😠*');
+                    jsonread(prometido);
+                    if (getAllInfoPlayer(prometido).casado === "nadie :(") {
+                        update_info_player(contact.id.user, "casado", prometido, true);
+                        update_info_player(prometido, "casado", contact.id.user, true);
+                        message.reply("*🎉Felicidades ahora casad@!!*");
                     }
                 }
             } catch (err) {
@@ -616,11 +612,15 @@ client.on('message_create', async (message) => {
         prometido = prometido.replace('@', '');
         prometido = prometido + '@c.us';
         if(prometido.replace('@c.us', '') != contact.id.user){
-            client.getContactById(prometido).then((c) => {
-                chat.sendMessage(`*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
-            }).catch(error => {
-                message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
-            })
+            if(getAllInfoPlayer(contact.id.user).casado === "nadie :("){
+                client.getContactById(prometido).then((c) => {
+                    chat.sendMessage(`*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
+                }).catch(error => {
+                    message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
+                })
+            }else{
+                message.reply('*Ya estabas casad@ infiel 😠*');
+            }
         }else{
             message.reply("Eres imbécil o que, no puedes casarte contigo mismo")
         }
