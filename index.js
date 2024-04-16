@@ -113,6 +113,7 @@ function addgroup(group) {
         title_quest: "",
         activate_quest: false,
         correctAnswer: 0,
+        baba: false,
         juegos: [{ "todos": false, baneados: ["admins", "menciones"] }]
     }
     // Comprueba si grouplist existe antes de intentar acceder a su longitud
@@ -379,6 +380,26 @@ function update_dias(player ,dias, opcion) {
         return null;
     }
 }
+/**
+ * 
+ * @param {number} opcion si es 1 actualiza el valor de baba si es 2 retorna el valor de baba
+ * @param {boolean} booleano valor que se quiere agregar a baba
+ * @param {number} player id del jugador
+ * @returns retorna el valor de baba si es 2
+ */
+function atrapa_baba(opcion, player, booleano) {
+    try {
+        if(opcion === 1){
+            update_info_player(player, "baba", booleano, true);
+        }else if(opcion === 2){
+            return getAllInfoPlayer(player).baba;
+        }
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+
+}
 let option = {
     juego: 0,
     ajustes: 0
@@ -513,11 +534,6 @@ client.on('message_create', async (message) => {
                 activeBot(chat.id._serialized, false);
                 message.reply('El bot ha sido desactivado');
             }
-        }
-    }
-    if (message.from === "120363123428242054@g.us") {
-        if (message.body === 'hola') {
-            message.reply('Bienvenid@ a Anime Fan Site');
         }
     }
     if (botIsAdmin(chat.id._serialized, 1) === true) {
@@ -782,7 +798,6 @@ client.on('message_create', async (message) => {
             message.reply("Has recibido 10 monedas por ser ama de casa");
         }
     }
-    
     if(message.body.toLocaleLowerCase() === 'arrestar'){
         console.log(golpear);
         if(getAllInfoPlayer(contact.id.user).roles === "policia" && golpear === true){
@@ -1398,7 +1413,16 @@ client.on('message_create', async (message) => {
             }
         }
     }
-
+    if(message.body.toLocaleLowerCase() === 'baba'){
+        if(atrapa_baba(2, contact.id.user) === false && message.hasQuotedMsg){
+            const quotedMsg = await message.getQuotedMessage();
+            const contacto_baba = await quotedMsg.getContact();
+            if(contacto_baba === '595973819264'){
+                message.reply('Felicidades has atrapado la Baba ganaste una moneda');
+                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
+            }
+        }
+    }
     if (message.body.toLowerCase().startsWith("musica ") || message.body.toLowerCase().startsWith("m ") || message.body.toLowerCase().startsWith("música ")) {
             counterListRequestMusic++;
             const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
