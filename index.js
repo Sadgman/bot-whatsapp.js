@@ -615,7 +615,7 @@ client.on('message_create', async (message) => {
         let prometido = parts[1];
         prometido = prometido.replace('@', '');
         prometido = prometido + '@c.us';
-        if(!prometido.replace('@c.us', '') === contact.id.user){
+        if(prometido.replace('@c.us', '') != contact.id.user){
             client.getContactById(prometido).then((contact) => {
                 chat.sendMessage(`¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}\nsi tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
             }).catch(error => {
