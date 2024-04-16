@@ -1619,7 +1619,7 @@ client.on('message_create', async (message) => {
     ¡Hola! ◡̈
     Puedes comunicarte con mi creador desde este link:
     
-    tengo muchos numeros puede que Mr Alastor este en tu grupo
+    wa.me/32466905630
     
     𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
     Aquí puedes Contactar con el diseñador del menu:
