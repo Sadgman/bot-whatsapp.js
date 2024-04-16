@@ -1423,17 +1423,24 @@ client.on('message_create', async (message) => {
                                     client.sendMessage(message.from, media, { quotedMessageId: message.id._serialized });
                                     counterListRequestMusic = 0;
                                 })
-                                .on('error', console.error);
+                                .on('error', n => {
+                                    counterListRequestMusic = 0;
+                                    console.error('Ocurrió un error:', n);
+                                    message.reply('No pude descargar la música');   
+                                });
                         }
                     } catch (error) {
+                        counterListRequestMusic = 0;
                         console.error('Ocurrió un error:', error);
                         message.reply('No pude descargar la música');
                     }
                 }).catch(err => {
+                    counterListRequestMusic = 0;
                     console.error('Ocurrió un error en youtube.search:', err);
                     message.reply('No pude buscar la música');
                 });
             } catch (error) {
+                counterListRequestMusic = 0;
                 console.error('Ocurrió un error:', error);
                 message.reply('No pude descargar la música');
             }
