@@ -600,7 +600,7 @@ client.on('message_create', async (message) => {
                             message.reply("*🎉Felicidades ahora casad@!!*");
                         }
                     } else {
-                        message.reply('Ya estabas casad@ infiel');
+                        message.reply('*Ya estabas casad@ infiel 😠*');
                     }
                 }
             } catch (err) {
