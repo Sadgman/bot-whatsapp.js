@@ -1395,6 +1395,7 @@ client.on('message_create', async (message) => {
 
     if (message.body.toLowerCase().startsWith("musica ") || message.body.toLowerCase().startsWith("m ") || message.body.toLowerCase().startsWith("música ")) {
             counterListRequestMusic++;
+            const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
             if(counterListRequestMusic <= 1){
                 try {
                     const parts = message.body.split(' ');
@@ -1426,23 +1427,23 @@ client.on('message_create', async (message) => {
                                 .on('error', n => {
                                     counterListRequestMusic = 0;
                                     console.error('Ocurrió un error:', n);
-                                    message.reply('No pude descargar la música');   
+                                    message.reply(mensaje_error);   
                                 });
                         }
                     } catch (error) {
                         counterListRequestMusic = 0;
                         console.error('Ocurrió un error:', error);
-                        message.reply('No pude descargar la música');
+                        message.reply(mensaje_error);
                     }
                 }).catch(err => {
                     counterListRequestMusic = 0;
                     console.error('Ocurrió un error en youtube.search:', err);
-                    message.reply('No pude buscar la música');
+                    message.reply(mensaje_error);
                 });
             } catch (error) {
                 counterListRequestMusic = 0;
                 console.error('Ocurrió un error:', error);
-                message.reply('No pude descargar la música');
+                message.reply(mensaje_error);
             }
         }else{
             message.reply('Espera un momento estoy ocupado enviando una canción');
