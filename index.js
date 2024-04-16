@@ -1413,6 +1413,7 @@ client.on('message_create', async (message) => {
             }
         }
     }
+    // Hay que implementar el tiempo a esto luego
     if(message.body.toLocaleLowerCase() === 'baba'){
         if(atrapa_baba(2, contact.id.user) === false && message.hasQuotedMsg){
             const quotedMsg = await message.getQuotedMessage();
