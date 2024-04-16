@@ -13,6 +13,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const quest = require('preguntas');
 const Jimp = require('jimp');
+const { error } = require('console');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -569,33 +570,6 @@ client.on('message_create', async (message) => {
             message.reply('La funcion aun esta en desarrollo');
         }
     }
-    if (message.body.toLocaleLowerCase().startsWith('casar ') || message.body.toLocaleLowerCase().startsWith('cr ')) {
-        let parts = message.body.split(' ');
-        let prometido = parts[1];
-        prometido = prometido.replace('@', '');
-        const regex = /^\d+$/;
-        if (regex.test(prometido)) {
-            try {
-                if (chat.isGroup) {
-                    if (getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
-                        jsonread(prometido);
-                        if (getAllInfoPlayer(prometido).casado === "nadie :(") {
-                            update_info_player(contact.id.user, "casado", prometido, true);
-                            update_info_player(prometido, "casado", contact.id.user, true);
-                            message.reply("Ahora estas casad@");
-                        }
-
-                    } else {
-                        message.reply('Ya estabas casad@ infiel');
-                    }
-                }
-            } catch (err) {
-                message.reply('hubo un error y no te puedes casar');
-            }
-        } else {
-            message.reply('menciona a alguien o Introduce un numero valido');
-        }
-    }
     if (message.body.toLocaleLowerCase() === 'divorciarse' || message.body.toLocaleLowerCase() === 'divorcio') {
         if (getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
             message.reply('No estas casad@');
@@ -611,6 +585,60 @@ client.on('message_create', async (message) => {
                 message.reply('No tienes suficientes mensajes o puntuacion para divorciarte');
             }
 
+        }
+    }
+    function casarse(prometido){
+        const regex = /^\d+$/;
+        if (regex.test(prometido)) {
+            try {
+                if (chat.isGroup) {
+                    if (getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
+                        jsonread(prometido);
+                        if (getAllInfoPlayer(prometido).casado === "nadie :(") {
+                            update_info_player(contact.id.user, "casado", prometido, true);
+                            update_info_player(prometido, "casado", contact.id.user, true);
+                            message.reply("*🎉Felicidades ahora casad@!!*");
+                        }
+                    } else {
+                        message.reply('Ya estabas casad@ infiel');
+                    }
+                }
+            } catch (err) {
+                message.reply('hubo un error y no te puedes casar');
+            }
+        } else {
+            message.reply('menciona a alguien o Introduce un numero valido');
+        }
+    }
+    if (message.body.toLocaleLowerCase().startsWith('casar ') || message.body.toLocaleLowerCase().startsWith('cr ')) {
+        let parts = message.body.split(' ');
+        let prometido = parts[1];
+        prometido = prometido.replace('@', '');
+        prometido = prometido + '@c.us';
+        if(!prometido.replace('@c.us', '') === contact.id.user){
+            client.getContactById(prometido).then((contact) => {
+                chat.sendMessage(`¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}\nsi tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
+            }).catch(error => {
+                message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
+            })
+        }else{
+            message.reply("Eres imbécil o que, no puedes casarte contigo mismo")
+        }
+    }
+    if(message.body.toLocaleLowerCase() === 'si' || message.body.toLocaleLowerCase() === 'sí'){
+        if(message.hasQuotedMsg){
+            const quotedMsg = await message.getQuotedMessage();
+            let contacto = await quotedMsg.getContact();
+            if(quotedMsg.fromMe && contacto.id.user === client.info.me.user){
+                const regex_prometido = /hey @(\d+)/;
+                const match_prometido = quotedMsg.body.match(regex_prometido);
+                const regex_propositor = /quieres casarte con (\d+)/;
+                const match_propositor = quotedMsg.body.match(regex_propositor);
+                if (match_prometido[1] == contact.id.user){
+                    let phoneNumber = match_propositor[1]; 
+                    casarse(phoneNumber);
+                }
+            }
         }
     }
     if (message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú') {
