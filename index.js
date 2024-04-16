@@ -418,13 +418,15 @@ let menu = `
 
 🎮 👾🎧| Jugar.
 
-👰‍♀️❤️‍🔥🤵‍♂ | Cr (Amor)
+👰‍♀️❤️‍🔥🤵‍♂ | Cr (@persona_con_que_te_casas)
 
 🚪🫠 😦| Divorcio(1 punto y 20 mensajes)
 
-🃏🎞️🤳| St (crea sticker de la imagen que respondas).
+🃏🎞️🤳| St (crea sticker de la imagen que respondas)
 
 🔈🔉🔊 | TV (Crea un audio)
+
+🎸🎼🎵 | m (nombre de la cancion) 
 
 📸 🕺🕴️| Sf (Foto o video de imagen temporal) 
 
@@ -432,11 +434,13 @@ let menu = `
 
 🏪🏬💸 | Tienda
 
-🏦💰💱 | Banco(banco cp n°)
+🛒🛍️🏷️ | Comprar (nombre del articulo)
+
+🏦💰💱 | Banco (opcion, monto)
 
 🧊⛏️🕹️ | MS (servidor de Minecraft)
 
-📝⚙️🪛 | As (Ajustes).
+📝⚙️🪛 | As (Ajustes)
 
 🎁 🎉— donar
 
