@@ -35,5 +35,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "mr-red-bot-whatsap-24"
-          entrypoint: "/home/runner/work/bot-whatsapp.js/index.js"
+          entrypoint: "index.js"
           root: ""
