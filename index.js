@@ -472,7 +472,7 @@ let menu = `
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)\n!q crea una pregunta"
-const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xhamster", "redtube", "youporn"]
+const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn"]
 let golpear;
 let counterListRequestMusic = 0;
 
@@ -538,7 +538,7 @@ client.on('message_create', async (message) => {
         }
     }
     if (botIsAdmin(chat.id._serialized, 1) === true) {
-        let mmsg = message.body
+        let mmsg = message.body.toLocaleLowerCase();
         addgroup(chat.id._serialized);
         for (let i = 0; i < links_baneados.length; i++) {
             if (mmsg.includes(links_baneados[i])) {
