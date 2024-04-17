@@ -1415,10 +1415,10 @@ client.on('message_create', async (message) => {
     }
     // Hay que implementar el tiempo a esto luego
     if(message.body.toLocaleLowerCase() === 'baba'){
-        if(atrapa_baba(2, contact.id.user) === false && message.hasQuotedMsg){
+        if(message.hasQuotedMsg){
             const quotedMsg = await message.getQuotedMessage();
             const contacto_baba = await quotedMsg.getContact();
-            if(contacto_baba === '595973819264'){
+            if(contacto_baba.id.user === '595973819264'){
                 message.reply('Felicidades has atrapado la Baba ganaste una moneda');
                 update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
             }
