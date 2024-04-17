@@ -380,6 +380,7 @@ function update_dias(player ,dias, opcion) {
         return null;
     }
 }
+//terminar luego
 /**
  * 
  * @param {number} opcion si es 1 actualiza el valor de baba si es 2 retorna el valor de baba
