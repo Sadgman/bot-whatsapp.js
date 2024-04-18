@@ -13,6 +13,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const quest = require('preguntas');
 const Jimp = require('jimp');
+const { jsonread, update_info_player, getAllInfoPlayer, update_dias } = require('./utils/playerUtils.js');
 const { error } = require('console');
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -66,35 +67,6 @@ function RandomTwoIndex(array) {
         randomIndex2 = Math.floor(Math.random() * array.length);
     }
     return [randomIndex, randomIndex2];
-}
-function jsonread(player) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    dataplayer =
-    {
-        id: player,
-        casado: "nadie :(",
-        dias: 0,
-        nivel: 0,
-        ganadas: 0,
-        dinero: 0,
-        mensajes: 0,
-        banco: 0,
-        roles: "vagabundo",
-        objetos: []
-    };
-    let encuentra = false;
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === player) {
-            encuentra = true;
-            break;
-        }
-    }
-    if (encuentra === false) {
-        data.players.push(dataplayer);
-        fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-    }
-    return encuentra;
 }
 /**
  * 
@@ -152,51 +124,6 @@ function Bangame(id_group, game) {
             data.grouplist[i].juegos[0].baneados.push(games);
             fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
         }
-    }
-}
-function getAllInfoPlayer(player) {
-    try {
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
-        for (let i = 0; i < data.players.length; i++) {
-            if (data.players[i].id === player) {
-                return data.players[i];
-            }
-        }
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
-}
-/**
- * @param {id} player el id del jugador
- * @param {string} type el tipo de dato que se quiere actualizar
- * @param {string} value el valor que se quiere agregar
- * @param {boolean} rem si es true se reemplaza el valor si es false se agrega al array
- *   
- */
-function update_info_player(player, type, value, rem) {
-    try {
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
-        let data = JSON.parse(jsonfile);
-        if (rem === false) {
-            
-            for (let i = 0; i < data.players.length; i++) {
-                if (data.players[i].id === player) {
-                    data.players[i][type].push(value);
-                }
-            }
-        }else{
-            for (let i = 0; i < data.players.length; i++) {
-                if (data.players[i].id === player) {
-                    data.players[i][type] = value;
-                }
-            }
-        }
-        fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
-    } catch (err) {
-        console.log(err);
-        return null;
     }
 }
 /**
@@ -364,23 +291,6 @@ function activeBot(id_group, boolean) {
         }
     }
 }
-function update_dias(player ,dias, opcion) {
-    try {
-        if(opcion === 1){    
-            update_info_player(player, "dias", dias, true);
-        }else if(opcion === 2){
-            if(getAllInfoPlayer(player).dias !== dias){
-                return false;
-            }else{
-                return true;
-            }
-        }
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
-}
-//terminar luego
 /**
  * 
  * @param {number} opcion si es 1 actualiza el valor de baba si es 2 retorna el valor de baba
