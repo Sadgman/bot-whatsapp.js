@@ -410,9 +410,6 @@ client.on('message_create', async (message) => {
         update_info_player(contact.id.user, "ganadas", 0, true);
         message.reply('Felicidades has subido de nivel');
     }
-
-
-
     /**
     * Verifica si el usuario es admin o no, no necesita parametros
     * @param {string} author  id del usuario que envio el mensaje
@@ -1366,11 +1363,7 @@ client.on('message_create', async (message) => {
                                     client.sendMessage(message.from, media, { quotedMessageId: message.id._serialized });
                                     counterListRequestMusic = 0;
                                 })
-                                .on('error', n => {
-                                    counterListRequestMusic = 0;
-                                    console.error('Ocurrió un error:', n);
-                                    message.reply(mensaje_error);   
-                                });
+                                .on('error', console.error)
                         }
                     } catch (error) {
                         counterListRequestMusic = 0;
