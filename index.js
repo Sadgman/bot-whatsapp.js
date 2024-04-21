@@ -11,10 +11,10 @@ const { constrainedMemory } = require('process');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const quest = require('preguntas');
 const Jimp = require('jimp');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias } = require('./utils/playerUtils.js');
 const { error } = require('console');
+const quest = require('preguntas');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -975,6 +975,7 @@ client.on('message_create', async (message) => {
         if(chat.isGroup){
             if(groupActiveQuestions(1 ,chat.id._serialized) === false){
                 let indexp = quest.newIndexP();
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
                 groupActiveQuestions(6, chat.id._serialized, indexp);
                 groupActiveQuestions(2, chat.id._serialized, true);
