@@ -161,7 +161,13 @@ const prefijosPais = {
     '675': 'Papúa Nueva Guinea',
     '676': 'Tonga',
     '677': 'Islas Salomón',
-    '678': 'Van'
+    '678': 'Van',
+    '1809': 'República Dominicana',
+    '1829': 'República Dominicana',
+    '1849': 'República Dominicana',
+    '1868': 'Trinidad y Tobago',
+    '1869': 'San Cristóbal y Nieves',
+    '1876': 'Jamaica',
 };
 /**
  * Obtiene el país al que pertenece el número de teléfono
@@ -169,7 +175,7 @@ const prefijosPais = {
  * @returns {string} Nombre del país
  */
 function obtenerPais(numeroTelefono) {
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 5; i >= 1; i--) {
         let prefijo = numeroTelefono.substring(0, i);
         if (prefijosPais[prefijo]) {
             return prefijosPais[prefijo];
