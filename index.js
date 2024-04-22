@@ -12,6 +12,7 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
+const esp = require('languagetool-api')
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney } = require('./utils/playerUtils.js');
 const { error } = require('console');
 const quest = require('preguntas');
@@ -758,6 +759,40 @@ client.on('message_create', async (message) => {
             console.log(err);
         }
     }
+    if(message.body.toLocaleLowerCase().startsWith('escribir')){
+        if(getAllInfoPlayer(contact.id.user).roles === "escritor"){
+            if(getAllInfoPlayer(contact.id.user).objetos.includes("papel") && getAllInfoPlayer(contact.id.user).objetos.includes("lapiz")){
+                let texto = message.body.split(" ");
+                texto = texto.slice(1).join(" ");
+                if(texto.length < 20000){
+                    params = {
+                        language: 'auto',
+                        text: texto,
+                        preferredVariants: ['es-ES', 'es-AR']
+                    }
+                    esp.check(params, function (err, res) {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            if (res.matches.length > 0) {
+                                message.reply("Tienes errores ortograficos en tu texto, por favor corrigelos")
+                            }else{
+                                if(texto.length < 770){
+                                    message.reply("Eres bastante vag@ para escribir, te dare 2 monedas por tu esfuerzo");
+                                }else if(texto.length > 770){
+                                    message.reply("UFF eso está bastante bueno, te dare 20 monedas por tu esfuerzo");
+                                }
+                            }
+                        }
+                    })
+                }else{
+                    message.reply("Tu texto es demasiado largo, por favor acortalo");
+                }
+            }else{
+                message.reply("No tienes los objetos necesarios para escribir compra un papel y un lapiz");
+            }
+        }
+    }
     if(message.body.toLocaleLowerCase().startsWith('baile sexual')){
         console.log(contact.id.user)
         if(getAllInfoPlayer(contact.id.user).roles === "stripper"){
@@ -1186,7 +1221,9 @@ client.on('message_create', async (message) => {
                 "cuchillo": 10,
                 "pistola": 100,
                 "fusil": 500,
-                "rifle": 1000
+                "rifle": 1000,
+                "lapiz": 5,
+                "papel": 2,
             }
         }
         if (getAllInfoPlayer(contact.id.user).dinero >= 0 && getAllInfoPlayer(contact.id.user).nivel > 1){
