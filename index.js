@@ -980,7 +980,7 @@ client.on('message_create', async (message) => {
                 groupActiveQuestions(2, chat.id._serialized, true);
                 groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
                 if(watchBan(chat.id._serialized, 'todos') === true){
-                    message.reply(`${quest.readTitle()} \n\n ${quest.readResponse()}`);
+                    message.reply(quest.readTitle() + "\n\n" + quest.readResponse());
                 }
             }else{
                 message.reply('Ya hay una pregunta activa');
