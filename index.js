@@ -975,7 +975,7 @@ client.on('message_create', async (message) => {
         if(chat.isGroup){
             if(groupActiveQuestions(1 ,chat.id._serialized) === false){
                 let indexp = quest.newIndexP();
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                quest.modifyDataQuestion();
                 groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
                 groupActiveQuestions(6, chat.id._serialized, indexp);
                 groupActiveQuestions(2, chat.id._serialized, true);
