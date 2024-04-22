@@ -107,9 +107,20 @@ function update_dias(player ,dias, opcion) {
         return null;
     }
 }
+function topPlayersWithMostMoney() {
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let json = JSON.parse(jsonfile);
+    let top = [];
+    let sortedPlayers = json.players.sort((a, b) => b.dinero - a.dinero);
+    for (let i = 0; i < 5; i++) {
+        top.push(sortedPlayers[i].id);
+    }
+    return top;
+}
 module.exports = {
     jsonread,
     update_info_player,
     getAllInfoPlayer,
-    update_dias
+    update_dias,
+    topPlayersWithMostMoney
 };

@@ -12,7 +12,7 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
-const { jsonread, update_info_player, getAllInfoPlayer, update_dias } = require('./utils/playerUtils.js');
+const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney } = require('./utils/playerUtils.js');
 const { error } = require('console');
 const quest = require('preguntas');
 dayjs.extend(utc);
@@ -825,6 +825,13 @@ client.on('message_create', async (message) => {
         } else {
             update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
             message.reply('Ganaste el bot escogio papel');
+        }
+    }
+    if(message.body.toLocaleLowerCase() === 'los ricos'){
+        if(chat.isGroup){
+            const los_ricos =  topPlayersWithMostMoney();
+            let mentions;
+            let messageToSend = "*Los Ricos*\n\n";
         }
     }
     if (message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true) {
