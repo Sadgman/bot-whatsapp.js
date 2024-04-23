@@ -775,12 +775,17 @@ client.on('message_create', async (message) => {
                             console.log(err)
                         } else {
                             if (res.matches.length > 0) {
-                                message.reply("Tienes errores ortograficos en tu texto, por favor corrigelos")
+                                message.reply("*Tienes errores ortograficos en tu texto, por favor corrigelos*")
                             }else{
-                                if(texto.length < 770){
-                                    message.reply("Eres bastante vag@ para escribir, te dare 2 monedas por tu esfuerzo");
+                                if(texto.length < 770 && texto.length > 0 && texto.length < 100){
+                                    message.reply("*Eres bastante vag@ para escribir, te dare 2 monedas por tu esfuerzo*");
+                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 2, true);
                                 }else if(texto.length > 770){
-                                    message.reply("UFF eso está bastante bueno, te dare 20 monedas por tu esfuerzo");
+                                    message.reply("*UFF eso está bastante bueno, te dare 20 monedas por tu esfuerzo*");
+                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 20, true);
+                                }else{
+                                    message.reply("*Tu texto es una mierda no te dare nada por eso, es mas pagame te quitare dos monedas por hacerme perder el tiempo*")
+                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - 2, true);
                                 }
                             }
                         }
