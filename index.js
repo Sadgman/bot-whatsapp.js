@@ -386,7 +386,7 @@ const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Pied
 const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn"]
 let golpear;
 let counterListRequestMusic = 0;
-
+let cuentos = []
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
     let contact = await message.getContact();
@@ -764,34 +764,39 @@ client.on('message_create', async (message) => {
             if(getAllInfoPlayer(contact.id.user).objetos.includes("papel") && getAllInfoPlayer(contact.id.user).objetos.includes("lapiz")){
                 let texto = message.body.split(" ");
                 texto = texto.slice(1).join(" ");
-                if(texto.length < 20000){
-                    params = {
-                        language: 'auto',
-                        text: texto,
-                        preferredVariants: ['es-ES', 'es-AR']
-                    }
-                    esp.check(params, function (err, res) {
-                        if (err) {
-                            console.log(err)
-                        } else {
-                            if (res.matches.length > 0) {
-                                message.reply("*Tienes errores ortograficos en tu texto, por favor corrigelos*")
-                            }else{
-                                if(texto.length > 200 && texto.length < 770){
-                                    message.reply("*Eres bastante vag@ para escribir, te dare 2 monedas por tu esfuerzo*");
-                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 2, true);
-                                }else if(texto.length > 770){
-                                    message.reply("*UFF eso está bastante bueno, te dare 20 monedas por tu esfuerzo*");
-                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 20, true);
+                if(cuentos.includes(texto)){
+                    message.reply("*Ya has escrito esto antes, no puedes escribirlo de nuevo*");
+                }else{
+                    cuentos.push(texto);
+                    if(texto.length < 20000){
+                        params = {
+                            language: 'auto',
+                            text: texto,
+                            preferredVariants: ['es-ES', 'es-AR']
+                        }
+                        esp.check(params, function (err, res) {
+                            if (err) {
+                                console.log(err)
+                            } else {
+                                if (res.matches.length > 0) {
+                                    message.reply("*Tienes errores ortograficos en tu texto, por favor corrigelos*")
                                 }else{
-                                    message.reply("*Tu texto es una mierda no te dare nada por eso, es mas pagame te quitare dos monedas por hacerme perder el tiempo.*")
-                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - 2, true);
+                                    if(texto.length > 200 && texto.length < 770){
+                                        message.reply("*Eres bastante vag@ para escribir, te dare 2 monedas por tu esfuerzo*");
+                                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 2, true);
+                                    }else if(texto.length > 770){
+                                        message.reply("*UFF eso está bastante bueno, te dare 20 monedas por tu esfuerzo*");
+                                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 20, true);
+                                    }else{
+                                        message.reply("*Tu texto es una mierda no te dare nada por eso, es mas pagame te quitare dos monedas por hacerme perder el tiempo.*")
+                                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - 2, true);
+                                    }
                                 }
                             }
-                        }
-                    })
-                }else{
-                    message.reply("Tu texto es demasiado largo, por favor acortalo");
+                        })
+                    }else{
+                        message.reply("Tu texto es demasiado largo, por favor acortalo");
+                    }
                 }
             }else{
                 message.reply("No tienes los objetos necesarios para escribir compra un papel y un lapiz");
