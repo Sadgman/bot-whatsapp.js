@@ -387,6 +387,7 @@ const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", 
 let golpear;
 let counterListRequestMusic = 0;
 let cuentos = []
+const Alastor_Number = "32466905630"
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
     let contact = await message.getContact();
@@ -430,7 +431,7 @@ client.on('message_create', async (message) => {
 
 
         if (message.body.toLocaleLowerCase() === 'activar bot' || message.body.toLocaleLowerCase() === 'ab') {
-            if ((participantes(message.author) || contact.id.user === "32466905630") && watchBot(chat.id._serialized) === false) {
+            if ((participantes(message.author) || contact.id.user === Alastor_Number) && watchBot(chat.id._serialized) === false) {
                 activeBot(chat.id._serialized, true);
                 message.reply('El bot ha sido activado');
             }
@@ -439,7 +440,7 @@ client.on('message_create', async (message) => {
             return;
         }
         if (message.body.toLocaleLowerCase() === 'desactivar bot' || message.body.toLocaleLowerCase() === 'db') {
-            if (participantes(message.author) || contact.id.user === "32466905630") {
+            if (participantes(message.author) || contact.id.user === Alastor_Number) {
                 activeBot(chat.id._serialized, false);
                 message.reply('El bot ha sido desactivado');
             }
@@ -513,7 +514,6 @@ client.on('message_create', async (message) => {
             } else {
                 message.reply('No tienes suficientes mensajes o puntuacion para divorciarte');
             }
-
         }
     }
     function casarse(prometido){
@@ -1381,8 +1381,12 @@ client.on('message_create', async (message) => {
             const quotedMsg = await message.getQuotedMessage();
             const contacto_baba = await quotedMsg.getContact();
             if(contacto_baba.id.user === '595973819264'){
-                message.reply('Felicidades has atrapado la Baba ganaste una moneda');
-                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
+                if(contact.id.user === Alastor_Number){
+                    message.reply('Felicidades has atrapado la Baba ganaste una moneda');
+                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
+                }else{
+                    message.reply('*No toques la baba de Alastor*');
+                }
             }
         }
     }
@@ -1438,6 +1442,60 @@ client.on('message_create', async (message) => {
             message.reply('Espera un momento estoy ocupado enviando una canción');
         }
     }
+   /*  async function descargarVideo(){
+        const mensaje_error = "*Lo siento, no pude descargar el vídeo 😞*";
+        try {
+            const parts = message.body.split(' ');
+            const search = parts.slice(1).join(' ');
+            let stream;
+            await chat.sendSeen();
+            await chat.sendStateTyping();
+            await youtube.search(search, { limit: 1 }).then(x => {
+                try {
+                    if (x.length === 0) {
+                        message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
+                        return; 
+                    } else {
+                        if (!/^https?:\/\/(www\.)?youtube\.com\//.test(search)) {
+                            stream = ytdl(x[0].url);
+                        } else {
+                            stream = ytdl(search);
+                        }
+                        ffmpeg()
+                        .input(stream)
+                        .save('video.mp4')
+                        .on('end', () => {
+                            const file = fs.readFileSync('video.mp4');
+                            const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
+                            client.sendMessage(message.from, media, { quotedMessageId: message.id._serialized });
+                            counterListRequestMusic = 0;
+                        })
+                        .on('error', console.error)
+                    }
+                } catch (error) {
+                counterListRequestMusic = 0;
+                console.error('Ocurrió un error:', error);
+                message.reply(mensaje_error);
+                }
+            }).catch(err => {
+                counterListRequestMusic = 0;
+                console.error('Ocurrió un error en youtube.search:', err);
+                message.reply(mensaje_error);
+            });
+        } catch (error) {
+        counterListRequestMusic = 0;
+        console.error('Ocurrió un error:', error);
+        message.reply(mensaje_error);
+        }
+    }
+    if(message.body.toLocaleLowerCase().startsWith('vídeos') || message.body.toLocaleLowerCase().startsWith('v') || message.body.toLocaleLowerCase().startsWith('vídeo')){
+        counterListRequestMusic++;
+        if (counterListRequestMusic <= 1) {
+            descargarVideo();
+        }else {
+            message.reply('Espera un momento estoy ocupado enviando algo.');
+        }
+    } */
     async function mentionAll(text){
         if(chat.isGroup){
             try{
