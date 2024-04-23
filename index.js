@@ -782,11 +782,11 @@ client.on('message_create', async (message) => {
                                     message.reply("*Tienes errores ortograficos en tu texto, por favor corrigelos*")
                                 }else{
                                     if(texto.length > 200 && texto.length < 770){
-                                        message.reply("*Eres bastante vag@ para escribir, te dare 2 monedas por tu esfuerzo*");
-                                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 2, true);
+                                        message.reply("*Eres bastante vag@ para escribir, te dare 0.2 monedas por tu esfuerzo*");
+                                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 0.2, true);
                                     }else if(texto.length > 770){
-                                        message.reply("*UFF eso está bastante bueno, te dare 20 monedas por tu esfuerzo*");
-                                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 20, true);
+                                        message.reply("*UFF eso está bastante bueno, te dare 4 monedas por tu esfuerzo*");
+                                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 4, true);
                                     }else{
                                         message.reply("*Tu texto es una mierda no te dare nada por eso, es mas pagame te quitare dos monedas por hacerme perder el tiempo.*")
                                         update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - 2, true);
