@@ -111,9 +111,19 @@ function topPlayersWithMostMoney() {
     let jsonfile = fs.readFileSync('data.json', 'utf-8');
     let json = JSON.parse(jsonfile);
     let top = [];
-    let sortedPlayers = json.players.sort((a, b) => b.dinero - a.dinero);
+    let sortedPlayers = json.players.sort((a, b) => b.banco - a.banco);
     for (let i = 0; i < 5; i++) {
         top.push(sortedPlayers[i].id);
+    }
+    return top;
+}
+function moneyTopPlayers(){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let json = JSON.parse(jsonfile);
+    let top = [];
+    let sortedPlayers = json.players.sort((a, b) => b.banco - a.banco);
+    for (let i = 0; i < 5; i++) {
+        top.push(sortedPlayers[i].banco);
     }
     return top;
 }
@@ -122,5 +132,6 @@ module.exports = {
     update_info_player,
     getAllInfoPlayer,
     update_dias,
-    topPlayersWithMostMoney
+    topPlayersWithMostMoney,
+    moneyTopPlayers
 };

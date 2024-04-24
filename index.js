@@ -13,7 +13,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const esp = require('languagetool-api')
-const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney } = require('./utils/playerUtils.js');
+const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers } = require('./utils/playerUtils.js');
 const { error } = require('console');
 const quest = require('preguntas');
 dayjs.extend(utc);
@@ -867,9 +867,21 @@ client.on('message_create', async (message) => {
     if(message.body.toLocaleLowerCase() === 'los ricos'){
         if(chat.isGroup){
             const los_ricos =  topPlayersWithMostMoney();
-            let mentions;
+            const dinero_ricos = moneyTopPlayers();
+
             let messageToSend = "*Los Ricos*\n\n";
+            const contactsPromises = los_ricos.map(id => client.getContactById(id + '@c.us'));
+            const contacts = await Promise.all(contactsPromises);
+
+            for (let i = 0; i < contacts.length; i++) {
+                messageToSend += `${i + 1}. ${contacts[i].name} con ${dinero_ricos[i]} monedas\n`;
+            }
+            message.reply(messageToSend + los_ricos);
         }
+    }
+    if(message.body.toLocaleLowerCase() === 'prueba'){
+        const contactf = contact.name;
+        message.reply(contactf);
     }
     if (message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true) {
         let tempmenu_game = menu_game;
