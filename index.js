@@ -397,7 +397,12 @@ client.on('message_create', async (message) => {
     }
     const infoPlayer = getAllInfoPlayer(contact.id.user);
     const currentLevel = infoPlayer.nivel;
-    let winsNeeded = currentLevel * 10;
+    let winsNeeded;
+    if(currentLevel === 0){
+        winsNeeded = (currentLevel + 1) * 10;
+    }else{
+        winsNeeded = currentLevel * 10;
+    }
     if(infoPlayer.ganadas == winsNeeded){
         update_info_player(contact.id.user, "nivel", currentLevel + 1, true);
         update_info_player(contact.id.user, "ganadas", 0, true);
