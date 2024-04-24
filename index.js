@@ -357,7 +357,7 @@ let menu = `
 
 🃏🎞️🤳| St (crea sticker de la imagen que respondas)
 
-🔈🔉🔊 | TV (Crea un audio)
+🔈🔉🔊 | Tv (Crea un audio)
 
 🎸🎼🎵 | m (nombre de la cancion) 
 
@@ -382,33 +382,24 @@ let menu = `
 ¡Por ahora estas son todas las opciones que puedes disfrutar! Sigue apoyando.
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
-const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n" + "formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n Dado 🎲 (pon un numero del 1 al 6)\n!q crea una pregunta"
+const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n Dado 🎲 (pon un numero del 1 al 6)\n\n!q crea una pregunta" + "\n\nLos Roles tienen sus juegos propios"
 const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn"]
 let golpear;
 let counterListRequestMusic = 0;
 let cuentos = []
 const Alastor_Number = "32466905630"
+
 client.on('message_create', async (message) => {
     const chat = await message.getChat()
     let contact = await message.getContact();
     if (jsonread(contact.id.user)) {
         update_info_player(contact.id.user, "mensajes", getAllInfoPlayer(contact.id.user).mensajes + 1, true);
-        if (getAllInfoPlayer(contact.id.user).mensajes == 10000) {
-            update_info_player(contact.id.user, "nivel", getAllInfoPlayer(contact.id.user).nivel + 1, true);
-            update_info_player(contact.id.user, "mensajes", 0, true);
-            message.reply('Felicidades has subido de nivel');
-        }
     }
-    if (getAllInfoPlayer(contact.id.user).ganadas == 10 && getAllInfoPlayer(contact.id.user).nivel === 0) {
-        update_info_player(contact.id.user, "nivel", getAllInfoPlayer(contact.id.user).nivel + 1, true);
-        update_info_player(contact.id.user, "ganadas", 0, true);
-        message.reply('Felicidades has subido de nivel');
-    } else if (getAllInfoPlayer(contact.id.user).ganadas == 20 && getAllInfoPlayer(contact.id.user).nivel === 1) {
-        update_info_player(contact.id.user, "nivel", getAllInfoPlayer(contact.id.user).nivel + 1, true);
-        update_info_player(contact.id.user, "ganadas", 0,true);
-        message.reply('Felicidades has subido de nivel');
-    } else if (getAllInfoPlayer(contact.id.user).ganadas == 30 && getAllInfoPlayer(contact.id.user).nivel >= 2) {
-        update_info_player(contact.id.user, "nivel", getAllInfoPlayer(contact.id.user).nivel + 1, true);
+    const infoPlayer = getAllInfoPlayer(contact.id.user);
+    const currentLevel = infoPlayer.nivel;
+    let winsNeeded = currentLevel * 10;
+    if(infoPlayer.ganadas == winsNeeded){
+        update_info_player(contact.id.user, "nivel", currentLevel + 1, true);
         update_info_player(contact.id.user, "ganadas", 0, true);
         message.reply('Felicidades has subido de nivel');
     }
@@ -1177,7 +1168,9 @@ client.on('message_create', async (message) => {
                 "cuchillo": 10,
                 "pistola": 100,
                 "fusil": 500,
-                "rifle": 1000
+                "rifle": 1000,
+                "lapiz": 5,
+                "papel": 2,
             }
         }
         let mensaje1 = `*Bienvenido a la Tienda*\n\nEstos son los articulos disponibles por el momento:\n\nRoles:\n\n`;
@@ -1234,6 +1227,8 @@ client.on('message_create', async (message) => {
                 "rifle": 1000,
                 "lapiz": 5,
                 "papel": 2,
+                "lápiz": 5,
+
             }
         }
         if (getAllInfoPlayer(contact.id.user).dinero >= 0 && getAllInfoPlayer(contact.id.user).nivel > 1){
