@@ -382,7 +382,7 @@ let menu = `
 ¡Por ahora estas son todas las opciones que puedes disfrutar! Sigue apoyando.
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
-const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n Dado 🎲 (pon un numero del 1 al 6)\n\n!q crea una pregunta" + "\n\nLos Roles tienen sus juegos propios"
+const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> !q crea una pregunta" + "\n\n*Los Roles tienen sus juegos propios*"
 const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn"]
 let golpear;
 let counterListRequestMusic = 0;
@@ -398,7 +398,7 @@ client.on('message_create', async (message) => {
     const infoPlayer = getAllInfoPlayer(contact.id.user);
     const currentLevel = infoPlayer.nivel;
     let winsNeeded = (currentLevel + 1) * 10;
-    
+
     if(infoPlayer.ganadas == winsNeeded){
         update_info_player(contact.id.user, "nivel", currentLevel + 1, true);
         update_info_player(contact.id.user, "ganadas", 0, true);
