@@ -1655,7 +1655,7 @@ client.on('message_create', async (message) => {
     ¡Hola! ◡̈
     Puedes comunicarte con mi creador desde este link:
     
-    wa.me/32466905630
+    wa.me/${Alastor_Number}
     
     𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
     Aquí puedes Contactar con el diseñador del menu:
