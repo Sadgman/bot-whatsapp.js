@@ -1174,8 +1174,8 @@ client.on('message_create', async (message) => {
                 "cirujano plastico": 200000,
                 "enfermera": 2000,
             },
-            "Animales":{
-                "pollo": 5
+            "Pokemos":{
+                "baba": 5
             },
             "objetos":{
                 "casa": "2,000,000",
@@ -1238,7 +1238,7 @@ client.on('message_create', async (message) => {
                 "enfermera": 2000,
             },
             "Animales":{
-                "pollo": 5
+                "baba": 5
             },
             "objetos":{
                 "casa": 2000000,
