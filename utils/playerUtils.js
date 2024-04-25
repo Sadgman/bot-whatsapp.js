@@ -19,6 +19,16 @@ function jsonread(player) {
         mensajes: 0,
         banco: 0,
         roles: "vagabundo",
+        animales: [
+            {
+                "nombre": "",
+                "tipo": "",
+                "cansancio": 0,
+                "hambre": 0,
+                "felicidad": 0,
+                "salud": 0,
+            }
+        ],
         objetos: []
     };
     let encuentra = false;

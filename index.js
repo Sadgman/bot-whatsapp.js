@@ -16,6 +16,7 @@ const esp = require('languagetool-api')
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers } = require('./utils/playerUtils.js');
 const { error } = require('console');
 const quest = require('preguntas');
+const { addAnimal, modifyAnimalsParameters, getAnimalParameters, getAnimals } = require('./utils/animals.js');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -517,7 +518,7 @@ client.on('message_create', async (message) => {
                     if (getAllInfoPlayer(prometido).casado === "nadie :(") {
                         update_info_player(contact.id.user, "casado", prometido, true);
                         update_info_player(prometido, "casado", contact.id.user, true);
-                        message.reply("*🎉Felicidades ahora casad@!!*");
+                        message.reply("*🎉Felicidades ahora estas casad@!!*");
                     }
                 }
             } catch (err) {
@@ -1173,6 +1174,9 @@ client.on('message_create', async (message) => {
                 "cirujano plastico": 200000,
                 "enfermera": 2000,
             },
+            "Animales":{
+                "pollo": 5
+            },
             "objetos":{
                 "casa": "2,000,000",
                 "carro": "500,000",
@@ -1196,6 +1200,10 @@ client.on('message_create', async (message) => {
             }else if(rol === "detective"){
                 mensaje1 += "\n\n*Hospital*\n\n";
             }
+        }
+        mensaje1 += "\n\n*Animales*\n\n";
+        for (let animal in articulos.Animales) {
+            mensaje1 += `${animal}: ${articulos.Animales[animal]} monedas\n`;
         }
         mensaje1 += "\n\n*Objetos:*\n\n";
         for (let objeto in articulos.objetos) {
@@ -1228,6 +1236,9 @@ client.on('message_create', async (message) => {
                 "cirujano": 100000,
                 "cirujano plastico": 200000,
                 "enfermera": 2000,
+            },
+            "Animales":{
+                "pollo": 5
             },
             "objetos":{
                 "casa": 2000000,
@@ -1275,6 +1286,21 @@ client.on('message_create', async (message) => {
                             update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - articulos.objetos[objeto], true);
                             update_info_player(contact.id.user, "objetos", objeto, false);
                             message.reply('Has comprado el articulo');
+                        }else{
+                            message.reply('No tienes suficiente dinero');
+                        }
+                    }
+                }
+            }else if(articulo in articulos.Animales){
+                for (let animal in articulos.Animales) {
+                    if (articulo === animal) {
+                        if(getAllInfoPlayer(contact.id.user).dinero >= articulos.Animales[animal]){
+                            if(addAnimal(contact.id.user, animal)){
+                                message.reply('Ya tenias este animal');
+                            }else{
+                                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - articulos.Animales[animal], true);
+                                message.reply('Has comprado el articulo');
+                            }
                         }else{
                             message.reply('No tienes suficiente dinero');
                         }
