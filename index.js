@@ -888,7 +888,7 @@ client.on('message_create', async (message) => {
     }
     if (message.body.toLocaleLowerCase().startsWith('st')) {
         let part = message.body.split(' ');
-        partst = part.slice(0);
+        const partst = part.slice(0);
         if(partst.length === 2){
             part = part.slice(1)
             await chat.sendSeen();
