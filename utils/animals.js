@@ -128,6 +128,12 @@ function deleteAnimal(player_id, animal_name){
         }
     }
 }
+/**
+ * 
+ * @param {number} player_id el id del jugador
+ * @param {string} animal_name nombre del animal
+ * @returns devuelve true si el animal ya existe en el jugador, false si no existe
+ */
 function animalExist(player_id ,animal_name){
     // Esta función verifica si el animal ya existe en el jugador
     let playerRead = fs.readFileSync('data.json', 'utf-8');

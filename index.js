@@ -16,7 +16,7 @@ const esp = require('languagetool-api')
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers } = require('./utils/playerUtils.js');
 const { error } = require('console');
 const quest = require('preguntas');
-const { addAnimal, modifyAnimalsParameters, getAnimalParameters, getAnimals } = require('./utils/animals.js');
+const { addAnimal, modifyAnimalsParameters, getAnimalParameters, getAnimals, animalExist } = require('./utils/animals.js');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -292,26 +292,6 @@ function activeBot(id_group, boolean) {
             break;
         }
     }
-}
-/**
- * 
- * @param {number} opcion si es 1 actualiza el valor de baba si es 2 retorna el valor de baba
- * @param {boolean} booleano valor que se quiere agregar a baba
- * @param {number} player id del jugador
- * @returns retorna el valor de baba si es 2
- */
-function atrapa_baba(opcion, player, booleano) {
-    try {
-        if(opcion === 1){
-            update_info_player(player, "baba", booleano, true);
-        }else if(opcion === 2){
-            return getAllInfoPlayer(player).baba;
-        }
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
-
 }
 let option = {
     juego: 0,
@@ -1174,7 +1154,7 @@ client.on('message_create', async (message) => {
                 "cirujano plastico": 200000,
                 "enfermera": 2000,
             },
-            "Pokemos":{
+            "Animales":{
                 "baba": 5
             },
             "objetos":{
@@ -1201,7 +1181,7 @@ client.on('message_create', async (message) => {
                 mensaje1 += "\n\n*Hospital*\n\n";
             }
         }
-        mensaje1 += "\n\n*Animales*\n\n";
+        mensaje1 += "\n\n*Pokemos*\n\n";
         for (let animal in articulos.Animales) {
             mensaje1 += `${animal}: ${articulos.Animales[animal]} monedas\n`;
         }
@@ -1238,7 +1218,8 @@ client.on('message_create', async (message) => {
                 "enfermera": 2000,
             },
             "Animales":{
-                "baba": 5
+                "baba": 5,
+                "Baba": 5
             },
             "objetos":{
                 "casa": 2000000,
@@ -1409,17 +1390,26 @@ client.on('message_create', async (message) => {
             }
         }
     }
-    // Hay que implementar el tiempo a esto luego
     if(message.body.toLocaleLowerCase() === 'baba'){
         if(message.hasQuotedMsg){
             const quotedMsg = await message.getQuotedMessage();
             const contacto_baba = await quotedMsg.getContact();
             if(contacto_baba.id.user === '595973819264'){
+                let random_number = Math.floor(Math.random() * 2) + 1;
                 if(contact.id.user === Alastor_Number){
-                    message.reply('Felicidades has atrapado la Baba ganaste una moneda');
+                    message.reply('Felicidades has atrapado a Baba ganaste una moneda');
                     update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
+                }else if(animalExist(contact.id.user, 'baba')){
+                    switch (random_number) {
+                        case 1:
+                            message.reply('Felicidades has atrapado a Baba ganaste media moneda');
+                            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 0.5, true);
+                            break;
+                        case 2:
+                            message.reply('*Baba escapó :(*')
+                    }
                 }else{
-                    message.reply('*No toques la baba de Alastor*');
+                    message.reply('No tienes a Baba');
                 }
             }
         }
