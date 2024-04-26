@@ -886,81 +886,84 @@ client.on('message_create', async (message) => {
             message.reply(tempmenu_game);
         }
     }
-    if (message.body.toLocaleLowerCase().startsWith('sticker ') || message.body.toLocaleLowerCase().startsWith('st')) {
+    if (message.body.toLocaleLowerCase().startsWith('st')) {
         let part = message.body.split(' ');
-        part = part.slice(1)
-        await chat.sendSeen();
-        await chat.sendStateTyping();
-        let d;
-        if (message.hasQuotedMsg) {
-            const mensaje_citado = await message.getQuotedMessage();
-            try {
-                d = await mensaje_citado.downloadMedia();
-            } catch (err) {
-                message.reply('No pude descargar eso');
-            }
-            let media;
-            if (mensaje_citado.hasMedia) {
+        partst = part.slice(0);
+        if(partst.length === 2){
+            part = part.slice(1)
+            await chat.sendSeen();
+            await chat.sendStateTyping();
+            let d;
+            if (message.hasQuotedMsg) {
+                const mensaje_citado = await message.getQuotedMessage();
                 try {
-                    switch (mensaje_citado.type) {
+                    d = await mensaje_citado.downloadMedia();
+                } catch (err) {
+                    message.reply('No pude descargar eso');
+                }
+                let media;
+                if (mensaje_citado.hasMedia) {
+                    try {
+                        switch (mensaje_citado.type) {
+                            case 'image':
+                                media = new MessageMedia('image/png', d.data, 'sticker');
+                                chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                                break;
+                            case 'video':
+                                media = new MessageMedia('video/mp4', d.data, 'sticker');
+                                chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                                break;
+                        }
+
+                    } catch (err) {
+                        message.reply('No se pudo crear el sticker');
+                    }
+                }
+            } else if (message.hasMedia === true) {
+                try {
+                    d = await message.downloadMedia();
+                } catch (err) {
+                    message.reply('No pude descargar eso');
+                }
+                try {
+                    switch (message.type) {
                         case 'image':
                             media = new MessageMedia('image/png', d.data, 'sticker');
-                            chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                            chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: '' });
                             break;
                         case 'video':
                             media = new MessageMedia('video/mp4', d.data, 'sticker');
                             chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
                             break;
                     }
-
                 } catch (err) {
                     message.reply('No se pudo crear el sticker');
                 }
-            }
-        } else if (message.hasMedia === true) {
-            try {
-                d = await message.downloadMedia();
-            } catch (err) {
-                message.reply('No pude descargar eso');
-            }
-            try {
-                switch (message.type) {
-                    case 'image':
-                        media = new MessageMedia('image/png', d.data, 'sticker');
-                        chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: '' });
-                        break;
-                    case 'video':
-                        media = new MessageMedia('video/mp4', d.data, 'sticker');
-                        chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
-                        break;
+            } else if(part.length > 0){
+                async function createStickerWithText(text) {
+                    const image = new Jimp(512, 512, 0x00000000);
+                    const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK); 
+
+                    const textImage = new Jimp(image.bitmap.width, image.bitmap.height);
+                    textImage.print(font, 0, 0, {
+                        text: text,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+                        alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
+                    }, image.bitmap.width, image.bitmap.height);
+                    textImage.color([{ apply: 'xor', params: ['#800000'] }]);
+                    image.composite(textImage, 0, 0);
+
+                    const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+                    const sticker = new MessageMedia('image/png', buffer.toString('base64'), 'sticker');
+                    return sticker;
                 }
-            } catch (err) {
-                message.reply('No se pudo crear el sticker');
+                
+                async function sendSticker(to, text) {
+                    const sticker = await createStickerWithText(text);
+                    chat.sendMessage(sticker, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                }
+                sendSticker(message.from, part.join(' '));
             }
-        } else if(part.length > 0){
-            async function createStickerWithText(text) {
-                const image = new Jimp(512, 512, 0x00000000);
-                const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK); 
-
-                const textImage = new Jimp(image.bitmap.width, image.bitmap.height);
-                textImage.print(font, 0, 0, {
-                    text: text,
-                    alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
-                    alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
-                }, image.bitmap.width, image.bitmap.height);
-                textImage.color([{ apply: 'xor', params: ['#800000'] }]);
-                image.composite(textImage, 0, 0);
-
-                const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
-                const sticker = new MessageMedia('image/png', buffer.toString('base64'), 'sticker');
-                return sticker;
-            }
-            
-            async function sendSticker(to, text) {
-                const sticker = await createStickerWithText(text);
-                chat.sendMessage(sticker, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
-            }
-            sendSticker(message.from, part.join(' '));
         }
     }
     if (message.body.toLowerCase().startsWith("tv ")) {
