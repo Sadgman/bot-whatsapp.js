@@ -371,7 +371,8 @@ let cuentos = []
 const Alastor_Number = "32466905630"
 
 client.on('message_create', async (message) => {
-    const chat = await message.getChat()
+    console.log(message.body);
+    const chat = await message.getChat();
     let contact = await message.getContact();
     if (jsonread(contact.id.user)) {
         update_info_player(contact.id.user, "mensajes", getAllInfoPlayer(contact.id.user).mensajes + 1, true);
@@ -1418,7 +1419,7 @@ client.on('message_create', async (message) => {
         let pokemons = getAllAnimals(contact.id.user);
         let mensaje = "*Tus pokemons son:*\n\n";
         for(let pokemon of pokemons){
-            mensaje += `${pokemon}\n`;
+            mensaje += `${pokemon.nombre}\n`;
         }
         message.reply(mensaje);
     }
@@ -1426,7 +1427,7 @@ client.on('message_create', async (message) => {
         pokemon = message.body.split(' ');
         pokemon = pokemon.slice(1).join(' ');
         if(animalExist(contact.id.user, pokemon)){
-            let stats = getAnimalParameters(contact.id.user, pokemon);
+            let stats = await getAnimalParameters(contact.id.user, pokemon);
             let mensaje = `*Estadisticas de ${pokemon}*\n\n`;
             mensaje += `*Nombre:* ${stats.nombre}\n`;
             mensaje += `*Tipo:* ${stats.tipo}\n`;

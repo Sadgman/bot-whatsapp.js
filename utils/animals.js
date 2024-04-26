@@ -91,7 +91,7 @@ function modifyAnimalsParameters(player_id, animal_name, parameter, value, optio
  * @param {string} animal_name nombre del animal
  * @returns 
  */
-function getAnimalParameters(player_id, animal_name){
+async function getAnimalParameters(player_id, animal_name){
     // Esta función devuelve los parámetros de un animal en específico con este formato:
     /* {
         "nombre": "",
