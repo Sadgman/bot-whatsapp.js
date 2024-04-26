@@ -874,7 +874,6 @@ client.on('message_create', async (message) => {
         await chat.sendSeen();
         await chat.sendStateTyping();
         if (chat.isGroup) {
-
             jsonread(contact.id.user);
             addgroup(message.from);
             if (watchBan(chat.id._serialized, 'menciones') == false && watchBan(chat.id._serialized, 'todos') == true) {
