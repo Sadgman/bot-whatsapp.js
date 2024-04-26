@@ -1414,6 +1414,29 @@ client.on('message_create', async (message) => {
             }
         }
     }
+    if(message.body.toLocaleLowerCase() === 'pokemons'){
+        let pokemons = getAllAnimals(contact.id.user);
+        let mensaje = "*Tus pokemons son:*\n\n";
+        for(let pokemon of pokemons){
+            mensaje += `${pokemon}\n`;
+        }
+        message.reply(mensaje);
+    }
+    if(message.body.toLocaleLowerCase().startsWith('stats')){
+        pokemon = message.body.split(' ');
+        pokemon = pokemon.slice(1).join(' ');
+        if(animalExist(contact.id.user, pokemon)){
+            let stats = getAnimalParameters(contact.id.user, pokemon);
+            let mensaje = `*Estadisticas de ${pokemon}*\n\n`;
+            mensaje += `*Nombre:* ${stats.nombre}\n`;
+            mensaje += `*Tipo:* ${stats.tipo}\n`;
+            mensaje += `*Cansancio:* ${stats.cansancio}\n`;
+            mensaje += `*Hambre:* ${stats.hambre}\n`;
+            mensaje += `*Felicidad:* ${stats.felicidad}\n`;
+            mensaje += `*Salud:* ${stats.salud}\n`;
+            message.reply(mensaje);
+        }
+    }
     if (message.body.toLowerCase().startsWith("musica ") || message.body.toLowerCase().startsWith("m ") || message.body.toLowerCase().startsWith("música ")) {
             counterListRequestMusic++;
             const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";

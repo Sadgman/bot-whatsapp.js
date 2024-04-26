@@ -85,9 +85,22 @@ function modifyAnimalsParameters(player_id, animal_name, parameter, value, optio
         }
     }
 }
-
+/**
+ * 
+ * @param {number} player_id id del jugador
+ * @param {string} animal_name nombre del animal
+ * @returns 
+ */
 function getAnimalParameters(player_id, animal_name){
-    // Esta función devuelve los parámetros de un animal en específico
+    // Esta función devuelve los parámetros de un animal en específico con este formato:
+    /* {
+        "nombre": "",
+        "tipo": "",
+        "cansancio": 0,
+        "hambre": 0,
+        "felicidad": 0,
+        "salud": 0,
+    } */
     let playerRead = fs.readFileSync('data.json', 'utf-8');
     let data = JSON.parse(playerRead);
     for (let i = 0; i < data.players.length; i++) {
