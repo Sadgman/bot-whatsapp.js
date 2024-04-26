@@ -863,7 +863,11 @@ client.on('message_create', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'prueba'){
         const contactf = contact.name;
+        const id = client.getNumberId(contact.id.user)
+        const contactfr = await client.getContactById(id);
+        message.reply(contactfr);
         message.reply(contactf);
+        message.reply(id)
     }
     if (message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true) {
         let tempmenu_game = menu_game;
