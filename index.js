@@ -889,7 +889,6 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase().startsWith('st')) {
         let part = message.body.split(' ');
         const partst = part.slice(0)[0];
-        console.log(partst, partst.length)
         if(partst.length === 2){
             part = part.slice(1)
             await chat.sendSeen();
@@ -1430,15 +1429,17 @@ client.on('message_create', async (message) => {
     if(message.body.toLocaleLowerCase().startsWith('stats')){
         pokemon = message.body.split(' ');
         pokemon = pokemon.slice(1).join(' ');
+        console.log(pokemon)
         if(animalExist(contact.id.user, pokemon)){
             let stats = await getAnimalParameters(contact.id.user, pokemon);
-            let mensaje = `*Estadisticas de ${pokemon}*\n\n`;
-            mensaje += `*Nombre:* ${stats.nombre}\n`;
-            mensaje += `*Tipo:* ${stats.tipo}\n`;
-            mensaje += `*Cansancio:* ${stats.cansancio}\n`;
-            mensaje += `*Hambre:* ${stats.hambre}\n`;
-            mensaje += `*Felicidad:* ${stats.felicidad}\n`;
-            mensaje += `*Salud:* ${stats.salud}\n`;
+            let mensaje = `
+            *Estadisticas de ${pokemon}*\n\n
+            *Nombre:* ${stats.nombre}\n
+            *Tipo:* ${stats.tipo}\n
+            *Cansancio:* ${stats.cansancio}\n
+            *Hambre:* ${stats.hambre}\n
+            *Felicidad:* ${stats.felicidad}\n
+            *Salud:* ${stats.salud}\n`;
             message.reply(mensaje);
         }
     }
