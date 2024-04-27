@@ -25,8 +25,8 @@ function addAnimal(id_player ,name){
         "tipo": name,
         "cansancio": 0,
         "hambre": 0,
-        "felicidad": 0,
-        "salud": 0,
+        "felicidad": 100,
+        "salud": 100,
     };
     // Se busca si el jugador ya tiene el animal 
     let found = false;
