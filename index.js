@@ -846,19 +846,22 @@ client.on('message_create', async (message) => {
             message.reply('Ganaste el bot escogio papel');
         }
     }
-    if(message.body.toLocaleLowerCase() === 'los ricos'){
+    if(message.body.toLocaleLowerCase() === 'top ricos'){
         if(chat.isGroup){
             const los_ricos =  topPlayersWithMostMoney();
             const dinero_ricos = moneyTopPlayers();
-
+            let menciones = []
+            
             let messageToSend = "*Los Ricos*\n\n";
-            const contactsPromises = los_ricos.map(id => client.getContactById(id + '@c.us'));
-            const contacts = await Promise.all(contactsPromises);
+
+            for(mention of los_ricos){
+                mention.push(`${mention}@c.us`);
+            }
 
             for (let i = 0; i < contacts.length; i++) {
-                messageToSend += `${i + 1}. ${contacts[i].name} con ${dinero_ricos[i]} monedas\n`;
+                messageToSend += `${i + 1}. @${los_ricos[i]} con ${dinero_ricos[i]} monedas\n`;
             }
-            message.reply(messageToSend + los_ricos);
+            chat.sendMessage(messageToSend, { mentions: menciones });
         }
     }
     if(message.body.toLocaleLowerCase() === 'prueba'){
