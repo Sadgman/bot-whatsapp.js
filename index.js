@@ -858,7 +858,7 @@ client.on('message_create', async (message) => {
                 menciones.push(`${mention}@c.us`);
             }
 
-            for (let i = 0; i < contacts.length; i++) {
+            for (let i = 0; i < los_ricos.length; i++) {
                 messageToSend += `${i + 1}. @${los_ricos[i]} con ${dinero_ricos[i]} monedas\n`;
             }
             chat.sendMessage(messageToSend, { mentions: menciones });
