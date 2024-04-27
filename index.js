@@ -876,11 +876,10 @@ client.on('message_create', async (message) => {
             }
 
             for (let i = 0; i < los_niveles.length; i++) {
-                messageToSend += `${i + 1}. @${los_niveles[i]} con ${niveles[i]} monedas\n`;
+                messageToSend += `${i + 1}. @${los_niveles[i]} nivel ${niveles[i]}. \n`;
             }
             chat.sendMessage(messageToSend, { mentions: menciones });
         }
-        
     }
     if(message.body.toLocaleLowerCase() === 'prueba'){
         const contactf = contact.name;
