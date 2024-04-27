@@ -137,11 +137,34 @@ function moneyTopPlayers(){
     }
     return top;
 }
+function topPlayersWithMostLevel(){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let json = JSON.parse(jsonfile);
+    let top = [];
+    let sortedPlayers = json.players.sort((a, b) => b.nivel - a.nivel);
+    for (let i = 0; i < 5; i++) {
+        top.push(sortedPlayers[i].id);
+    }
+    return top;
+
+}
+function levelTopPlayers(){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let json = JSON.parse(jsonfile);
+    let top = [];
+    let sortedPlayers = json.players.sort((a, b) => b.nivel - a.nivel);
+    for (let i = 0; i < 5; i++) {
+        top.push(sortedPlayers[i].nivel);
+    }
+    return top;
+}
 module.exports = {
     jsonread,
     update_info_player,
     getAllInfoPlayer,
     update_dias,
     topPlayersWithMostMoney,
-    moneyTopPlayers
+    moneyTopPlayers,
+    topPlayersWithMostLevel,
+    levelTopPlayers
 };

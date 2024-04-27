@@ -13,7 +13,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const esp = require('languagetool-api')
-const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers } = require('./utils/playerUtils.js');
+const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers } = require('./utils/playerUtils.js');
 const { error } = require('console');
 const quest = require('preguntas');
 const { addAnimal, modifyAnimalsParameters, getAnimalParameters, getAnimals, animalExist } = require('./utils/animals.js');
@@ -863,6 +863,24 @@ client.on('message_create', async (message) => {
             }
             chat.sendMessage(messageToSend, { mentions: menciones });
         }
+    }
+    if(message.body.toLocaleLowerCase() === 'top nivel'){
+        if(chat.isGroup){
+            const los_niveles = topPlayersWithMostLevel();
+            const niveles = levelTopPlayers();
+            let menciones = []
+            let messageToSend = "*Los Mejores*\n\n";
+
+            for(mention of los_niveles){
+                menciones.push(`${mention}@c.us`);
+            }
+
+            for (let i = 0; i < los_niveles.length; i++) {
+                messageToSend += `${i + 1}. @${los_niveles[i]} con ${niveles[i]} monedas\n`;
+            }
+            chat.sendMessage(messageToSend, { mentions: menciones });
+        }
+        
     }
     if(message.body.toLocaleLowerCase() === 'prueba'){
         const contactf = contact.name;
