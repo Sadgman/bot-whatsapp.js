@@ -1042,15 +1042,11 @@ client.on('message_create', async (message) => {
         }
 
         groupTimes[id_group] = setTimeout(() => {
-            if(groupActiveQuestions(1, id_group) === false){
-                return;
-            }
-
             groupActiveQuestions(2, id_group, false);
             chat.sendMessage('La pregunta ha expirado');
 
             delete groupTimes[id_group];
-        }, 7000);
+        }, 10000);
     }
     if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
         if(chat.isGroup){
