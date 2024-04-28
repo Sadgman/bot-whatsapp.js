@@ -369,7 +369,7 @@ let golpear;
 let counterListRequestMusic = 0;
 let cuentos = []
 let groupTimes = {};
-const Alastor_Number = "32466905630"
+const Alastor_Number = ["32466905630", "18098972404"]
 
 client.on('message_create', async (message) => {
     console.log(message.body);
@@ -406,7 +406,7 @@ client.on('message_create', async (message) => {
 
 
         if (message.body.toLocaleLowerCase() === 'activar bot' || message.body.toLocaleLowerCase() === 'ab') {
-            if ((participantes(message.author) || contact.id.user === Alastor_Number) && watchBot(chat.id._serialized) === false) {
+            if ((participantes(message.author) || Alastor_Number.includes(contact.id.user)) && watchBot(chat.id._serialized) === false) {
                 activeBot(chat.id._serialized, true);
                 message.reply('El bot ha sido activado');
             }
@@ -415,7 +415,7 @@ client.on('message_create', async (message) => {
             return;
         }
         if (message.body.toLocaleLowerCase() === 'desactivar bot' || message.body.toLocaleLowerCase() === 'db') {
-            if (participantes(message.author) || contact.id.user === Alastor_Number) {
+            if (participantes(message.author) || Alastor_Number.includes(contact.id.user)) {
                 activeBot(chat.id._serialized, false);
                 message.reply('El bot ha sido desactivado');
             }
@@ -1440,7 +1440,7 @@ client.on('message_create', async (message) => {
             const contacto_baba = await quotedMsg.getContact();
             if(contacto_baba.id.user === '595973819264'){
                 let random_number = Math.floor(Math.random() * 2) + 1;
-                if(contact.id.user === Alastor_Number){
+                if(Alastor_Number.includes(contact.id.user)){
                     message.reply('Felicidades has atrapado a Baba ganaste una moneda');
                     update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
                 }else if(animalExist(contact.id.user, 'baba')){
@@ -1725,6 +1725,10 @@ client.on('message_create', async (message) => {
             }
         }
     }
+    if(message.body.toLocaleLowerCase() === 'sb' && Alastor_Number.includes(contact.id.user)){
+        client.destroy();
+        process.exit();
+    }
     if(message.body.toLocaleLowerCase() == 'donacion' || message.body.toLocaleLowerCase() == 'donar'){
         message.reply(`
         🌟 *Apoya Mi Trabajo* 🌟
@@ -1753,7 +1757,7 @@ client.on('message_create', async (message) => {
     ¡Hola! ◡̈
     Puedes comunicarte con mi creador desde este link:
     
-    wa.me/${Alastor_Number}
+    wa.me/${Alastor_Number[0]}
     
     𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
     Aquí puedes Contactar con el diseñador del menu:
