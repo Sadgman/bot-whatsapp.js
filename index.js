@@ -372,7 +372,6 @@ let groupTimes = {};
 const Alastor_Number = ["32466905630", "18098972404"]
 
 client.on('message_create', async (message) => {
-    console.log(message.body);
     const chat = await message.getChat();
     let contact = await message.getContact();
     if (jsonread(contact.id.user)) {
