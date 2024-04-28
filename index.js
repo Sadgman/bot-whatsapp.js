@@ -368,6 +368,7 @@ const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", 
 let golpear;
 let counterListRequestMusic = 0;
 let cuentos = []
+let groupTimes = {};
 const Alastor_Number = "32466905630"
 
 client.on('message_create', async (message) => {
@@ -1035,17 +1036,33 @@ client.on('message_create', async (message) => {
 
         processAudio();
     }
+
+    const TempQuest = (id_group) => {
+        if (groupTimes[id_group]) {
+            return;
+        }
+
+        groupTimes[id_group] = setTimeout(() => {
+            if(groupActiveQuestions(1, id_group) === false){
+                return;
+            }
+
+            groupActiveQuestions(2, id_group, false);
+            chat.sendMessage('La pregunta ha expirado');
+
+            delete groupTimes[id_group];
+        }, 7000);
+    }
     if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
         if(chat.isGroup){
-            if(groupActiveQuestions(1 ,chat.id._serialized) === false){
+            if(groupActiveQuestions(1 ,chat.id._serialized) === false && watchBan(chat.id._serialized, 'todos') === true){
                 let indexp = quest.newIndexP();
                 groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
                 groupActiveQuestions(6, chat.id._serialized, indexp);
                 groupActiveQuestions(2, chat.id._serialized, true);
                 groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
-                if(watchBan(chat.id._serialized, 'todos') === true){
-                    message.reply(quest.readTitle() + "\n\n" + quest.readResponse());
-                }
+                message.reply(quest.readTitle() + "\n\n" + quest.readResponse());
+                TempQuest(chat.id._serialized);
             }else{
                 message.reply('Ya hay una pregunta activa');
             }
