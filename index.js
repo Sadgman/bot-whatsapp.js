@@ -1042,6 +1042,7 @@ client.on('message_create', async (message) => {
         }
 
         groupTimes[id_group] = setTimeout(() => {
+
             groupActiveQuestions(2, id_group, false);
             chat.sendMessage('La pregunta ha expirado');
 
@@ -1659,6 +1660,10 @@ client.on('message_create', async (message) => {
         const quotedMsg = await message.getQuotedMessage();
         if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
             groupActiveQuestions(2, chat.id._serialized, false);
+            if (groupTimes[chat.id._serialized]) {
+                clearTimeout(groupTimes[chat.id._serialized]);
+                delete groupTimes[chat.id._serialized];
+            }
             if(resp === groupActiveQuestions(4, chat.id._serialized)){
                 message.reply("Respuesta correcta ganaste 1 punto 👍 ");
                 update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
