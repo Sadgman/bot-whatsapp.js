@@ -369,6 +369,7 @@ let golpear;
 let counterListRequestMusic = 0;
 let cuentos = []
 let groupTimes = {};
+let contadordia = {};
 const Alastor_Number = ["32466905630", "18098972404"]
 
 client.on('message_create', async (message) => {
@@ -987,6 +988,37 @@ client.on('message_create', async (message) => {
                 }
                 sendSticker(message.from, part.join(' '));
             }
+        }
+    }
+
+    const ContadorDeUnDia = (player) => {
+        if(contadordia[player]){
+            return;
+        }
+        let startTime = Date.now();
+        contadordia[player] = {
+            timeout: setTimeout(() => {
+                delete contadordia[player];
+            }, 60000),
+            startTime: startTime,
+            totalDuration: 60000
+        };
+    }
+    const Tiempo_restante = (player) => {
+        if(!contadordia[player]){
+            return 0;
+        }
+        let elapsedTime = Date.now() - contadordia[player].startTime;
+        return Math.floor((contadordia[player].totalDuration - elapsedTime) / 1000);
+    }
+    if(message.body.toLocaleLowerCase() === '!w'){
+        if(contadordia[contact.id.user]){
+            message.reply(`Ya trabajaste intentalo en ${Tiempo_restante(contact.id.user)} segundos`);
+            return;
+        }else if(chat.isGroup){
+            message.reply('Uff trabajaste duro, alguien te pagó 1 moneda');
+            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
+            ContadorDeUnDia(contact.id.user);
         }
     }
     if (message.body.toLowerCase().startsWith("tv ")) {
