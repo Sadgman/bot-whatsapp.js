@@ -1539,10 +1539,14 @@ client.on('message_create', async (message) => {
                                 .on('end', () => {
                                     const file = fs.readFileSync('n.mp3');
                                     const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                                    client.sendMessage(message.from, media, { quotedMessageId: message.id._serialized });
+                                    chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                                     counterListRequestMusic = 0;
                                 })
-                                .on('error', console.error)
+                                .on('error', (err) => {
+                                    console.error(err);
+                                    counterListRequestMusic = 0;
+                                    message.reply(mensaje_error);
+                                })
                         }
                     } catch (error) {
                         counterListRequestMusic = 0;
