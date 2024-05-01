@@ -158,6 +158,26 @@ function levelTopPlayers(){
     }
     return top;
 }
+function topUsersMessages(){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let json = JSON.parse(jsonfile);
+    let top = [];
+    let sortedPlayers = json.players.sort((a, b) => b.mensajes - a.mensajes);
+    for (let i = 0; i < 5; i++) {
+        top.push(sortedPlayers[i].id);
+    }
+    return top;
+}
+function messageUsers(){
+    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let json = JSON.parse(jsonfile);
+    let top = [];
+    let sortedPlayers = json.players.sort((a, b) => b.mensajes - a.mensajes);
+    for (let i = 0; i < 5; i++) {
+        top.push(sortedPlayers[i].mensajes);
+    }
+    return top;
+}
 module.exports = {
     jsonread,
     update_info_player,
@@ -166,5 +186,7 @@ module.exports = {
     topPlayersWithMostMoney,
     moneyTopPlayers,
     topPlayersWithMostLevel,
-    levelTopPlayers
+    levelTopPlayers,
+    topUsersMessages,
+    messageUsers
 };

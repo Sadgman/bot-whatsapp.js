@@ -13,7 +13,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const esp = require('languagetool-api')
-const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers } = require('./utils/playerUtils.js');
+const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers } = require('./utils/playerUtils.js');
 const { error } = require('console');
 const quest = require('preguntas');
 const { addAnimal, modifyAnimalsParameters, getAnimalParameters, getAnimals, animalExist } = require('./utils/animals.js');
@@ -375,6 +375,14 @@ const Alastor_Number = ["32466905630", "18098972404"]
 client.on('message_create', async (message) => {
     const chat = await message.getChat();
     let contact = await message.getContact();
+    function quitar_acentos(palabra){
+        const palabras_raras = ["á", "é", "í", "ó", "ú", "ñ", "ü"];
+        const letras_normales = ["a", "e", "i", "o", "u", "n", "u"];
+        for (let i = 0; i < palabras_raras.length; i++) {
+            palabra = palabra.replace(new RegExp(palabras_raras[i], 'g'), letras_normales[i]);
+        }
+        return palabra;
+    }
     if (jsonread(contact.id.user)) {
         update_info_player(contact.id.user, "mensajes", getAllInfoPlayer(contact.id.user).mensajes + 1, true);
     }
@@ -613,6 +621,12 @@ client.on('message_create', async (message) => {
             return;
         }
         message.reply(`${dado} El resultado es: ${ganador}`);
+    }
+    if(message.body.toLocaleLowerCase().startsWith('pp')){
+        //pp es pelea de pollos por apuestas el jugador introduce una cantidad de dinero a apostar y el bot elige un numero de probabilidad de ganar basandose en las estadisticas del animal
+        let parts = message.body.split(' ');
+        let cantidad = parts[1];
+        
     }
     if (message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt') {
         await chat.sendSeen();
@@ -878,6 +892,21 @@ client.on('message_create', async (message) => {
 
             for (let i = 0; i < los_niveles.length; i++) {
                 messageToSend += `${i + 1}. @${los_niveles[i]} nivel ${niveles[i]}. \n`;
+            }
+            chat.sendMessage(messageToSend, { mentions: menciones });
+        }
+    }
+    if(message.body.toLocaleLowerCase() === 'top mensajes'){
+        if(chat.isGroup){
+            const personas = topUsersMessages();
+            const mensajes = messageUsers();
+            let menciones = []
+            let messageToSend = "*Los mas habladores*\n\n";
+            for(mention of personas){
+                menciones.push(`${mention}@c.us`);
+            }
+            for (let i = 0; i < personas.length; i++) {
+                messageToSend += `${i + 1}. @${personas[i]} con ${mensajes[i]} mensajes\n`;
             }
             chat.sendMessage(messageToSend, { mentions: menciones });
         }
@@ -1227,7 +1256,8 @@ client.on('message_create', async (message) => {
                 "enfermera": 2000,
             },
             "Animales":{
-                "baba": 5
+                "baba": 5,
+                "pollo": 10
             },
             "objetos":{
                 "casa": "2,000,000",
@@ -1266,7 +1296,7 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase().startsWith('comprar ')) {
         let parts = message.body.split(' ');
         let articulo = parts[1];
-        articulo = articulo.toLocaleLowerCase();
+        articulo = quitar_acentos(articulo.toLocaleLowerCase());
         let articulos = {
             "roles": {
                 "panadero": 200,    
@@ -1291,7 +1321,7 @@ client.on('message_create', async (message) => {
             },
             "Animales":{
                 "baba": 5,
-                "Baba": 5
+                "pollo": 10,
             },
             "objetos":{
                 "casa": 2000000,
@@ -1304,7 +1334,6 @@ client.on('message_create', async (message) => {
                 "rifle": 1000,
                 "lapiz": 5,
                 "papel": 2,
-                "lápiz": 5,
 
             }
         }
