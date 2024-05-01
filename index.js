@@ -367,6 +367,7 @@ const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Pi
 const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn"]
 let golpear;
 let counterListRequestMusic = 0;
+let counterListRequestVideo = 0;
 let cuentos = []
 let groupTimes = {};
 let contadordia = {};
@@ -612,7 +613,7 @@ client.on('message_create', async (message) => {
             dado = "         ⚂\n";
         } else if (numeroObjetivo === 4) {
             dado = "         ⚃\n";
-        } else if (numeroObjetivo === 5) {
+        } else if (numeroObjetivo === 5) {z
             dado = "         ⚄\n";
         } else if (numeroObjetivo === 6) {
             dado = "         ⚅\n";
@@ -1596,60 +1597,63 @@ client.on('message_create', async (message) => {
             message.reply('Espera un momento estoy ocupado enviando una canción');
         }
     }
-   /*  async function descargarVideo(){
+    if (message.body.toLowerCase().startsWith("v ")) {
+        counterListRequestVideo++;
+        message.reply('*Descargando el vídeo, espera un momento...*');
         const mensaje_error = "*Lo siento, no pude descargar el vídeo 😞*";
-        try {
-            const parts = message.body.split(' ');
-            const search = parts.slice(1).join(' ');
-            let stream;
-            await chat.sendSeen();
-            await chat.sendStateTyping();
-            await youtube.search(search, { limit: 1 }).then(x => {
-                try {
-                    if (x.length === 0) {
-                        message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
-                        return; 
-                    } else {
-                        if (!/^https?:\/\/(www\.)?youtube\.com\//.test(search)) {
-                            stream = ytdl(x[0].url);
+        if(counterListRequestVideo <= 1){
+            try {
+                const parts = message.body.split(' ');
+                const search = parts.slice(1).join(' ');
+                let stream;
+                await chat.sendSeen();
+                await chat.sendStateTyping();
+                await youtube.search(search, { limit: 1 }).then(x => {
+                    try {
+                        if (x.length === 0) {
+                            message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
+                            return;
                         } else {
-                            stream = ytdl(search);
+                            if (!/^https?:\/\/(www\.)?youtube\.com\//.test(search)) {
+                                stream = ytdl(x[0].url, { filter: 'videoandaudio', quality: "lowestvideo"});
+                            } else {
+                                stream = ytdl(search, { filter:  'videoandaudio', quality: "lowestvideo"});
+                            }
+                            ffmpeg()
+                                .input(stream)
+                                .save('video.mp4')
+                                .on('end', () => {
+                                    const file = fs.readFileSync('video.mp4');
+                                    const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
+                                    chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                                    counterListRequestVideo = 0;
+                                })
+                                .on('error', (err) => {
+                                    console.error(err);
+                                    counterListRequestVideo = 0;
+                                    message.reply(mensaje_error);
+                                })
                         }
-                        ffmpeg()
-                        .input(stream)
-                        .save('video.mp4')
-                        .on('end', () => {
-                            const file = fs.readFileSync('video.mp4');
-                            const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
-                            client.sendMessage(message.from, media, { quotedMessageId: message.id._serialized });
-                            counterListRequestMusic = 0;
-                        })
-                        .on('error', console.error)
+                    } catch (error) {
+                        counterListRequestVideo = 0;
+                        console.error('Ocurrió un error:', error);
+                        message.reply(mensaje_error);
                     }
-                } catch (error) {
-                counterListRequestMusic = 0;
+                }).catch(err => {
+                    counterListRequestVideo = 0;
+                    console.error('Ocurrió un error en youtube.search:', err);
+                    message.reply(mensaje_error);
+                });
+            } catch (error) {
+                counterListRequestVideo = 0;
                 console.error('Ocurrió un error:', error);
                 message.reply(mensaje_error);
-                }
-            }).catch(err => {
-                counterListRequestMusic = 0;
-                console.error('Ocurrió un error en youtube.search:', err);
-                message.reply(mensaje_error);
-            });
-        } catch (error) {
-        counterListRequestMusic = 0;
-        console.error('Ocurrió un error:', error);
-        message.reply(mensaje_error);
+            }
+        }else{
+            message.reply('Espera un momento estoy ocupado enviando un vídeo');
         }
     }
-    if(message.body.toLocaleLowerCase().startsWith('vídeos') || message.body.toLocaleLowerCase().startsWith('v') || message.body.toLocaleLowerCase().startsWith('vídeo')){
-        counterListRequestMusic++;
-        if (counterListRequestMusic <= 1) {
-            descargarVideo();
-        }else {
-            message.reply('Espera un momento estoy ocupado enviando algo.');
-        }
-    } */
+
     async function mentionAll(text){
         if(chat.isGroup){
             try{
