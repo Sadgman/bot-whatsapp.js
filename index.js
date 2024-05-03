@@ -1541,6 +1541,23 @@ client.on('message_create', async (message) => {
             message.reply(mensaje);
         }
     }
+    function descargarM(stream){
+        ffmpeg()
+            .input(stream)
+            .audioBitrate(128)
+            .save('n.mp3')
+            .on('end', () => {
+                const file = fs.readFileSync('n.mp3');
+                const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+                chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                counterListRequestMusic = 0;
+            })
+            .on('error', (err) => {
+                console.error(err);
+                counterListRequestMusic = 0;
+                message.reply(mensaje_error);
+            })
+    }
     if (message.body.toLowerCase().startsWith("musica ") || message.body.toLowerCase().startsWith("m ") || message.body.toLowerCase().startsWith("música ")) {
             counterListRequestMusic++;
             const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
@@ -1551,34 +1568,21 @@ client.on('message_create', async (message) => {
                     let stream;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
+                    if (search.includes('https://youtu.be/')){
+                        stream = ytdl(search, { filter: 'audioonly' });
+                        descargarM(stream);
+                        return
+                    }
                     await youtube.search(search, { limit: 1 }).then(x => {
                     try {
                         if (x.length === 0) {
                             message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
                             counterListRequestMusic = 0;
                             return;
-                        } else {
-                            if (!/^https?:\/\/(www\.)?youtube\.com\//.test(search)) {
-                                stream = ytdl(x[0].url, { filter: 'audioonly' });
-                            } else {
-                                stream = ytdl(search, { filter: 'audioonly' });
-                            }
-                            ffmpeg()
-                                .input(stream)
-                                .audioBitrate(128)
-                                .save('n.mp3')
-                                .on('end', () => {
-                                    const file = fs.readFileSync('n.mp3');
-                                    const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                                    chat.sendMessage(media, { quotedMessageId: message.id._serialized });
-                                    counterListRequestMusic = 0;
-                                })
-                                .on('error', (err) => {
-                                    console.error(err);
-                                    counterListRequestMusic = 0;
-                                    message.reply(mensaje_error);
-                                })
                         }
+                        stream = ytdl(x[0].url, { filter: 'audioonly' });
+                        descargarM(stream);
+
                     } catch (error) {
                         counterListRequestMusic = 0;
                         console.error('Ocurrió un error:', error);
