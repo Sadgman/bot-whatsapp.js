@@ -25,8 +25,8 @@ function jsonread(player) {
                 "tipo": "",
                 "cansancio": 0,
                 "hambre": 0,
-                "felicidad": 0,
-                "salud": 0,
+                "felicidad": 100,
+                "salud": 100,
             }
         ],
         objetos: []

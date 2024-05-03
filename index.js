@@ -1555,6 +1555,7 @@ client.on('message_create', async (message) => {
                     try {
                         if (x.length === 0) {
                             message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
+                            counterListRequestMusic = 0;
                             return;
                         } else {
                             if (!/^https?:\/\/(www\.)?youtube\.com\//.test(search)) {
