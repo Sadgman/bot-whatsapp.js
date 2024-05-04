@@ -817,6 +817,13 @@ client.on('message_create', async (message) => {
         }
     }
     //-----------------------------------------------------------------------------------------------------------------------
+    // Creo el juego del blackjack debo terminarlo luego
+    if (message.body.toLocaleLowerCase().startsWith('bj')) {
+        if(chat.isGroup){
+            const mensaje = '*Bienvenido*\n\nUsa los siguientes comandos para jugar:\n\nbj apostar (cantidad)\nbj plantarse\nbj pedir carta\nbj doblar apuesta\nbj rendirse';
+            message.reply(mensaje)
+        }
+    }
     if (message.body.toLocaleLowerCase() === 'ppt piedra') {
         await chat.sendSeen();
         await chat.sendStateTyping();
