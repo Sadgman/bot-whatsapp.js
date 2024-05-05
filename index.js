@@ -363,7 +363,7 @@ let menu = `
 ¡Por ahora estas son todas las opciones que puedes disfrutar! Sigue apoyando.
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
-const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n> formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> !q crea una pregunta" + "\n\n*Los Roles tienen sus juegos propios*"
+const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n> formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> BlackJack(bj)\n\n> !q crea una pregunta" + "\n\n*Los Roles tienen sus juegos propios*"
 const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn"]
 let golpear;
 let counterListRequestMusic = 0;
@@ -824,22 +824,46 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase().startsWith('bj')){
         if(chat.isGroup){
             if(message.body.toLocaleLowerCase() === 'bj'){
-                const mensaje = '*Bienvenido*\n\nUsa los siguientes comandos para jugar:\n\nbj apostar (cantidad)\nbj plantarse\nbj pedir carta\nbj doblar apuesta\nbj rendirse';
+                const mensaje = '*Bienvenido*\n\nUsa los siguientes comandos para jugar:\n\nbj apostar (cantidad)\nbj plantarse\nbj pedir\nbj rendirse';
                 message.reply(mensaje);
             }
             //cartas tiene el valor de su numero
             const cartas =[2,3,4,5,6,7,8,9,10,11,12,13,14];
             // cartas_palos no tiene un valor numerico en el juego pero el as de corazones puede valer 1 u 11
-            const cartas_palos = ['♠️', '♣️', '♥️', '♦️'];
+            const cartas_palos = ['♠️', '♣️', '♥️', '♦️', '♥️', '♥️', '♥️'];
             // cartas especiales tiene un valor de 10
             const cartas_especiales = ['J', 'Q', 'K', 'A'];
             const cartas_completas = cartas.concat(cartas_especiales, cartas_palos);
             const opcion = message.body.toLocaleLowerCase().split(" ");
+            const sumar_cartas_dealer = (jugador) => {
+                let suma = 0;
+                let as = 0;
+                for(carta of dealer[jugador]){
+                    if(cartas.includes(carta)){
+                        suma += carta;
+                    }else if(cartas_especiales.includes(carta)){
+                        suma += 10;
+                    }else if(carta === 'A'){
+                        as += 1;
+                    }
+                }
+                for(let i = 0; i < as; i++){
+                    if(suma + 11 <= 21){
+                        suma += 11;
+                    }else{
+                        suma += 1;
+                    }
+                }
+                return suma;
+            }
             const dealer_bot = (jugador) =>{
                 let numero = Math.floor(Math.random() * cartas_completas.length);
                 let carta = cartas_completas[numero];
                 if (!dealer[jugador]) {
                     dealer[jugador] = [];
+                }
+                if(sumar_cartas_dealer(jugador) >= 17){
+                    return;
                 }
                 if(dealer[jugador].includes(carta)){
                     return dealer_bot(jugador);
@@ -859,14 +883,52 @@ client.on('message_create', async (message) => {
                     return repartir(jugador);
                 }
                 cartas_jugador[jugador].push(carta);
+                dealer_bot(jugador);
                 return carta;
             }
-
+            const sumar_cartas_jugador = (jugador) => {
+                let suma = 0;
+                let as = 0;
+                for(carta of cartas_jugador[jugador]){
+                    if(cartas.includes(carta)){
+                        suma += carta;
+                    }else if(cartas_especiales.includes(carta)){
+                        suma += 10;
+                    }else if(carta === 'A'){
+                        as += 1;
+                    }
+                }
+                for(let i = 0; i < as; i++){
+                    if(suma + 11 <= 21){
+                        suma += 11;
+                    }else{
+                        suma += 1;
+                    }
+                }
+                return suma;
+            }
+            const ganador = (jugador) => {
+                const suma_jugador = sumar_cartas_jugador(jugador);
+                const suma_dealer = sumar_cartas_dealer(jugador);
+                if(suma_jugador > 21 && suma_dealer > 21){
+                    return 'empate';
+                }else if(suma_dealer > 21){
+                    return 'jugador';
+                }else if(suma_jugador > 21){
+                    return 'dealer';
+                }else if(suma_jugador > suma_dealer){
+                    return 'jugador';
+                }else if(suma_jugador < suma_dealer){
+                    return 'dealer';
+                }
+                return 'empate';
+            }
             if(opcion[1] === 'apostar'){
                 if(!cartas_jugador[contact.id.user]){
                     const cantidad = opcion[2];
                     if(cantidad > 0){
                         if(getAllInfoPlayer(contact.id.user).dinero >= cantidad){
+                            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
                             message.reply("Tu carta es: " + repartir(contact.id.user));
                         }else{
                             message.reply('No tienes suficiente dinero para apostar esa cantidad');
@@ -882,6 +944,29 @@ client.on('message_create', async (message) => {
                 if(cartas_jugador[contact.id.user]){
                     let carta = repartir(contact.id.user);
                     message.reply("Tu carta es: " + carta);
+                }else{
+                    message.reply('Debes apostar primero');
+                }
+            }
+            if(opcion[1] === 'plantarse'){
+                if(cartas_jugador[contact.id.user]){
+                    const ganador_juego = ganador(contact.id.user);
+                    if(ganador_juego === 'jugador'){
+                        message.reply('Has ganado' + " las cartas del deler son: " + dealer[contact.id.user]);
+                    }else if(ganador_juego === 'dealer'){
+                        message.reply('Has perdido' + " las cartas del deler son: " + dealer[contact.id.user]);
+                    }else{
+                        message.reply('Empate');
+                    }
+                    delete cartas_jugador[contact.id.user];
+                    delete dealer[contact.id.user];
+                }
+            }
+            if(opcion[1] === 'rendirse'){
+                if(cartas_jugador[contact.id.user]){
+                    delete cartas_jugador[contact.id.user];
+                    delete dealer[contact.id.user];
+                    message.reply('Has perdido');
                 }else{
                     message.reply('Debes apostar primero');
                 }
