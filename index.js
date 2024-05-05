@@ -371,11 +371,14 @@ let counterListRequestVideo = 0;
 let cuentos = []
 let groupTimes = {};
 let contadordia = {};
+let cartas_jugador = {};
+let dealer = {};
 const Alastor_Number = ["32466905630", "18098972404"]
 
 client.on('message_create', async (message) => {
     const chat = await message.getChat();
     let contact = await message.getContact();
+    console.log("menaje de : " + message.body)
     function quitar_acentos(palabra){
         const palabras_raras = ["á", "é", "í", "ó", "ú", "ñ", "ü"];
         const letras_normales = ["a", "e", "i", "o", "u", "n", "u"];
@@ -414,7 +417,7 @@ client.on('message_create', async (message) => {
         addgroup(chat.id._serialized);
 
 
-        if (message.body.toLocaleLowerCase() === 'activar bot' || message.body.toLocaleLowerCase() === 'ab') {
+        if (message.body.toLocaleLowerCase() === 'ab') {
             if ((participantes(message.author) || Alastor_Number.includes(contact.id.user)) && watchBot(chat.id._serialized) === false) {
                 activeBot(chat.id._serialized, true);
                 message.reply('El bot ha sido activado');
@@ -818,10 +821,71 @@ client.on('message_create', async (message) => {
     }
     //-----------------------------------------------------------------------------------------------------------------------
     // Creo el juego del blackjack debo terminarlo luego
-    if (message.body.toLocaleLowerCase().startsWith('bj')) {
+    if (message.body.toLocaleLowerCase().startsWith('bj')){
         if(chat.isGroup){
-            const mensaje = '*Bienvenido*\n\nUsa los siguientes comandos para jugar:\n\nbj apostar (cantidad)\nbj plantarse\nbj pedir carta\nbj doblar apuesta\nbj rendirse';
-            message.reply(mensaje)
+            if(message.body.toLocaleLowerCase() === 'bj'){
+                const mensaje = '*Bienvenido*\n\nUsa los siguientes comandos para jugar:\n\nbj apostar (cantidad)\nbj plantarse\nbj pedir carta\nbj doblar apuesta\nbj rendirse';
+                message.reply(mensaje);
+            }
+            //cartas tiene el valor de su numero
+            const cartas =[2,3,4,5,6,7,8,9,10,11,12,13,14];
+            // cartas_palos no tiene un valor numerico en el juego pero el as de corazones puede valer 1 u 11
+            const cartas_palos = ['♠️', '♣️', '♥️', '♦️'];
+            // cartas especiales tiene un valor de 10
+            const cartas_especiales = ['J', 'Q', 'K', 'A'];
+            const cartas_completas = cartas.concat(cartas_especiales, cartas_palos);
+            const opcion = message.body.toLocaleLowerCase().split(" ");
+            const dealer_bot = (jugador) =>{
+                let numero = Math.floor(Math.random() * cartas_completas.length);
+                let carta = cartas_completas[numero];
+                if (!dealer[jugador]) {
+                    dealer[jugador] = [];
+                }
+                if(dealer[jugador].includes(carta)){
+                    return dealer_bot(jugador);
+                }
+                if(!cartas_jugador[jugador].includes(carta)){
+                    dealer[jugador].push(carta);
+                }
+                return carta;
+            }
+            const repartir = (jugador) => {
+                let numero = Math.floor(Math.random() * cartas_completas.length);
+                let carta = cartas_completas[numero];
+                if (!cartas_jugador[jugador]) {
+                    cartas_jugador[jugador] = [];
+                }
+                if(cartas_jugador[jugador].includes(carta) && dealer[jugador].includes(carta)){
+                    return repartir(jugador);
+                }
+                cartas_jugador[jugador].push(carta);
+                return carta;
+            }
+
+            if(opcion[1] === 'apostar'){
+                if(!cartas_jugador[contact.id.user]){
+                    const cantidad = opcion[2];
+                    if(cantidad > 0){
+                        if(getAllInfoPlayer(contact.id.user).dinero >= cantidad){
+                            message.reply("Tu carta es: " + repartir(contact.id.user));
+                        }else{
+                            message.reply('No tienes suficiente dinero para apostar esa cantidad');
+                        }
+                    }else{
+                        message.reply('Introduce una cantidad valida');
+                    }
+                }else{
+                    message.reply('Ya has apostado, no puedes apostar de nuevo');
+                }
+            }
+            if(opcion[1] === 'pedir'){
+                if(cartas_jugador[contact.id.user]){
+                    let carta = repartir(contact.id.user);
+                    message.reply("Tu carta es: " + carta);
+                }else{
+                    message.reply('Debes apostar primero');
+                }
+            }
         }
     }
     if (message.body.toLocaleLowerCase() === 'ppt piedra') {
