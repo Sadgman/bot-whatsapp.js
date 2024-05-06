@@ -373,6 +373,7 @@ let groupTimes = {};
 let contadordia = {};
 let cartas_jugador = {};
 let dealer = {};
+let dinero_bj = {};
 const Alastor_Number = ["32466905630", "18098972404"]
 
 client.on('message_create', async (message) => {
@@ -928,6 +929,7 @@ client.on('message_create', async (message) => {
                     const cantidad = opcion[2];
                     if(cantidad > 0){
                         if(getAllInfoPlayer(contact.id.user).dinero >= cantidad){
+                            dinero_bj[contact.id.user] = cantidad;
                             update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
                             message.reply("Tu carta es: " + repartir(contact.id.user));
                         }else{
@@ -952,6 +954,7 @@ client.on('message_create', async (message) => {
                 if(cartas_jugador[contact.id.user]){
                     const ganador_juego = ganador(contact.id.user);
                     if(ganador_juego === 'jugador'){
+                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + dinero_bj[contact.id.user] * 2, true);
                         message.reply('Has ganado' + " las cartas del deler son: " + dealer[contact.id.user]);
                     }else if(ganador_juego === 'dealer'){
                         message.reply('Has perdido' + " las cartas del deler son: " + dealer[contact.id.user]);
@@ -960,12 +963,14 @@ client.on('message_create', async (message) => {
                     }
                     delete cartas_jugador[contact.id.user];
                     delete dealer[contact.id.user];
+                    delete dinero_bj[contact.id.user];
                 }
             }
             if(opcion[1] === 'rendirse'){
                 if(cartas_jugador[contact.id.user]){
                     delete cartas_jugador[contact.id.user];
                     delete dealer[contact.id.user];
+                    delete dinero_bj[contact.id.user];
                     message.reply('Has perdido');
                 }else{
                     message.reply('Debes apostar primero');
