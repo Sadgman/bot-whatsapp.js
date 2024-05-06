@@ -299,9 +299,12 @@ let option = {
 };
 client.on('group_join', (notification) => {
     notification.getChat().then((chat) => {
-        notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}`, {
-            mentions: [notification.recipientIds[0]]
-        });
+        addgroup(chat.id._serialized);
+        if(watchBot(chat.id._serialized)){
+            notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}`, {
+                mentions: [notification.recipientIds[0]]
+            });
+        }
     })
 });
 client.on('group_admin_changed', (notification) => {
