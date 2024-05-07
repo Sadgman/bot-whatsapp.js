@@ -1215,7 +1215,7 @@ client.on('message_create', async (message) => {
             ContadorDeUnDia(contact.id.user);
         }
     }
-    if (message.body.toLowerCase().startsWith("tv ")) {
+    if (message.body.toLowerCase().startsWith("tv")) {
         let parts = message.body.split(' ');
         if(message.body.toLocaleLowerCase() === 'tv'){
             message.reply('Debes introducir un texto, y estos son los idiomas validos:\n\n en\n es\n fr\n de\n it\n ja\n ko\n nl\n pl\n pt\n ru\n zh\n pt');
