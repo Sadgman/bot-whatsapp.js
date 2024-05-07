@@ -849,6 +849,7 @@ client.on('message_create', async (message) => {
                 message.reply('No puedes apostar una cantidad negativa');
                 return;
             }
+            cantidad = parseInt(cantidad);
             if(getAllInfoPlayer(contact.id.user).dinero >= cantidad){
                 let resultado = Math.floor(Math.random() * 2);
                 if(resultado === 0 && opcion === 'cara'){
