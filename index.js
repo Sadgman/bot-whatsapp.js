@@ -1784,7 +1784,7 @@ client.on('message_create', async (message) => {
                 message.reply(mensaje_error);
             })
     }
-    if (message.body.toLowerCase().startsWith("musica ") || message.body.toLowerCase().startsWith("m ") || message.body.toLowerCase().startsWith("música ")) {
+    if (message.body.toLowerCase().startsWith("m")) {
             counterListRequestMusic++;
             const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
             if(counterListRequestMusic <= 1){
@@ -1828,7 +1828,7 @@ client.on('message_create', async (message) => {
             message.reply('Espera un momento estoy ocupado enviando una canción');
         }
     }
-    if (message.body.toLowerCase().startsWith("v ")) {
+    if (message.body.toLowerCase().startsWith("v")) {
         counterListRequestVideo++;
         message.reply('*Descargando el vídeo, espera un momento...*');
         const mensaje_error = "*Lo siento, no pude descargar el vídeo 😞*";
