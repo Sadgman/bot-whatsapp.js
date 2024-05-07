@@ -1974,7 +1974,7 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '1') {
-        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){      
+        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized)){      
             comp(1);     
         }
         if (option.juego == 1) {
@@ -1990,12 +1990,12 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '2') {
-        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
+        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized)){
             comp(2);
         }
         if (option.juego == 1) {
-            if (watchBan(chat.id._serialized, 'todos') == true) {
-                if (watchBan(chat.id._serialized, 'menciones') == true) {
+            if (watchBan(chat.id._serialized, 'todos')) {
+                if (watchBan(chat.id._serialized, 'menciones')) {
                     Bangame(message.from, ['menciones']);
                     option.juego = 0;
                     message.reply("Se han quitado los juegos con menciones");
@@ -2008,12 +2008,12 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() == '3') {
-        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized) === true){
+        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized)){
             comp(3);
         }
         if (option.juego == 1) {
-            if (watchBan(chat.id._serialized, 'todos') == true) {
-                if (watchBan(chat.id._serialized, 'admins') == true) {
+            if (watchBan(chat.id._serialized, 'todos')) {
+                if (watchBan(chat.id._serialized, 'admins')) {
                     Bangame(message.from, ['admins']);
                     option.juego = 0;
                     message.reply("Ahora solo los administradores pueden utilizar los juegos con menciones");
@@ -2042,6 +2042,8 @@ client.on('message_create', async (message) => {
         💻 Gastos del Servidor y Desarrollo - Con $10 al mes, apoyas directamente los costos del servidor y el desarrollo continuo del bot.
         ¿Quieres contribuir?
         
+        *Si quieres que el Bot entre a tu grupo dona algo*
+
         Haz clic aquí y elige cómo quieres apoyar: 
         Donar Ahora 💖 https://www.patreon.com/alastor782/membership
         `);
