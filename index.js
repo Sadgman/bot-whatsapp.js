@@ -1217,6 +1217,11 @@ client.on('message_create', async (message) => {
     }
     if (message.body.toLowerCase().startsWith("tv ")) {
         let parts = message.body.split(' ');
+        if(message.body.toLocaleLowerCase() === 'tv'){
+            message.reply('Debes introducir un texto, y estos son los idiomas validos:\n\n en\n es\n fr\n de\n it\n ja\n ko\n nl\n pl\n pt\n ru\n zh\n pt');
+            message.reply('Ejemplo:\n\n> tv en hola como estas');
+            return;
+        }
         let mensaje_citado;
         let text;
         valid_language_codes = ['in', 'es', 'fr', 'de', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'zh', 'pt'];
