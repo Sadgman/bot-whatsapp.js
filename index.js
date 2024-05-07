@@ -1337,7 +1337,7 @@ client.on('message_create', async (message) => {
             delete groupTimes[id_group];
         }, 10000);
     }
-    if(message.body.toLocaleLowerCase() === '!q' || message.body.toLocaleLowerCase() === 'preguntass'){
+    if(message.body.toLocaleLowerCase() === '!q'){
         if(chat.isGroup){
             if(groupActiveQuestions(1 ,chat.id._serialized) === false && watchBan(chat.id._serialized, 'todos') === true){
                 let indexp = quest.newIndexP();
@@ -1969,7 +1969,7 @@ client.on('message_create', async (message) => {
                 update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
             }else{
                 message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(groupActiveQuestions(5, chat.id._serialized), groupActiveQuestions(4, chat.id._serialized))} perdiste dos puntos 👎👎`);
-                update_info_player(contact.id.user, "perdidas", getAllInfoPlayer(contact.id.user).perdidas + 2, true);
+                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 2, true);
             }
         }
     }
