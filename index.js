@@ -1520,7 +1520,7 @@ client.on('message_create', async (message) => {
         }
         message.reply(mensaje1);
     }
-    if (message.body.toLocaleLowerCase().startsWith('comprar ')) {
+    if (message.body.toLocaleLowerCase().startsWith('comprar')) {
         let parts = message.body.split(' ');
         let articulo = parts[1];
         articulo = quitar_acentos(articulo.toLocaleLowerCase());
