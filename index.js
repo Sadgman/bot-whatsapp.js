@@ -824,6 +824,63 @@ client.on('message_create', async (message) => {
         }
     }
     //-----------------------------------------------------------------------------------------------------------------------
+
+    if (message.body.toLocaleLowerCase().startsWith('cz')) {
+        if (chat.isGroup) {
+            if (message.body.toLocaleLowerCase() === 'cz') {
+                message.reply('Usa los siguientes comandos para jugar:\ncz (cantidad) (cara o cruz)');
+                return;
+            }
+            let parts = message.body.split(' ');
+            let cantidad = parts[1];
+            let opcion = parts[2];
+            if(typeof opcion !== 'string'){
+                message.reply('La opcion debe ser cara o cruz');
+                return;
+            }else{
+                opcion = quitar_acentos(opcion);
+                opcion = opcion.toLocaleLowerCase();
+            }
+            if (isNaN(cantidad)) {
+                message.reply('La cantidad debe ser un numero');
+                return;
+            }
+            if(cantidad < 0){
+                message.reply('No puedes apostar una cantidad negativa');
+                return;
+            }
+            if(getAllInfoPlayer(contact.id.user).dinero < cantidad){
+                let resultado = Math.floor(Math.random() * 2);
+                if(resultado === 0 && opcion === 'cara'){
+                    const media = MessageMedia.fromFilePath('./assets/cara.jpg')
+                    const medi = new MessageMedia('image/jpg', media.data, 'sticker');
+                    message.reply('Has ganado');
+                    chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + cantidad, true);
+
+                }else if(opcion === 'cara'){
+                    const media = MessageMedia.fromFilePath('./assets/cruz.jpg')
+                    const medi = new MessageMedia('image/jpg', media.data, 'sticker');
+                    message.reply('Has perdido');
+                    chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
+                } 
+                if(opcion === 'cruz'){
+                    const media = MessageMedia.fromFilePath('./assets/cruz.jpg')
+                    const medi = new MessageMedia('image/jpg', media.data, 'sticker');
+                    message.reply('Has ganado');
+                    chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + cantidad, true);
+                }else if(opcion === 'cruz'){
+                    const media = MessageMedia.fromFilePath('./assets/cara.jpg')
+                    const medi = new MessageMedia('image/jpg', media.data, 'sticker');
+                    message.reply('Has perdido');
+                    chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
+                }
+            }
+        }
+    }
     // Creo el juego del blackjack debo terminarlo luego
     if (message.body.toLocaleLowerCase().startsWith('bj')){
         if(chat.isGroup){
