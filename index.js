@@ -634,7 +634,22 @@ client.on('message_create', async (message) => {
         //pp es pelea de pollos por apuestas el jugador introduce una cantidad de dinero a apostar y el bot elige un numero de probabilidad de ganar basandose en las estadisticas del animal
         let parts = message.body.split(' ');
         let cantidad = parts[1];
-        
+        let tiene_pollo = getAnimals(contact.id.user)
+        for(let i = 0; i < tiene_pollo.length; i++){
+            if(tiene_pollo[i].tipo === "pollo"){
+                tiene_pollo === true;
+            }
+        }
+        if (cantidad === "all" && isNaN(cantidad)) {
+            cantidad = getAllInfoPlayer(contact.id.user).dinero;
+        }
+        if (isNaN(cantidad)) {
+            message.reply('Introduce una cantidad valida');
+            return;
+        }
+        if (getAllInfoPlayer(contact.id.user).dinero >= cantidad && getAllInfoPlayer(contact.id.user).dinero > 0 && tiene_pollo) {
+            
+        }        
     }
     if (message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt') {
         await chat.sendSeen();

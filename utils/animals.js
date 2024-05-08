@@ -114,6 +114,11 @@ async function getAnimalParameters(player_id, animal_name){
         }
     }
 }
+/**
+ * 
+ * @param {number} player_id id del jugador 
+ * @returns devuelve un array con todos los animales del jugador
+ */
 function getAnimals(player_id){
     // Esta función devuelve todos los animales que tiene el jugador
     let playerRead = fs.readFileSync('data.json', 'utf-8');
