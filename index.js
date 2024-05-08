@@ -867,31 +867,29 @@ client.on('message_create', async (message) => {
             cantidad = parseInt(cantidad);
             if(getAllInfoPlayer(contact.id.user).dinero >= cantidad){
                 let resultado = Math.floor(Math.random() * 2);
-                if(resultado === 0 && opcion === 'cara'){
-                    const media = MessageMedia.fromFilePath('./assets/cara.jpg')
-                    const medi = new MessageMedia('image/jpg', media.data, 'sticker');
-                    chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                let respuesta;
+                let foto;
+                if(resultado === 0){
+                    respuesta = "cara";
+                    foto = "./assets/cara.jpg";
+                }
+                if(resultado === 1){
+                    respuesta = "cruz";
+                    foto = "./assets/cruz.jpg";
+                }
+                if(opcion === respuesta){
                     update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + cantidad, true);
-                    message.reply('Has ganado');
-                }else if(opcion === 'cara'){
-                    const media = MessageMedia.fromFilePath('./assets/cruz.jpg')
+                    message.reply(`Has ganado`);
+                    const media = MessageMedia.fromFilePath(foto)
                     const medi = new MessageMedia('image/jpg', media.data, 'sticker');
                     chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                }
+                if(opcion !== respuesta){
                     update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
-                    message.reply('Has perdido');
-                } 
-                if(opcion === 'cruz'){
-                    const media = MessageMedia.fromFilePath('./assets/cruz.jpg')
+                    message.reply(`Has perdido`);
+                    const media = MessageMedia.fromFilePath(foto)
                     const medi = new MessageMedia('image/jpg', media.data, 'sticker');
                     chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
-                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + cantidad, true);
-                    message.reply('Has ganado');
-                }else if(opcion === 'cruz'){
-                    const media = MessageMedia.fromFilePath('./assets/cara.jpg')
-                    const medi = new MessageMedia('image/jpg', media.data, 'sticker');
-                    chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
-                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
-                    message.reply('Has perdido');
                 }
             }
         }
