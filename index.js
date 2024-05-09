@@ -630,7 +630,7 @@ client.on('message_create', async (message) => {
         }
         message.reply(`${dado} El resultado es: ${ganador}`);
     }
-    if(message.body.toLocaleLowerCase().startsWith('pp')){
+    if(message.body.toLocaleLowerCase().startsWith('pp ')){
         //pp es pelea de pollos por apuestas el jugador introduce una cantidad de dinero a apostar y el bot elige un numero de probabilidad de ganar basandose en las estadisticas del animal
         let parts = message.body.split(' ');
         let cantidad = parts[1];
