@@ -1763,7 +1763,7 @@ client.on('message_create', async (message) => {
         }
         message.reply(mensaje);
     }
-    if(message.body.toLocaleLowerCase().startsWith('stats')){
+    if(message.body.toLocaleLowerCase().startsWith('stats ')){
         pokemon = message.body.split(' ');
         pokemon = pokemon.slice(1).join(' ');
         console.log(pokemon)
