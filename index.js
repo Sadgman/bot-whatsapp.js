@@ -378,11 +378,18 @@ let cartas_jugador = {};
 let dealer = {};
 let dinero_bj = {};
 const Alastor_Number = ["32466905630", "18098972404"]
+const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
 
 client.on('message_create', async (message) => {
     const chat = await message.getChat();
     let contact = await message.getContact();
-    console.log("menaje de : " + message.body)
+    if(message.body.toLocaleLowerCase() === ''){
+        return;
+    }
+    if(insultos.includes(message.body.toLocaleLowerCase())){
+        message.reply('Tu madre me dijo otra cosa');
+    }
+    if(message.body.toLocaleLowerCase() === 'bot de mierda')
     function quitar_acentos(palabra){
         const palabras_raras = ["á", "é", "í", "ó", "ú", "ñ", "ü"];
         const letras_normales = ["a", "e", "i", "o", "u", "n", "u"];
