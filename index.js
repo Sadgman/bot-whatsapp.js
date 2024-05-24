@@ -367,7 +367,7 @@ let menu = `
 `
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n> formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> BlackJack(bj)\n\n> !q crea una pregunta" + "\n\n> cz (cara o cruz)" + "\n\n*Los Roles tienen sus juegos propios*"
-const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn"]
+const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "xxnx", "pornhub", "xvideos", "xnxx", "xnxx", "xhamster", "redtube", "youporn", "te odio baba", "odio baba", "odio a baba"]
 let golpear;
 let counterListRequestMusic = 0;
 let counterListRequestVideo = 0;
@@ -377,7 +377,7 @@ let contadordia = {};
 let cartas_jugador = {};
 let dealer = {};
 let dinero_bj = {};
-const Alastor_Number = ["32466905630", "18098972404"]
+const Alastor_Number = ["32466905630", "18098972404", "573170633386"]
 const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
 
 client.on('message_create', async (message) => {
