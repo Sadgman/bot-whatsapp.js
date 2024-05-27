@@ -11,7 +11,7 @@
     "languagetool-api": "^1.1.2",
     "preguntas": "^3.2.0",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "1.23.1-alpha.5",
+    "whatsapp-web.js": "1.23.1-alpha.6",
     "youtube-sr": "^4.3.10",
     "ytdl-core": "^4.11.5"
   }
