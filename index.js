@@ -30,7 +30,7 @@ function activateClientBot(browserPath){
     client = new Client({
         authStrategy: new LocalAuth(),
         puppeteer: {
-            args: ['-no-sandbox'],
+            args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
             executablePath: browserPath
         },       
         webVersionCache: {
