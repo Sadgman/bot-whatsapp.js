@@ -35,7 +35,7 @@ function activateClientBot(browserPath){
         },       
         webVersionCache: {
        		type: 'remote',
-        	remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.0.html`,
+        	remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.2.html`,
         },
         ffmpegPath: ffmpegPath
 
@@ -1787,7 +1787,7 @@ client.on('message_create', async (message) => {
             message.reply(mensaje);
         }
     }
-    function descargarM(stream){
+    function descargarM(stream, mensaje_error){
         ffmpeg()
             .input(stream)
             .audioBitrate(128)
@@ -1816,7 +1816,7 @@ client.on('message_create', async (message) => {
                     await chat.sendStateTyping();
                     if (search.includes('https://youtu.be/')){
                         stream = ytdl(search, { filter: 'audioonly' });
-                        descargarM(stream);
+                        descargarM(stream, mensaje_error);
                         return
                     }
                     await youtube.search(search, { limit: 1 }).then(x => {
@@ -1827,7 +1827,7 @@ client.on('message_create', async (message) => {
                             return;
                         }
                         stream = ytdl(x[0].url, { filter: 'audioonly' });
-                        descargarM(stream);
+                        descargarM(stream, mensaje_error);
 
                     } catch (error) {
                         counterListRequestMusic = 0;
@@ -1848,7 +1848,7 @@ client.on('message_create', async (message) => {
             message.reply('Espera un momento estoy ocupado enviando una canción');
         }
     }
-    function descargarV(stream){
+    function descargarV(stream, mensaje_error){
         ffmpeg()
             .input(stream)
             .save('video.mp4')
@@ -1875,8 +1875,8 @@ client.on('message_create', async (message) => {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     if (search.includes('https://youtu.be/')){
-                        stream = ytdl(search, { filter: 'videoandaudio' });
-                        descargarV(stream);
+                        stream = ytdl(search, { filter: 'audioandvideo', quality: 'lowest'});
+                        descargarV(stream, mensaje_error);
                         return
                     }
                     await youtube.search(search, { limit: 1 }).then(x => {
@@ -1886,8 +1886,8 @@ client.on('message_create', async (message) => {
                             counterListRequestVideo = 0;
                             return;
                         }
-                        stream = ytdl(x[0].url, { filter: 'videoandaudio' });
-                        descargarV(stream);
+                        stream = ytdl(x[0].url, { filter: 'audioandvideo', quality: 'lowest'});
+                        descargarV(stream, mensaje_error);
 
                     } catch (error) {
                         counterListRequestVideo = 0;
