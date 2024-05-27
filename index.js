@@ -35,7 +35,7 @@ function activateClientBot(browserPath){
         },       
         webVersionCache: {
        		type: 'remote',
-        	remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/6a5cfe71f5c983e5667e10ab32feb8a0b38a9899/html/2.2409.0.html`,
+        	remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.2.html`,
         },
         ffmpegPath: ffmpegPath
 
