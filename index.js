@@ -33,12 +33,7 @@ function activateClientBot(browserPath){
             args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
             executablePath: browserPath
         },       
-        webVersionCache: {
-       		type: 'remote',
-        	remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.2.html`,
-        },
         ffmpegPath: ffmpegPath
-
     });
 }
 
@@ -254,34 +249,6 @@ function groupActiveQuestions(option, id_group, boolean) {
         }
     }
 }
-function botIsAdmin(id_group, option){
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    if(option === 1){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                return data.grouplist[i].bot_admin
-            }
-        }
-    }else if(option === 2){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                data.grouplist[i].bot_admin = true;
-                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                break;
-            }
-        }
-    }else{
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                data.grouplist[i].bot_admin = false;
-                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                break;
-            }
-        }
-    
-    }
-}
 function activeBot(id_group, boolean) {
     let jsonfile = fs.readFileSync('data.json', 'utf-8');
     let data = JSON.parse(jsonfile);
@@ -307,21 +274,7 @@ client.on('group_join', (notification) => {
         }
     })
 });
-client.on('group_admin_changed', (notification) => {
-    notification.getChat().then((chat) => {
-        addgroup(chat.id._serialized);
-        if (notification.type === 'promote') {
-            if(notification.recipientIds[0] === client.info.wid._serialized){
-                botIsAdmin(chat.id._serialized, 2);
-            }
-        } else if (notification.type === 'demote'){
-            if(notification.recipientIds[0] === client.info.wid._serialized){
-                botIsAdmin(chat.id._serialized, 3);
-            }
-            console.log(`You were demoted by ${notification.author}`);
-        }
-    });
-});
+
 let menu = `
 ~*MENU*~
 
@@ -383,6 +336,8 @@ const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
 client.on('message_create', async (message) => {
     const chat = await message.getChat();
     let contact = await message.getContact();
+    const group = await message.getChat();
+
     if(message.body.toLocaleLowerCase() === ''){
         return;
     }
@@ -444,15 +399,20 @@ client.on('message_create', async (message) => {
             }
         }
     }
-    if (botIsAdmin(chat.id._serialized, 1) === true) {
-        let mmsg = message.body.toLocaleLowerCase();
-        addgroup(chat.id._serialized);
-        for (let i = 0; i < links_baneados.length; i++) {
-            if (mmsg.includes(links_baneados[i])) {
-                message.delete(true);
+    if(chat.isGroup){
+        group.iAmadmin().then(resp => {
+            if(resp){
+                let mmsg = message.body.toLocaleLowerCase();
+                addgroup(chat.id._serialized);
+                for (let i = 0; i < links_baneados.length; i++) {
+                    if (mmsg.includes(links_baneados[i])) {
+                        message.delete(true);
+                        group.removeParticipants([contact.id._serialized])
+                    }
+                }
             }
-        }
-    } 
+        });
+    }
     if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
         let info;
         let casadoContact;
