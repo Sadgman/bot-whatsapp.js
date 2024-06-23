@@ -1,6 +1,7 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const fetch = require("node-fetch");
+const instagramDl = require("@sasmeee/igdl");
 const googleTTS = require('google-tts-api');
 const youtube = require('youtube-sr').default;
 const ytdl = require('ytdl-core');
@@ -342,10 +343,6 @@ client.on('message_create', async (message) => {
     if(message.body.toLocaleLowerCase() === ''){
         return;
     }
-    if(insultos.includes(message.body.toLocaleLowerCase())){
-        message.reply('Tu madre me dijo otra cosa');
-    }
-    if(message.body.toLocaleLowerCase() === 'bot de mierda')
     function quitar_acentos(palabra){
         const palabras_raras = ["á", "é", "í", "ó", "ú", "ñ", "ü"];
         const letras_normales = ["a", "e", "i", "o", "u", "n", "u"];
@@ -353,6 +350,9 @@ client.on('message_create', async (message) => {
             palabra = palabra.replace(new RegExp(palabras_raras[i], 'g'), letras_normales[i]);
         }
         return palabra;
+    }
+    if(insultos.includes(message.body.toLocaleLowerCase())){
+        message.reply('Tu madre me dijo otra cosa');
     }
     if (jsonread(contact.id.user)) {
         update_info_player(contact.id.user, "mensajes", getAllInfoPlayer(contact.id.user).mensajes + 1, true);
@@ -588,7 +588,7 @@ client.on('message_create', async (message) => {
             dado = "         ⚂\n";
         } else if (numeroObjetivo === 4) {
             dado = "         ⚃\n";
-        } else if (numeroObjetivo === 5) {z
+        } else if (numeroObjetivo === 5) {
             dado = "         ⚄\n";
         } else if (numeroObjetivo === 6) {
             dado = "         ⚅\n";
@@ -1825,7 +1825,7 @@ client.on('message_create', async (message) => {
                 message.reply(mensaje_error);
             })
     }
-    async function descargarVideoIG(url) {
+    async function descargarVideoIG(url, mensaje_error) {
         try {
             const dataList = await instagramDl(url);
             const response = await fetch(dataList[0].download_link);
@@ -1862,7 +1862,7 @@ client.on('message_create', async (message) => {
                         descargarV(stream, mensaje_error);
                         return
                     }else if(search.includes('https://www.instagram.com/')){
-                        descargarVideoIG(search);
+                        descargarVideoIG(search, mensaje_error);
                         return
                     }
                     await youtube.search(search, { limit: 1 }).then(x => {
