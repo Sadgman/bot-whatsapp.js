@@ -1761,7 +1761,7 @@ client.on('message_create', async (message) => {
             .on('end', () => {
                 const file = fs.readFileSync('n.mp3');
                 const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                chat.sendMessage(media, { sendAudioAsVoice: true, quotedMessageId: message.id._serialized });
+                chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                 counterListRequestMusic = 0;
             })
             .on('error', (err) => {
