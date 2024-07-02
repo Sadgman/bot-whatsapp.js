@@ -405,12 +405,17 @@ client.on('message_create', async (message) => {
             if(resp){
                 let mmsg = message.body.toLocaleLowerCase();
                 addgroup(chat.id._serialized);
-                for (let i = 0; i < links_baneados.length; i++) {
-                    if (mmsg.includes(links_baneados[i])) {
-                        message.delete(true);
-                        group.removeParticipants([contact.id._serialized])
+                chat.getInviteCode().then((linkg) => {
+                    if(linkg){
+                        for (let i = 0; i < links_baneados.length; i++) {
+                            if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i])) {
+                                message.delete(true);
+                                group.removeParticipants([contact.id._serialized])
+                                break
+                            }
+                        }
                     }
-                }
+                })
             }
         });
     }
