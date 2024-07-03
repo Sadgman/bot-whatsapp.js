@@ -1862,7 +1862,7 @@ client.on('message_create', async (message) => {
                     let stream;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
-                    if (search.includes('https://youtu.be/')){
+                    if (search.includes('https://youtu.be/') && search.includes('https://www.youtube.com/shorts/')){
                         stream = ytdl(search, { filter: 'audioandvideo', quality: 'lowest'});
                         descargarV(stream, mensaje_error);
                         return
