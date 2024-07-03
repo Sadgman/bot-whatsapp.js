@@ -1862,11 +1862,16 @@ client.on('message_create', async (message) => {
                     let stream;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
-                    if (search.includes('https://youtu.be/') || search.includes('https://www.youtube.com/' || search.includes('https://youtube.com/shorts/'))){
+                    if (search.includes('https://youtu.be/')){
                         stream = ytdl(search, { filter: 'audioandvideo', quality: 'lowest'});
                         descargarV(stream, mensaje_error);
                         return
-                    }else if(search.includes('https://www.instagram.com/')){
+                    }else if(search.includes('https://www.youtube.com/shorts/') || search.includes('https://youtube.com/shorts/')){
+                        stream = ytdl(search, { filter: 'audioandvideo', quality: 'highestvideo'});
+                        descargarV(stream, mensaje_error);
+                        return
+                    }
+                    else if(search.includes('https://www.instagram.com/')){
                         descargarVideoIG(search, mensaje_error);
                         return
                     }
