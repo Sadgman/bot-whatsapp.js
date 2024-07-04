@@ -1753,7 +1753,7 @@ client.on('message_create', async (message) => {
             message.reply(mensaje);
         }
     }
-    function descargarM(stream, mensaje_error){
+    async function descargarM(stream, mensaje_error){
         ffmpeg()
             .input(stream)
             .audioBitrate(128)
