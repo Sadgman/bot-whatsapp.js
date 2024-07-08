@@ -1893,7 +1893,7 @@ client.on('message_create', async (message) => {
                         descargarVideoIG(search, mensaje_error);
                         return
                     }
-                    if(search.includes('https://www.tiktok.com/')){
+                    if(search.includes('https://www.tiktok.com/') && search.includes('https://vm.tiktok.com/')){
                         descargarVideoTikTok(search, mensaje_error);
                         return
                     }
