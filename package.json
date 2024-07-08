@@ -12,6 +12,7 @@
     "languagetool-api": "^1.1.2",
     "preguntas": "^3.2.0",
     "qrcode-terminal": "^0.12.0",
+    "tiktok-downloaders": "^1.0.5",
     "whatsapp-web.js": "github:Sadgman/whatsapp-web.js#webpack-exodus",
     "youtube-sr": "^4.3.10",
     "ytdl-core": "^4.11.5"

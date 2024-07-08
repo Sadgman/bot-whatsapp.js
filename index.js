@@ -2,6 +2,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const fetch = require("node-fetch");
 const instagramDl = require("@sasmeee/igdl");
+const tk = require('tiktok-downloaders');
 const googleTTS = require('google-tts-api');
 const youtube = require('youtube-sr').default;
 const ytdl = require('ytdl-core');
@@ -1852,6 +1853,23 @@ client.on('message_create', async (message) => {
             message.reply(mensaje_error);
         }
     }
+    async function descargarVideoTikTok(url, mensaje_error) {
+        try {
+          const result = await tk.tiktokdownload(url);
+          const response = await fetch(result.nowm);
+          const buffer = await response.buffer();
+          fs.writeFileSync('video.mp4', buffer, () => {
+            const file = fs.readFileSync('video.mp4');
+            const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
+            chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+            counterListRequestVideo = 0;
+          });
+        } catch (error) {
+            console.error(error.message);
+            counterListRequestVideo = 0;
+            message.reply(mensaje_error);
+        }
+    }
     if (message.body.toLowerCase().startsWith("v ")) {
             counterListRequestVideo++;
             const mensaje_error = "*Lo siento, no pude descargar el video 😞*";
@@ -1871,8 +1889,12 @@ client.on('message_create', async (message) => {
                         descargarV(stream, mensaje_error);
                         return
                     }
-                    else if(search.includes('https://www.instagram.com/')){
+                    if(search.includes('https://www.instagram.com/')){
                         descargarVideoIG(search, mensaje_error);
+                        return
+                    }
+                    if(search.includes('https://www.tiktok.com/')){
+                        descargarVideoTikTok(search, mensaje_error);
                         return
                     }
                     await youtube.search(search, { limit: 1 }).then(x => {
