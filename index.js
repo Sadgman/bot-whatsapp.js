@@ -1,11 +1,12 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const fetch = require("node-fetch");
+const YTDownloadMusic = require('ytdp')
 const instagramDl = require("@sasmeee/igdl");
 const tk = require('tiktok-downloaders');
 const googleTTS = require('google-tts-api');
 const youtube = require('youtube-sr').default;
-const ytdl = require('ytdl-core');
+const ytdl = require('@distube/ytdl-core');
 const { obtenerPais } = require('./utils/prefix.js');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
@@ -46,6 +47,7 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
     activateClientBot('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
 }
 else{
+    ///bin/chromium-browser
     activateClientBot('/usr/bin/google-chrome-stable');
 }
 
@@ -1754,7 +1756,7 @@ client.on('message_create', async (message) => {
             message.reply(mensaje);
         }
     }
-    async function descargarM(stream, mensaje_error){
+    async function descargarM(stream, mensaje_error, url){
         ffmpeg()
             .input(stream)
             .audioBitrate(128)
@@ -1767,8 +1769,21 @@ client.on('message_create', async (message) => {
             })
             .on('error', (err) => {
                 console.error(err);
-                counterListRequestMusic = 0;
-                message.reply(mensaje_error);
+                try{
+                    YTDownloadMusic(url).then(async (n) => {
+                        const response = await fetch(n);
+                        const buffer = await response.buffer();
+                        fs.writeFileSync('n.mp3', buffer, () => {
+                            const file = fs.readFileSync('n.mp3')
+                            const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+                            chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                            counterListRequestMusic = 0;
+                        });
+                    });
+                }catch{
+                    counterListRequestMusic = 0;
+                    message.reply(mensaje_error);
+                }
             })
     }
     if (message.body.toLowerCase().startsWith("m ")) {
@@ -1794,7 +1809,7 @@ client.on('message_create', async (message) => {
                             return;
                         }
                         stream = ytdl(x[0].url, { filter: 'audioonly' });
-                        descargarM(stream, mensaje_error);
+                        descargarM(stream, mensaje_error, x[0].url);
 
                     } catch (error) {
                         counterListRequestMusic = 0;
