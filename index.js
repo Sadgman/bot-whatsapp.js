@@ -285,7 +285,7 @@ let menu = `
 
 📋🧾📄| Menu
 
-👨‍👩‍👧‍👦🏡💞 | !todos (Only Admins).
+👨‍👩‍👧‍👦🏡💞 | !t (Only Admins).
 
 📊📈📉 | IO (Stats)
 
@@ -560,10 +560,10 @@ client.on('message_create', async (message) => {
         const randomIndex = Math.floor(Math.random() * data.animes.names.length);
         message.reply(data.animes.names[randomIndex]);
     }
-    if (message.body.toLocaleLowerCase() === 'minecraft server' || message.body.toLocaleLowerCase() === 'ms') {
+    if (message.body.toLocaleLowerCase() === 'ms') {
         await chat.sendSeen();
         await chat.sendStateTyping();
-        message.reply('Aqui tienes el ip del servidor: AFSI.aternos.me\n' + "puerto: 55545\n" + "link del server: https://add.aternos.org/AFSI\n\n" + "Apk del juego: https://www.mediafire.com/file/g7tcnqaw53viyei/Minecraft-1.20.51.01-apktodo.io.apk/file");
+        message.reply('esta opcion esta desactida por el momento');
     }
     if (message.body.toLocaleLowerCase().startsWith('dados ') || message.body.toLocaleLowerCase().startsWith('dado ')) {
         let parts = message.body.split(' ');
@@ -1960,7 +1960,7 @@ client.on('message_create', async (message) => {
             }
         }
     }
-    if(message.body.toLocaleLowerCase() === '!todos' || message.body.toLocaleLowerCase().startsWith('!todos')){
+    if(message.body.toLocaleLowerCase() === '!t' || message.body.toLocaleLowerCase().startsWith('!t')){
         const parts = message.body.split(' ');
         if(parts.length > 1 && !parts.slice(1).join(' ').toLocaleLowerCase().includes('!todos')){
             mentionAll(parts.slice(1).join(' '));
