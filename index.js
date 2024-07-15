@@ -1,5 +1,7 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
+const https = require('https');
+const { TwitterDL } = require("twitter-downloader");
 const fetch = require("node-fetch");
 const YTDownloadMusic = require('ytdp')
 const instagramDl = require("@sasmeee/igdl");
@@ -1885,6 +1887,39 @@ client.on('message_create', async (message) => {
             message.reply(mensaje_error);
         }
     }
+    async function twitterDL(url, mensaje_error) {
+        await TwitterDL(url)
+        .then((result) => {
+            if(result['result'].media[0].type == 'video') {
+                https.get(result['result'].media[0].videos[1].url, (response) => {
+                    const videoStream = fs.createWriteStream('./assets/video.mp4');
+                    response.pipe(videoStream);
+                    videoStream.on('finish', () => {
+                        const file = fs.readFileSync('./assets/video.mp4');
+                        const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
+                        chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                        counterListRequestVideo = 0;
+                    });
+                })
+            }else if(result['result'].media[0].type == 'photo') {
+                https.get(result['result'].media[0].image, (response) => {
+                    const imageStream = fs.createWriteStream('./assets/image.jpg');
+                    response.pipe(imageStream);
+                    imageStream.on('finish', () => {
+                        const file = fs.readFileSync('./assets/image.jpg');
+                        const media = new MessageMedia('image/jpg', file.toString('base64'), 'image');
+                        chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                        counterListRequestVideo = 0;
+                    });
+                })
+            }
+        })
+        .catch((e) => {
+            console.log(e);
+            counterListRequestVideo = 0;
+            message.reply(mensaje_error);
+        });
+    }
     if (message.body.toLowerCase().startsWith("v ")) {
             counterListRequestVideo++;
             const mensaje_error = "*Lo siento, no pude descargar el video 😞*";
@@ -1910,6 +1945,10 @@ client.on('message_create', async (message) => {
                     }
                     if(search.includes('https://www.tiktok.com/') || search.includes('https://vm.tiktok.com/')){
                         descargarVideoTikTok(search, mensaje_error);
+                        return
+                    }
+                    if(search.includes('https://x.com/')){
+                        twitterDL(search, mensaje_error);
                         return
                     }
                     await youtube.search(search, { limit: 1 }).then(x => {

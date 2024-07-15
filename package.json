@@ -14,6 +14,7 @@
     "preguntas": "^3.2.0",
     "qrcode-terminal": "^0.12.0",
     "tiktok-downloaders": "^1.0.5",
+    "twitter-downloader": "^1.1.8",
     "whatsapp-web.js": "github:Sadgman/whatsapp-web.js#webpack-exodus",
     "youtube-sr": "^4.3.10",
     "ytdp": "1.0.0"
