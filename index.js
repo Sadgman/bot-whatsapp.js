@@ -458,7 +458,7 @@ client.on('message_create', async (message) => {
                     } else {
                         casadoContact = await client.getContactById(info.casado + '@c.us');
                         chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
-                            mentions: [casadoContact],
+                            mentions: casadoContact,
                             quotedMessageId: message.id._serialized
                         });
                     }
