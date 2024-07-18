@@ -429,8 +429,8 @@ client.on('message_create', async (message) => {
             if(chat.isGroup){
                 jsonread(contact.id.user);
                 let info = getAllInfoPlayer(contact.id.user);
-                const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
-                const mensaje_stats = `*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`
+                let casado = info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
+                let mensaje_stats = `*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`
                 if (message.hasQuotedMsg) { 
                     const quotedMsg = await message.getQuotedMessage();
                     
