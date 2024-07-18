@@ -425,46 +425,39 @@ client.on('message_create', async (message) => {
         });
     }
     if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
-        let info;
-        let casadoContact;
-        try {
-            jsonread(contact.id.user);
-            if (message.hasQuotedMsg) {
-                if (chat.isGroup) {
+        try{
+            if(chat.isGroup){
+                jsonread(contact.id.user);
+                let info = getAllInfoPlayer(contact.id.user);
+                const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
+                const mensaje_stats = `*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`
+                if (message.hasQuotedMsg) { 
                     const quotedMsg = await message.getQuotedMessage();
-                    let contact = await quotedMsg.getContact();
-                    info = getAllInfoPlayer(contact.id.user);
-                    const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
+                    
                     if (info.casado === 'nadie :(') {
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*total de mensajes enviados:* ${info.mensajes}`, {
+                        chat.sendMessage(mensaje_stats, {
                             quotedMessageId: quotedMsg.id._serialized
                         });
                     } else {
-                        casadoContact = await client.getContactById(info.casado + '@c.us');
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
+                        chat.sendMessage(mensaje_stats, {
                             mentions: info.casado + '@c.us',
                             quotedMessageId: quotedMsg.id._serialized
                         });
                     }
-                }
-            } else {
-                if (chat.isGroup) {
-                    info = getAllInfoPlayer(contact.id.user);
-                    const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
+                } else {
                     if (info.casado === 'nadie :(') {
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
+                        chat.sendMessage(mensaje_stats, {
                             quotedMessageId: message.id._serialized
                         });
                     } else {
-                        casadoContact = await client.getContactById(info.casado + '@c.us');
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
+                        chat.sendMessage(mensaje_stats, {
                             mentions: info.casado + '@c.us',
                             quotedMessageId: message.id._serialized
                         });
                     }
                 }
             }
-        } catch (err) {
+        }catch(err){
             console.log(err);
             message.reply('La funcion aun esta en desarrollo');
         }
