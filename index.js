@@ -426,7 +426,6 @@ client.on('message_create', async (message) => {
     }
     if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
         let info;
-        let casadoContact;
         try {
             if (chat.isGroup) {
                 jsonread(contact.id.user);
