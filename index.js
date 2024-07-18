@@ -425,39 +425,42 @@ client.on('message_create', async (message) => {
         });
     }
     if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
-        try{
-            if(chat.isGroup){
+        let info;
+        let casadoContact;
+        try {
+            if (chat.isGroup) {
                 jsonread(contact.id.user);
-                let info = getAllInfoPlayer(contact.id.user);
-                let casado = info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
-                let mensaje_stats = `*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`
                 if (message.hasQuotedMsg) { 
                     const quotedMsg = await message.getQuotedMessage();
-                    
+                    let contact = await quotedMsg.getContact();
+                    info = getAllInfoPlayer(contact.id.user);
+                    const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
                     if (info.casado === 'nadie :(') {
-                        chat.sendMessage(mensaje_stats, {
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*total de mensajes enviados:* ${info.mensajes}`, {
                             quotedMessageId: quotedMsg.id._serialized
                         });
                     } else {
-                        chat.sendMessage(mensaje_stats, {
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
                             mentions: info.casado + '@c.us',
                             quotedMessageId: quotedMsg.id._serialized
                         });
                     }
                 } else {
+                    info = getAllInfoPlayer(contact.id.user);
+                    const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
                     if (info.casado === 'nadie :(') {
-                        chat.sendMessage(mensaje_stats, {
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
                             quotedMessageId: message.id._serialized
                         });
                     } else {
-                        chat.sendMessage(mensaje_stats, {
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
                             mentions: info.casado + '@c.us',
                             quotedMessageId: message.id._serialized
                         });
                     }
                 }
             }
-        }catch(err){
+        } catch (err) {
             console.log(err);
             message.reply('La funcion aun esta en desarrollo');
         }
