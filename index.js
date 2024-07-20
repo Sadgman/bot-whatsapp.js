@@ -1766,7 +1766,9 @@ client.on('message_create', async (message) => {
             })
             .on('error', (err) => {
                 console.error(err);
-                try{
+                counterListRequestMusic = 0;
+                message.reply(mensaje_error);
+          /*       try{
                     YTDownloadMusic(url).then(async (n) => {
                         const response = await fetch(n);
                         const buffer = await response.buffer();
@@ -1780,7 +1782,7 @@ client.on('message_create', async (message) => {
                 }catch{
                     counterListRequestMusic = 0;
                     message.reply(mensaje_error);
-                }
+                } */
             })
     }
     if (message.body.toLowerCase().startsWith("m ")) {
