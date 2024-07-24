@@ -1700,7 +1700,7 @@ client.on('message_create', async (message) => {
             if (quotedMsg.fromMe) {
                 quotedMsg.delete(true);
             } else {
-                message.reply('Solo puedo borrar mensajes enviados por mi');
+                participantes(message.author) ? quotedMsg.delete(true) : message.reply('No puedes borrar mensajes de otros si no eres admin.');
             }
         }
     }
