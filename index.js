@@ -1704,30 +1704,6 @@ client.on('message_create', async (message) => {
             }
         }
     }
-    if(message.body.toLocaleLowerCase() === 'baba'){
-        if(message.hasQuotedMsg){
-            const quotedMsg = await message.getQuotedMessage();
-            const contacto_baba = await quotedMsg.getContact();
-            if(contacto_baba.id.user === '595973819264'){
-                let random_number = Math.floor(Math.random() * 2) + 1;
-                if(Alastor_Number.includes(contact.id.user)){
-                    message.reply('Felicidades has atrapado a Baba ganaste una moneda');
-                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
-                }else if(animalExist(contact.id.user, 'baba')){
-                    switch (random_number) {
-                        case 1:
-                            message.reply('Felicidades has atrapado a Baba ganaste media moneda');
-                            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 0.5, true);
-                            break;
-                        case 2:
-                            message.reply('*Baba escapó :(*')
-                    }
-                }else{
-                    message.reply('No tienes a Baba');
-                }
-            }
-        }
-    }
     if(message.body.toLocaleLowerCase() === 'pokemons'){
         let pokemons = getAllAnimals(contact.id.user);
         let mensaje = "*Tus pokemons son:*\n\n";
@@ -2152,7 +2128,7 @@ client.on('message_create', async (message) => {
     ¡Hola! ◡̈
     Puedes comunicarte con mi creador desde este link:
     
-    wa.me/${Alastor_Number[0]}
+    wa.me/${Alastor_Number[2]}
     
     𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
     Aquí puedes Contactar con el diseñador del menu:
