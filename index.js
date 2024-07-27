@@ -424,6 +424,36 @@ client.on('message_create', async (message) => {
             }
         });
     }
+    //añadir un miembro al grupo
+    if(message.body.toLocaleLowerCase().startsWith("aña")){
+        if(chat.isGroup){
+            //verifico si el bot es admin y si el que añade es admin
+            group.iAmadmin().then(resp =>{
+                if((participantes(contact.id.user) && resp) || Alastor_Number.includes(contact.id.user)){
+                    let parte = message.body.split(" ");
+                    parte = parte[1];
+                    parte = parte.replace('@', '');
+                    parte = parte + '@c.us';
+                    chat.addParticipants([parte]);
+                }
+            })
+        }
+    }
+    //remover un miembro del grupo
+    if(message.body.toLocaleLowerCase().startsWith("!re")){
+        if(chat.isGroup){
+            //verifico si el bot es admin y si el que añade es admin
+            group.iAmadmin().then(resp =>{
+                if((participantes(contact.id.user) && resp) || Alastor_Number.includes(contact.id.user)){
+                    let parte = message.body.split(" ");
+                    parte = parte[1];
+                    parte = parte.replace('@', '');
+                    parte = parte + '@c.us';
+                    chat.removeParticipants([parte]);
+                }
+            })
+        }
+    }
     if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
         let info;
         try {
