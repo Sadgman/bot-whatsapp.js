@@ -287,7 +287,7 @@ let menu = `
 
 📋🧾📄| Menu
 
-👨‍👩‍👧‍👦🏡💞 | !t (Only Admins).
+👨‍👩‍👧‍👦🏡💞 | !t (Solo Admins).
 
 📊📈📉 | IO (Stats)
 
@@ -582,7 +582,7 @@ client.on('message_create', async (message) => {
             }
         } else {
             tempMenu = tempMenu.replace('📝 — ajustes(as).\n', '');
-            tempMenu = tempMenu.replace('👨‍👨‍👧‍👦 — !todos (solo los admins lo pueden usar).\n', '');
+            tempMenu = tempMenu.replace('👨‍👩‍👧‍👦🏡💞 | !t (Only Admins).', '');
             message.reply(tempMenu);
         }
     }
