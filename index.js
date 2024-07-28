@@ -423,19 +423,24 @@ client.on('message_create', async (message) => {
             }
         });
     }
-    //añadir un miembro al grupo
-    if(message.body.toLocaleLowerCase().startsWith("aña")){
-        if(chat.isGroup){
-            //verifico si el bot es admin y si el que añade es admin
-            group.iAmadmin().then(resp =>{
-                if((participantes(contact.id.user) && resp) || Alastor_Number.includes(contact.id.user)){
-                    let parte = message.body.split(" ");
-                    parte = parte[1];
-                    parte = parte.replace('@', '');
-                    parte = parte + '@c.us';
-                    chat.addParticipants([parte]);
+    // Añadir un miembro al grupo con solo su número
+    if (message.body.toLocaleLowerCase().startsWith("aña")) {
+        if (chat.isGroup) {
+            // Verifico si el bot es admin y si el que añade es admin
+            group.iAmadmin().then(resp => {
+                if ((participantes(contact.id.user) && resp) || Alastor_Number.includes(contact.id.user)) {
+                    let parte = message.body.split(" ")[1];
+                    if (parte && /^\d+$/.test(parte)) { // Verifica que parte sea un número
+                        parte = parte + '@c.us';
+                        chat.addParticipants([parte]).catch(err => {
+                            console.error('Error al añadir participante:', err);
+                            message.reply('Hubo un error al intentar añadir el participante. Asegúrate de que el número es correcto y está registrado en WhatsApp.');
+                        });
+                    } else {
+                        message.reply('Por favor, proporciona un número de teléfono válido.');
+                    }
                 }
-            })
+            });
         }
     }
     //remover un miembro del grupo
