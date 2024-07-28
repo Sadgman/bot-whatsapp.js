@@ -1988,16 +1988,14 @@ client.on('message_create', async (message) => {
             message.reply('Espera un momento estoy ocupado enviando un video');
         }
     }
-
     async function mentionAll(text){
         if(chat.isGroup){
             try{
                 if(participantes(contact.id.user)){
-                    console.log(chat.participants);
                     let mention = [];
 
                     for(let participant of chat.participants) {
-                        mention.push(`${participant.id.user}@c.us`);
+                        mention.push(`${participant.id._serialized}`);
                     }
                     await chat.sendMessage(text, { mentions: mention });
                 }else{
