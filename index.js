@@ -1988,28 +1988,26 @@ client.on('message_create', async (message) => {
             message.reply('Espera un momento estoy ocupado enviando un video');
         }
     }
+    // Funcion para mencionar a todos los integrantes del grupo
     async function mentionAll(text){
-        if(chat.isGroup){
-            try{
-                if(participantes(contact.id.user)){
-                    let mention = [];
-                    
-                    chat.participants.forEach(participant => {
-                        mention.push(`${participant.id._serialized}`);
-                    });
+        //compruebo si el chat es un grupo, si el usuario es admin o si mi numero es el que hace la llamada.
+        if((chat.isGroup && participantes(contact.id.user)) || Alastor_Number.includes(contact.id.user)){
+
+            let mention = [];
+            //busco dentro del array para introducir el id de todos los usuarios serializados dentro de otro array
+            chat.participants.forEach(participant => {
+                mention.push(`${participant.id._serialized}`);
+            });
         
-                    await chat.sendMessage(text, { mentions: mention });
-                }else{
-                    message.reply('Solo los administradores pueden usar este comando');
-                }
-            }catch(err){
-                message.reply('No pude mencionar a todos');
-            }
+            await chat.sendMessage(text, { mentions: mention });
         }
     }
+    // llamada a todos los integrantes del grupo
     if(message.body.toLocaleLowerCase() === '!t' || message.body.toLocaleLowerCase().startsWith('!t')){
         const parts = message.body.split(' ');
-        if(parts.length > 1 && !parts.slice(1).join(' ').toLocaleLowerCase().includes('!todos')){
+        //verifico si parts tiene una longitud mayor a uno y si no incluye la palabra !t
+        if(parts.length > 1 && !parts.slice(1).join(' ').toLocaleLowerCase().includes('!t')){
+            //si es asi mando el texto a la funcion para que lo envie
             mentionAll(parts.slice(1).join(' '));
         }else{
             mentionAll('Hola a todos, activense!!');
