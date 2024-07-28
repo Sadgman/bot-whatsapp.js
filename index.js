@@ -1993,10 +1993,11 @@ client.on('message_create', async (message) => {
             try{
                 if(participantes(contact.id.user)){
                     let mention = [];
-
-                    for(let participant of chat.participants) {
+                    
+                    chat.participants.forEach(participant => {
                         mention.push(`${participant.id._serialized}`);
-                    }
+                    });
+        
                     await chat.sendMessage(text, { mentions: mention });
                 }else{
                     message.reply('Solo los administradores pueden usar este comando');
