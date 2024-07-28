@@ -377,6 +377,7 @@ client.on('message_create', async (message) => {
     * @returns {boolean}  si el usuario es admin devuelve true si no false
     */
     function participantes(userId) {
+        const groupParticipants = chat.participants()
         const participant = groupParticipants.find(part => part.id.user === userId);
         if (!participant) {
             return false;
