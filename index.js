@@ -376,14 +376,12 @@ client.on('message_create', async (message) => {
     * @param {string} author  id del usuario que envio el mensaje
     * @returns {boolean}  si el usuario es admin devuelve true si no false
     */
-    function participantes(author) {
-
-        let participantes = [];
-        chat.participants.forEach((participant) => {
-            participantes.push(participant);
-        });
-        const sender = participantes.find(participant => participant.id._serialized === author);
-        return sender.isAdmin;
+    function participantes(userId) {
+        const participant = groupParticipants.find(part => part.id.user === userId);
+        if (!participant) {
+            return false;
+        }
+        return participant.isAdmin;
     }
     if (chat.isGroup) {
         addgroup(chat.id._serialized);
