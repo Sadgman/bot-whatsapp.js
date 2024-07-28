@@ -384,12 +384,13 @@ client.on('message_create', async (message) => {
         }
         return participant.isAdmin;
     }
+
     if (chat.isGroup) {
         addgroup(chat.id._serialized);
 
 
         if (message.body.toLocaleLowerCase() === 'ab') {
-            if ((participantes(message.author) || Alastor_Number.includes(contact.id.user)) && watchBot(chat.id._serialized) === false) {
+            if ((participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && watchBot(chat.id._serialized) === false) {
                 activeBot(chat.id._serialized, true);
                 message.reply('El bot ha sido activado');
             }
@@ -398,7 +399,7 @@ client.on('message_create', async (message) => {
             return;
         }
         if (message.body.toLocaleLowerCase() === 'db') {
-            if (participantes(message.author) || Alastor_Number.includes(contact.id.user)) {
+            if (participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) {
                 activeBot(chat.id._serialized, false);
                 message.reply('El bot ha sido desactivado');
             }
@@ -1377,7 +1378,7 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp') {
         if (chat.isGroup) {
             if (addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos') && watchBan(chat.id._serialized, 'menciones')) {
-                if (watchBan(chat.id._serialized, 'admins') == false && participantes(message.author) && getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
+                if (watchBan(chat.id._serialized, 'admins') == false && participantes(contact.id.user) && getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     let participantes = [];
@@ -1734,7 +1735,7 @@ client.on('message_create', async (message) => {
             if (quotedMsg.fromMe) {
                 quotedMsg.delete(true);
             } else {
-                participantes(message.author) ? quotedMsg.delete(true) : message.reply('No puedes borrar mensajes de otros si no eres admin.');
+                participantes(contact.id.user) ? quotedMsg.delete(true) : message.reply('No puedes borrar mensajes de otros si no eres admin.');
             }
         }
     }
@@ -1991,7 +1992,8 @@ client.on('message_create', async (message) => {
     async function mentionAll(text){
         if(chat.isGroup){
             try{
-                if(participantes(message.author)){
+                if(participantes(contact.id.user)){
+                    console.log(chat.participants);
                     let mention = [];
 
                     for(let participant of chat.participants) {
@@ -2017,7 +2019,7 @@ client.on('message_create', async (message) => {
     if (message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as') {
         if (chat.isGroup) {
             addgroup(message.from);
-            if (participantes(message.author)) {
+            if (participantes(contact.id.user)) {
                 await chat.sendSeen();
                 await chat.sendStateTyping();
                 option.ajustes = 1;
@@ -2038,7 +2040,7 @@ client.on('message_create', async (message) => {
             if (option.ajustes == 1) {
                 await chat.sendSeen();
                 await chat.sendStateTyping();
-                if (participantes(message.author)) {
+                if (participantes(contact.id.user)) {
                     option.juego = 1;
                     option.ajustes = 0;
                     let menu_juego = option_game;
