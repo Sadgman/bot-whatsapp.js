@@ -20,7 +20,7 @@ const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const esp = require('languagetool-api')
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers } = require('./utils/playerUtils.js');
-const { error } = require('console');
+const { error, info } = require('console');
 const quest = require('preguntas');
 const { addAnimal, modifyAnimalsParameters, getAnimalParameters, getAnimals, animalExist } = require('./utils/animals.js');
 dayjs.extend(utc);
@@ -679,43 +679,27 @@ client.on('message_create', async (message) => {
         }
     }
     // Skills de Roles
-    if (message.body.toLocaleLowerCase().startsWith("robar ") || message.body.toLocaleLowerCase().startsWith("rb ")){
-        if (getAllInfoPlayer(contact.id.user).roles === "ladron") {
-            let futuro = ["lograste robar", "te atraparon"];
-            let randomIndex = Math.floor(Math.random() * futuro.length);
-            if(message.hasQuotedMsg){
-                const quotedMsg = await message.getQuotedMessage();
-                let contacto = await quotedMsg.getContact();
-                if (futuro[randomIndex] === "lograste robar") {
-                    if(getAllInfoPlayer(contacto.id.user).dinero > 0){
-                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + getAllInfoPlayer(contacto.id.user).dinero, true);
-                        update_info_player(contacto.id.user, "dinero", getAllInfoPlayer(contacto.id.user).dinero - getAllInfoPlayer(contacto.id.user).dinero, true);
-                        message.reply(futuro[randomIndex]);
-                    }else{
-                        message.reply("No hay nada que robar");
-                    }              
-                }else if(futuro[randomIndex] === "te atraparon"){
-                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).ganadas - 1,true);
-                    message.reply(futuro[randomIndex]);
-                }
-            }else{
-                let parte = message.body.split(" ")
-                parte = parte[1]
-                parte = parte.replace('@', '');
-                jsonread(parte);
-                if (futuro[randomIndex] === "lograste robar") {
-                    if(getAllInfoPlayer(parte).dinero > 0){
-                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + getAllInfoPlayer(parte).dinero, true);
-                        update_info_player(parte, "dinero", getAllInfoPlayer(parte).dinero - getAllInfoPlayer(parte).dinero, true);
-                        message.reply(futuro[randomIndex]);
-                    }else{
-                        message.reply("No hay nada que robar");
-                    }              
-                }else if(futuro[randomIndex] === "te atraparon"){
-                    update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
-                    message.reply(futuro[randomIndex]);
-                }
+    if (message.body.toLocaleLowerCase().startsWith("robar ") && message.hasQuotedMsg && getAllInfoPlayer(contact.id.user).roles === "ladron"){
+        let futuro = ["lograste robar", "te atraparon"];
+        let randomIndex = Math.floor(Math.random() * futuro.length);
+        const quotedMsg = await message.getQuotedMessage();
+        let contacto = await quotedMsg.getContact();
+        let infoJugador = getAllInfoPlayer(contact.id.user);
+        let infoContacto = getAllInfoPlayer(contacto.id.user);
+
+        if (futuro[randomIndex] === "lograste robar") {
+            if (infoContacto.dinero > 0) {
+                update_info_player(contact.id.user, "dinero", infoJugador.dinero + infoContacto.dinero, true);
+                update_info_player(contacto.id.user, "dinero", 0, true); // El contacto se queda sin dinero
+                message.reply(futuro[randomIndex]);
+            } else {
+                message.reply("No hay nada que robar");
             }
+        }else if (futuro[randomIndex] === "te atraparon") {
+            update_info_player(contact.id.user, "dinero", infoJugador.dinero - 1, true);
+            update_info_player(contact.id.user, "ganadas", infoJugador.ganadas - 1, true);
+            
+            message.reply(futuro[randomIndex]);
         }
     }
     if(getAllInfoPlayer(contact.id.user).roles === "ama"){
