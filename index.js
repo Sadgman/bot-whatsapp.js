@@ -1790,8 +1790,10 @@ client.on('message_create', async (message) => {
                     let stream;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
+                    const agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
+
                     if (search.includes('https://youtu.be/')){
-                        stream = ytdl(search, { filter: 'audioonly' });
+                        stream = ytdl(search, { filter: 'audioonly', agent: agent });
                         descargarM(stream, mensaje_error);
                         return
                     }
@@ -1802,7 +1804,7 @@ client.on('message_create', async (message) => {
                             counterListRequestMusic = 0;
                             return;
                         }
-                        stream = ytdl(x[0].url, { filter: 'audioonly' });
+                        stream = ytdl(x[0].url, { filter: 'audioonly', agent: agent });
                         descargarM(stream, mensaje_error, x[0].url);
 
                     } catch (error) {
@@ -1922,12 +1924,14 @@ client.on('message_create', async (message) => {
                     let stream;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
+                    const agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
+
                     if (search.includes('https://youtu.be/')){
-                        stream = ytdl(search, { filter: 'audioandvideo', quality: 'lowest'});
+                        stream = ytdl(search, { filter: 'audioandvideo', quality: 'lowest', agent: agent});
                         descargarV(stream, mensaje_error);
                         return
                     }else if(search.includes('https://www.youtube.com/shorts/') || search.includes('https://youtube.com/shorts/')){
-                        stream = ytdl(search, { filter: 'audioandvideo', quality: 'highestvideo'});
+                        stream = ytdl(search, { filter: 'audioandvideo', quality: 'highestvideo', agent: agent});
                         descargarV(stream, mensaje_error);
                         return
                     }
@@ -1950,7 +1954,7 @@ client.on('message_create', async (message) => {
                             counterListRequestVideo = 0;
                             return;
                         }
-                        stream = ytdl(x[0].url, { filter: 'audioandvideo', quality: 'lowest'});
+                        stream = ytdl(x[0].url, { filter: 'audioandvideo', quality: 'lowest', agent: agent});
                         descargarV(stream, mensaje_error);
 
                     } catch (error) {
