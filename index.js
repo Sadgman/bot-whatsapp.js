@@ -1782,28 +1782,20 @@ client.on('message_create', async (message) => {
     }
     if (message.body.toLowerCase().startsWith("m ")) {
             counterListRequestMusic++;
+            let stream;
             const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
             if(counterListRequestMusic <= 1){
                 try {
                     const parts = message.body.split(' ');
                     const search = parts.slice(1).join(' ');
-                    let stream;
+                    
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     const agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
 
                     if (search.includes('https://youtu.be/')){
                         stream = ytdl(search, { filter: 'audioonly', agent: agent });
-                        const funcao = stream.listeners('error')[2];
-                        stream.removeListener('error', funcao);
-                            stream.on('error', (err) => {
-                                try {
-                                throw new Error();
-                                } catch {
-                                stream.destroy();
-                                console.log(err);
-                                }
-                            });
+                    
                         descargarM(stream, mensaje_error);
                         return
                     }
@@ -1815,21 +1807,12 @@ client.on('message_create', async (message) => {
                             return;
                         }
                         stream = ytdl(x[0].url, { filter: 'audioonly', agent: agent });
-                        const funcao = stream.listeners('error')[2];
-                        stream.removeListener('error', funcao);
-
-                            stream.on('error', (err) => {
-                                try {
-                                throw new Error();
-                                } catch {
-                                stream.destroy();
-                                console.log(err);
-                                }
-                            });
+                    
                         descargarM(stream, mensaje_error, x[0].url);
 
                     } catch (error) {
                         counterListRequestMusic = 0;
+                        stream.destroy()
                         console.error('Ocurrió un error:', error);
                         message.reply(mensaje_error);
                     }
@@ -1839,6 +1822,7 @@ client.on('message_create', async (message) => {
                     message.reply(mensaje_error);
                 });
             } catch (error) {
+                stream.destroy()
                 counterListRequestMusic = 0;
                 console.error('Ocurrió un error:', error);
                 message.reply(mensaje_error);
