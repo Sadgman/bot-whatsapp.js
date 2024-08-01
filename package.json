@@ -17,6 +17,6 @@
     "twitter-downloader": "^1.1.8",
     "whatsapp-web.js": "github:Sadgman/whatsapp-web.js#webpack-exodus",
     "youtube-sr": "^4.3.10",
-    "ytdp": "1.0.0"
+    "ytdp": "1.1.0"
   }
 }
