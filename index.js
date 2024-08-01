@@ -383,10 +383,10 @@ client.on('message_create', async (message) => {
         update_info_player(contact.id.user, "mensajes", getAllInfoPlayer(contact.id.user).mensajes + 1, true);
     }
     const infoPlayer = getAllInfoPlayer(contact.id.user);
-    const currentLevel = infoPlayer.nivel;
+    const currentLevel = parseInt(infoPlayer.nivel);
     let winsNeeded = (currentLevel + 1) * 10;
 
-    if(infoPlayer.ganadas == winsNeeded){
+    if(parseInt(infoPlayer.ganadas) === winsNeeded){
         update_info_player(contact.id.user, "nivel", currentLevel + 1, true);
         update_info_player(contact.id.user, "ganadas", 0, true);
         message.reply('Felicidades has subido de nivel');
