@@ -1,5 +1,5 @@
 const fs = require('fs');
-const directory = 'data.json'
+const directory = './data.json'
 /**
  * 
  * @param {number} player id del jugador 
