@@ -1763,21 +1763,23 @@ client.on('message_create', async (message) => {
                 console.error(err);
                 counterListRequestMusic = 0;
                 message.reply(mensaje_error);
-          /*       try{
-                    YTDownloadMusic(url).then(async (n) => {
-                        const response = await fetch(n);
-                        const buffer = await response.buffer();
-                        fs.writeFileSync('n.mp3', buffer, () => {
-                            const file = fs.readFileSync('n.mp3')
-                            const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                            chat.sendMessage(media, { quotedMessageId: message.id._serialized });
-                            counterListRequestMusic = 0;
-                        });
+             
+                YTDownloadMusic(url)
+                .then(async (n) => {
+                    const response = await fetch(n);
+                    const buffer = await response.buffer();
+                    fs.writeFileSync('n.mp3', buffer, () => {
+                        const file = fs.readFileSync('n.mp3')
+                        const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+                        chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                        counterListRequestMusic = 0;
                     });
-                }catch{
+                }).catch((err) => {
+                    console.error(err);
                     counterListRequestMusic = 0;
                     message.reply(mensaje_error);
-                } */
+                })
+                
             })
     }
     if (message.body.toLowerCase().startsWith("m ")) {
