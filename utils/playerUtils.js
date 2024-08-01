@@ -1,12 +1,12 @@
 const fs = require('fs');
-
+const directory = 'data.json'
 /**
  * 
  * @param {number} player id del jugador 
  * @returns devuelve true si el jugador ya existe en el archivo data.json, false si no existe
  */
 function jsonread(player) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let jsonfile = fs.readFileSync(directory, 'utf-8');
     let data = JSON.parse(jsonfile);
     dataplayer =
     {
@@ -40,7 +40,7 @@ function jsonread(player) {
     }
     if (encuentra === false) {
         data.players.push(dataplayer);
-        fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
+        fs.writeFileSync(directory, JSON.stringify(data, null, 4), 'utf-8');
     }
     return encuentra;
 }
@@ -53,7 +53,7 @@ function jsonread(player) {
  */
 function update_info_player(player, type, value, rem) {
     try {
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let jsonfile = fs.readFileSync(directory, 'utf-8');
         let data = JSON.parse(jsonfile);
         if (rem === false) {
             
@@ -69,7 +69,7 @@ function update_info_player(player, type, value, rem) {
                 }
             }
         }
-        fs.writeFileSync('data.json', JSON.stringify(data, null, 2));
+        fs.writeFileSync(directory, JSON.stringify(data, null, 2));
     } catch (err) {
         console.log(err);
         return null;
@@ -82,7 +82,7 @@ function update_info_player(player, type, value, rem) {
  */
 function getAllInfoPlayer(player) {
     try {
-        let jsonfile = fs.readFileSync('data.json', 'utf-8');
+        let jsonfile = fs.readFileSync(directory, 'utf-8');
         let data = JSON.parse(jsonfile);
         for (let i = 0; i < data.players.length; i++) {
             if (data.players[i].id === player) {
@@ -118,7 +118,7 @@ function update_dias(player ,dias, opcion) {
     }
 }
 function topPlayersWithMostMoney() {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let jsonfile = fs.readFileSync(directory, 'utf-8');
     let json = JSON.parse(jsonfile);
     let top = [];
     let sortedPlayers = json.players.sort((a, b) => b.banco - a.banco);
@@ -128,7 +128,7 @@ function topPlayersWithMostMoney() {
     return top;
 }
 function moneyTopPlayers(){
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let jsonfile = fs.readFileSync(directory, 'utf-8');
     let json = JSON.parse(jsonfile);
     let top = [];
     let sortedPlayers = json.players.sort((a, b) => b.banco - a.banco);
@@ -138,7 +138,7 @@ function moneyTopPlayers(){
     return top;
 }
 function topPlayersWithMostLevel(){
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let jsonfile = fs.readFileSync(directory, 'utf-8');
     let json = JSON.parse(jsonfile);
     let top = [];
     let sortedPlayers = json.players.sort((a, b) => b.nivel - a.nivel);
@@ -149,7 +149,7 @@ function topPlayersWithMostLevel(){
 
 }
 function levelTopPlayers(){
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let jsonfile = fs.readFileSync(directory, 'utf-8');
     let json = JSON.parse(jsonfile);
     let top = [];
     let sortedPlayers = json.players.sort((a, b) => b.nivel - a.nivel);
@@ -159,7 +159,7 @@ function levelTopPlayers(){
     return top;
 }
 function topUsersMessages(){
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let jsonfile = fs.readFileSync(directory, 'utf-8');
     let json = JSON.parse(jsonfile);
     let top = [];
     let sortedPlayers = json.players.sort((a, b) => b.mensajes - a.mensajes);
@@ -169,7 +169,7 @@ function topUsersMessages(){
     return top;
 }
 function messageUsers(){
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
+    let jsonfile = fs.readFileSync(directory, 'utf-8');
     let json = JSON.parse(jsonfile);
     let top = [];
     let sortedPlayers = json.players.sort((a, b) => b.mensajes - a.mensajes);
