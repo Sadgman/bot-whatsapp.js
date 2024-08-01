@@ -345,7 +345,7 @@ client.on('message_create', async (message) => {
     let contact = await message.getContact();
     const group = await message.getChat();
 
-    if(message.body.toLocaleLowerCase() === ''){
+    if(message.body === ''){
         return;
     }
     function quitar_acentos(palabra){
@@ -355,6 +355,26 @@ client.on('message_create', async (message) => {
             palabra = palabra.replace(new RegExp(palabras_raras[i], 'g'), letras_normales[i]);
         }
         return palabra;
+    }
+    const ContadorDeUnDia = (player) => {
+        if(contadordia[player]){
+            return;
+        }
+        let startTime = Date.now();
+        contadordia[player] = {
+            timeout: setTimeout(() => {
+                delete contadordia[player];
+            }, 60000),
+            startTime: startTime,
+            totalDuration: 60000
+        };
+    }
+    const Tiempo_restante = (player) => {
+        if(!contadordia[player]){
+            return 0;
+        }
+        let elapsedTime = Date.now() - contadordia[player].startTime;
+        return Math.floor((contadordia[player].totalDuration - elapsedTime) / 1000);
     }
     if(insultos.includes(message.body.toLocaleLowerCase())){
         message.reply('Tu madre me dijo otra cosa');
@@ -597,46 +617,68 @@ client.on('message_create', async (message) => {
         await chat.sendStateTyping();
         message.reply('esta opcion esta desactida por el momento');
     }
-    if (message.body.toLocaleLowerCase().startsWith('dados ') || message.body.toLocaleLowerCase().startsWith('dado ')) {
+    if (message.body.toLocaleLowerCase().startsWith('dado ')) {
         let parts = message.body.split(' ');
         let num = parts[1];
-        let eleccionMaquina = Math.floor(Math.random() * 6) + 1;
-        message.reply(`yo escojo el numero ${eleccionMaquina}`);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        let numeroObjetivo = Math.floor(Math.random() * 6) + 1;
-        let diferenciaJugador = Math.abs(numeroObjetivo - parseInt(num));
-        let diferenciaMaquina = Math.abs(numeroObjetivo - eleccionMaquina);
+        const parsedNum = parseInt(num);
 
-        let ganador;
-        let dado;
-
-        if (diferenciaJugador < diferenciaMaquina) {
-            ganador = 'ganó el Jugador';
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
-        } else if (diferenciaMaquina < diferenciaJugador) {
-            ganador = 'ganó la Máquina';
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
-        } else {
-            ganador = 'quedo Empate';
+        // verifico si hay mas texto despues del numero
+        if(parts.length > 2){
+            return
         }
-
-        if (numeroObjetivo === 1) {
-            dado = "         ⚀\n";
-        } else if (numeroObjetivo === 2) {
-            dado = "         ⚁\n";
-        } else if (numeroObjetivo === 3) {
-            dado = "         ⚂\n";
-        } else if (numeroObjetivo === 4) {
-            dado = "         ⚃\n";
-        } else if (numeroObjetivo === 5) {
-            dado = "         ⚄\n";
-        } else if (numeroObjetivo === 6) {
-            dado = "         ⚅\n";
-        } else {
-            message.reply('Introduce un número del 1 al 6');
+        if(contadordia[contact.id.user + 'dado']){
+            message.reply(`Debes esperar ${Tiempo_restante(contact.id.user)} segundos para volver a jugar`);
             return;
         }
-        message.reply(`${dado} El resultado es: ${ganador}`);
+        // condiciono que el numero este entre 1 y 6 y que sea un numero
+        else if(!isNaN(parsedNum) && parsedNum <= 6 && parsedNum > 0) {
+            const eleccionMaquina = Math.floor(Math.random() * 6) + 1;
+            message.reply(`yo escojo el numero ${eleccionMaquina}`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const numeroObjetivo = Math.floor(Math.random() * 6) + 1;
+            //verifico si la maquina o el jugador este mas cerca del numero objetivo
+            const diferenciaJugador = Math.abs(numeroObjetivo - parsedNum);
+            const diferenciaMaquina = Math.abs(numeroObjetivo - eleccionMaquina);
+    
+            let ganador;
+            let dado;
+    
+            if (diferenciaJugador < diferenciaMaquina) {
+                ganador = 'ganó el Jugador';
+                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
+            } else if (diferenciaMaquina < diferenciaJugador) {
+                ganador = 'ganó la Máquina';
+                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
+            } else {
+                ganador = 'quedó Empate';
+            }
+    
+            switch (numeroObjetivo) {
+                case 1:
+                    dado = "         ⚀\n";
+                    break;
+                case 2:
+                    dado = "         ⚁\n";
+                    break;
+                case 3:
+                    dado = "         ⚂\n";
+                    break;
+                case 4:
+                    dado = "         ⚃\n";
+                    break;
+                case 5:
+                    dado = "         ⚄\n";
+                    break;
+                case 6:
+                    dado = "         ⚅\n";
+                    break;
+                default:
+                    message.reply('Introduce un número del 1 al 6');
+                    return;
+            }
+            message.reply(`${dado} El resultado es: ${ganador}`);
+            ContadorDeUnDia(contact.id.user + 'dado');
+        }
     }
     if(message.body.toLocaleLowerCase().startsWith('pp ')){
         //pp es pelea de pollos por apuestas el jugador introduce una cantidad de dinero a apostar y el bot elige un numero de probabilidad de ganar basandose en las estadisticas del animal
@@ -1245,27 +1287,6 @@ client.on('message_create', async (message) => {
                 sendSticker(message.from, part.join(' '));
             }
         }
-    }
-
-    const ContadorDeUnDia = (player) => {
-        if(contadordia[player]){
-            return;
-        }
-        let startTime = Date.now();
-        contadordia[player] = {
-            timeout: setTimeout(() => {
-                delete contadordia[player];
-            }, 60000),
-            startTime: startTime,
-            totalDuration: 60000
-        };
-    }
-    const Tiempo_restante = (player) => {
-        if(!contadordia[player]){
-            return 0;
-        }
-        let elapsedTime = Date.now() - contadordia[player].startTime;
-        return Math.floor((contadordia[player].totalDuration - elapsedTime) / 1000);
     }
     if(message.body.toLocaleLowerCase() === '!w'){
         if(contadordia[contact.id.user]){
