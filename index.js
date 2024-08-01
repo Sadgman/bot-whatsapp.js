@@ -1794,6 +1794,16 @@ client.on('message_create', async (message) => {
 
                     if (search.includes('https://youtu.be/')){
                         stream = ytdl(search, { filter: 'audioonly', agent: agent });
+                        const funcao = stream.listeners('error')[2];
+                        stream.removeListener('error', funcao);
+                            stream.on('error', (err) => {
+                                try {
+                                throw new Error();
+                                } catch {
+                                stream.destroy();
+                                console.log(err);
+                                }
+                            });
                         descargarM(stream, mensaje_error);
                         return
                     }
@@ -1805,6 +1815,17 @@ client.on('message_create', async (message) => {
                             return;
                         }
                         stream = ytdl(x[0].url, { filter: 'audioonly', agent: agent });
+                        const funcao = stream.listeners('error')[2];
+                        stream.removeListener('error', funcao);
+
+                            stream.on('error', (err) => {
+                                try {
+                                throw new Error();
+                                } catch {
+                                stream.destroy();
+                                console.log(err);
+                                }
+                            });
                         descargarM(stream, mensaje_error, x[0].url);
 
                     } catch (error) {
