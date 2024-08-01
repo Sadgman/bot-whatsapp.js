@@ -627,7 +627,7 @@ client.on('message_create', async (message) => {
             return
         }
         if(contadordia[contact.id.user + 'dado']){
-            message.reply(`Debes esperar ${Tiempo_restante(contact.id.user)} segundos para volver a jugar`);
+            message.reply(`Debes esperar ${Tiempo_restante(contact.id.user + 'dado')} segundos para volver a jugar`);
             return;
         }
         // condiciono que el numero este entre 1 y 6 y que sea un numero
