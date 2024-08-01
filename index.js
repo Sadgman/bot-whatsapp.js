@@ -1485,6 +1485,23 @@ client.on('message_create', async (message) => {
             message.reply('> Las opciones del banco son:\n\n> Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)');
         }
     }
+    //simplifico lo del banco y saco dp, para que el usuario solo tenga que poner dp (cantidad)
+    if (message.body.toLocaleLowerCase().startsWith('dp ')) {
+        let mensaje = message.body.split(' ');
+        let dinero = parseInt(mensaje[1]);
+        //verifico que sea solo dp (cantidadad) que sea un numero y que sea mayor a 0
+        if (mensaje.length === 2 && !isNaN(dinero) && dinero > 0) {
+            //verifico que tenga el dinero suficiente
+            if (getAllInfoPlayer(contact.id.user).dinero >= dinero) {
+                //actualizo el dinero y el banco
+                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - dinero, true);
+                update_info_player(contact.id.user, "banco", getAllInfoPlayer(contact.id.user).banco + dinero, true);
+                message.reply(`Has depositado ${dinero} a tu cuenta bancaria`);
+            } else {
+                message.reply('No tienes suficiente dinero');
+            }
+        }
+    }
     if (message.body.toLocaleLowerCase() === 'tienda') {
         let articulos = {
             "roles": {
