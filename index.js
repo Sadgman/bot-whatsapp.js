@@ -1482,7 +1482,7 @@ client.on('message_create', async (message) => {
                 console.error(err);
             }
         }else{
-            message.reply('> Las opciones del banco son:\n\n> Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)');
+            message.reply('> Las opciones del banco son:\n\n>\Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)');
         }
     }
     //simplifico lo del banco y saco dp, para que el usuario solo tenga que poner dp (cantidad)
@@ -1786,39 +1786,48 @@ client.on('message_create', async (message) => {
             message.reply(mensaje);
         }
     }
-    async function descargarM(stream, mensaje_error, url){
-        ffmpeg()
-            .input(stream)
-            .audioBitrate(128)
-            .save('n.mp3')
-            .on('end', () => {
+    async function descargarM(stream, mensaje_error, url) {
+        try {
+            await new Promise((resolve, reject) => {
+                //Comprimo el archivo
+                ffmpeg()
+                    .input(stream)
+                    .audioBitrate(128)
+                    .save('n.mp3')
+                    .on('end', resolve)
+                    .on('error', reject);
+            });
+            // lo envio
+            const file = fs.readFileSync('n.mp3');
+            const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+            await chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+            counterListRequestMusic = 0;
+        } catch (err) {
+            console.error(err);
+            console.log("Error YTDL");
+
+            try {
+                const n = await YTDownloadMusic(url);
+                const response = await fetch(n);
+                const buffer = await response.buffer();
+                fs.writeFileSync('n.mp3', buffer);
+
                 const file = fs.readFileSync('n.mp3');
                 const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                await chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                 counterListRequestMusic = 0;
-            })
-            .on('error', (err) => {
+            } catch (err) {
                 console.error(err);
+                console.log("\n\n Error my module");
                 counterListRequestMusic = 0;
                 message.reply(mensaje_error);
-             
-                YTDownloadMusic(url)
-                .then(async (n) => {
-                    const response = await fetch(n);
-                    const buffer = await response.buffer();
-                    fs.writeFileSync('n.mp3', buffer, () => {
-                        const file = fs.readFileSync('n.mp3')
-                        const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                        chat.sendMessage(media, { quotedMessageId: message.id._serialized });
-                        counterListRequestMusic = 0;
-                    });
-                }).catch((err) => {
-                    console.error(err);
-                    counterListRequestMusic = 0;
-                    message.reply(mensaje_error);
-                })
-                
-            })
+            }
+        } finally {
+            // Limpia el archivo temporal
+            if (fs.existsSync('n.mp3')) {
+                fs.unlinkSync('n.mp3');
+            }
+        }
     }
     if (message.body.toLowerCase().startsWith("m ")) {
             counterListRequestMusic++;
