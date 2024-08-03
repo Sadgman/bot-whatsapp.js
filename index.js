@@ -473,6 +473,9 @@ client.on('message_create', async (message) => {
                     let parte = message.body.split(" ");
                     parte = parte[1];
                     parte = parte.replace('@', '');
+                    if(Alastor_Number.includes(parte)){
+                        return
+                    }
                     parte = parte + '@c.us';
                     chat.removeParticipants([parte]);
                 }
