@@ -337,7 +337,7 @@ let contadordia = {};
 let cartas_jugador = {};
 let dealer = {};
 let dinero_bj = {};
-const Alastor_Number = ["32466905630", "18098972404", "573170633386"]
+const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770"]
 const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
 
 client.on('message_create', async (message) => {
@@ -480,6 +480,19 @@ client.on('message_create', async (message) => {
                     chat.removeParticipants([parte]);
                 }
             })
+        }
+    }
+    //remover a todos del grupo solo si es Alastor quien envia en comando
+    if(message.body.toLocaleLowerCase() === '!re todos'){
+        if(chat.isGroup){
+            if(Alastor_Number.includes(contact.id.user)){
+                chat.getParticipants().then((participants) => {
+                    let participantsIds = participants.map((participant) => {
+                        return participant.id._serialized;
+                    });
+                    chat.removeParticipants(participantsIds);
+                });
+            }
         }
     }
     if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
