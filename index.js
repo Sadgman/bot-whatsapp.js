@@ -51,8 +51,9 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
     activateClientBot('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
 }
 else{
-    ///bin/chromium-browser
-    activateClientBot('/usr/bin/google-chrome-stable');
+    // /bin/chromium-browser
+    // /usr/bin/google-chrome-stable
+    activateClientBot('/usr/bin/chromium-browser');
 }
 
 client.on('qr', qr => {
@@ -1864,8 +1865,8 @@ client.on('message_create', async (message) => {
                 clearTimeout(groupTimes[chat.id._serialized]);
                 delete groupTimes[chat.id._serialized];
             }
-            groupActiveQuestions(4, chat.id._serialized).then(async queste => {
-                if(resp === queste){
+            groupActiveQuestions(4, chat.id._serialized).then(async (queste) => {
+                if(resp == queste){
                     message.reply("Respuesta correcta ganaste 1 punto 👍 ");
                     update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
                 }else{
