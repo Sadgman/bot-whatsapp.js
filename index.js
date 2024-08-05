@@ -139,7 +139,7 @@ const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quit
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n> formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> BlackJack(bj)\n\n> !q crea una pregunta" + "\n\n> cz (cara o cruz)" + "\n\n*Los Roles tienen sus juegos propios*"
 const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "in.ru", "ln.ru", "https://xxnx", "https://pornhub", "https://xvideos", "https://xnxx", "xnxx", "xhamster", "redtube", "youporn", "te odio baba", "odio baba", "odio a baba"]
 let golpear;
-let counterListRequestMusic = 0;
+let counterListRequestMusic = 1;
 let counterListRequestVideo = 0;
 let groupTimes = {};
 let contadordia = {};
@@ -148,6 +148,7 @@ let dealer = {};
 let dinero_bj = {};
 const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770"]
 const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
+let requestM = []
 process.on('SIGINT', async () => {
     await client.destroy();
     await cerrarBase();
@@ -1553,75 +1554,102 @@ client.on('message_create', async (message) => {
         }
         message.reply(mensaje);
     }
-    async function descargarM(stream, mensaje_error, url) {
-        try {
-            await new Promise((resolve, reject) => {
-                //Comprimo el archivo
-                ffmpeg()
-                    .input(stream)
-                    .audioBitrate(128)
-                    .save('n.mp3')
-                    .on('end', resolve)
-                    .on('error', reject);
-            });
-            // lo envio
-            const file = fs.readFileSync('n.mp3');
-            const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-            await chat.sendMessage(media, { quotedMessageId: message.id._serialized });
-            counterListRequestMusic = 0;
-        } catch (err) {
-            console.error(err);
-            console.log("Error YTDL");
-
+    function descargarM(stream, mensaje_error, url) {
+        return new Promise(async (resolve, reject) => {
             try {
-                const n = await YTDownloadMusic(url);
-                const response = await fetch(n);
-                const buffer = await response.buffer();
-                fs.writeFileSync('n.mp3', buffer);
-
+                await new Promise((resolve, reject) => {
+                    //Comprimo el archivo
+                    ffmpeg()
+                        .input(stream)
+                        .audioBitrate(128)
+                        .save('n.mp3')
+                        .on('end', resolve)
+                        .on('error', reject);
+                });
+                // lo envio
                 const file = fs.readFileSync('n.mp3');
                 const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
-                await chat.sendMessage(media, { quotedMessageId: message.id._serialized });
-                counterListRequestMusic = 0;
+                await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
+                resolve();
             } catch (err) {
                 console.error(err);
-                console.log("\n\n Error my module");
-                counterListRequestMusic = 0;
-                message.reply(mensaje_error);
+                console.log("Error YTDL");
+
+                try {
+                    const n = await YTDownloadMusic(url);
+                    const response = await fetch(n);
+                    const buffer = await response.buffer();
+                    fs.writeFileSync('n.mp3', buffer);
+                    const file = fs.readFileSync('n.mp3');
+                    const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+                    await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
+                    reject()
+                } catch (err) {
+                    console.error(err);
+                    console.log("\n\n Error my module");
+                    reject(err);
+                }
+            } finally {
+                // Limpia el archivo temporal
+                if (fs.existsSync('n.mp3')) {
+                    fs.unlinkSync('n.mp3');
+                }
             }
-        } finally {
-            // Limpia el archivo temporal
-            if (fs.existsSync('n.mp3')) {
-                fs.unlinkSync('n.mp3');
+        });
+    }
+    function addPetition(url, mensaje_error) {
+        if(requestM.length < 1){
+            counterListRequestMusic = 1;
+        }
+        let petition = {
+            url: url,
+            chat: chat,
+            quotedMessageId: message.id._serialized
+        };
+        requestM.push(petition);
+        
+        if (counterListRequestMusic > 0) {
+            counterListRequestMusic = 0;
+            const agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
+            processQueue(agent, mensaje_error);
+        }
+    }
+    async function processQueue(agent, mensaje_error) {
+        while (requestM.length > 0) {
+            const petition = requestM[0];
+            try {
+                await descargarM(ytdl(petition.url, { filter: 'audioonly', agent: agent }), mensaje_error, petition.url);
+                requestM.shift(); // Elimina la petición procesada
+            } catch (error) {
+                console.error("Error al descargar la canción:", error);
+                requestM[0].chat.sendMessage(mensaje_error, { quotedMessageId: requestM[0].quotedMessageId });
+                requestM.shift(); 
             }
         }
     }
     if (message.body.toLowerCase().startsWith("m ")) {
-            counterListRequestMusic++;
+            message.reply('Descargando la canción, espera un momento...');
             const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
-            if(counterListRequestMusic <= 1){
-                try {
-                    const parts = message.body.split(' ');
-                    const search = parts.slice(1).join(' ');
-                    let stream;
-                    await chat.sendSeen();
-                    await chat.sendStateTyping();
-                    const agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
+            try {
+                const parts = message.body.split(' ');
+                const search = parts.slice(1).join(' ');
+                let stream;
+                await chat.sendSeen();
+                await chat.sendStateTyping();
 
-                    if (search.includes('https://youtu.be/')){
-                        stream = ytdl(search, { filter: 'audioonly', agent: agent });
-                        descargarM(stream, mensaje_error);
-                        return
-                    }
-                    await youtube.search(search, { limit: 1 }).then(x => {
+                if (search.includes('https://youtu.be/')){
+                    stream = 
+                    addPetition(search, mensaje_error);
+                    return
+                }
+                await youtube.search(search, { limit: 1 }).then(x => {
                     try {
                         if (x.length === 0) {
                             message.reply('No puede encontrar esa cosa que escribiste, toma un curso de ortografía');
                             counterListRequestMusic = 0;
                             return;
                         }
-                        stream = ytdl(x[0].url, { filter: 'audioonly', agent: agent });
-                        descargarM(stream, mensaje_error, x[0].url);
+                        addPetition(x[0].url, mensaje_error);
 
                     } catch (error) {
                         counterListRequestMusic = 0;
@@ -1633,13 +1661,10 @@ client.on('message_create', async (message) => {
                     console.error('Ocurrió un error en youtube.search:', err);
                     message.reply(mensaje_error);
                 });
-            } catch (error) {
-                counterListRequestMusic = 0;
-                console.error('Ocurrió un error:', error);
-                message.reply(mensaje_error);
-            }
-        }else{
-            message.reply('Espera un momento estoy ocupado enviando una canción');
+        } catch (error) {
+            counterListRequestMusic = 0;
+            console.error('Ocurrió un error:', error);
+            message.reply(mensaje_error);
         }
     }
     function descargarV(stream, mensaje_error){
