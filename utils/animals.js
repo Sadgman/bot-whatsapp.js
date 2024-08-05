@@ -1,179 +1,194 @@
-const fs = require('fs');
+const {db} = require('./base');
 
 /** 
- * @param {string} animal nombre del animal
- * @returns devuelve true si el animal ya existe en el archivo data.json, false si no existe
+ * @param {string} id_player id del jugador
+ * @param {string} tipo tipo de animal
+ * @param {string} name nombre del animal
 */
-function addAnimal(id_player ,name){
-    // Esta función modifica el archivo data.json para agregar un nuevo animal al jugador siguiendo la siguiente estructura:
-    /* {
-        animales: {
+function addAnimal(id_player, tipo, name){
+    /* [
+        {
+        tipo: {
             "nombre": "",
-            "tipo": "",
-            "cansancio": 0,
+            "cansado": 0,
             "hambre": 0,
-            "felicidad": 0,
-            "salud": 0,
-        }
+            "salud": 3,
+            "felicidad": 100,
+            }
+        ]
     }; */
-    // solo se modifica la propiedad animales, se agrega un nuevo objeto con los valores por defecto
-    let playerRead = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(playerRead);
-
-    animal = {
-        "nombre": name,
-        "tipo": name,
-        "cansancio": 0,
-        "hambre": 0,
-        "felicidad": 100,
-        "salud": 100,
-    };
-    // Se busca si el jugador ya tiene el animal 
-    let found = false;
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === id_player) {
-            for (let j = 0; j < data.players[i].animales.length; j++) {
-                if (data.players[i].animales[j].nombre === name) {
-                    found = true;
-                    return found;
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Animales FROM players WHERE id = ?`, [id_player], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
                 }
-            }
-            if (found === false) {
-                data.players[i].animales.push(animal);
-                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                return found;
-            }
-            break;
-        }
-    }   
-}
-
-function modifyAnimalsParameters(player_id, animal_name, parameter, value, option){
-    // Esta función modifica los parámetros de los animales del jugador, se puede modificar el cansancio, hambre, felicidad y salud dependiendo de option
-    // option = 0 -> cansancio
-    // option = 1 -> hambre
-    // option = 2 -> felicidad
-    // option = 3 -> salud
-    // tomando en cuenta que el animal ya existe
-    let playerRead = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(playerRead);
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === player_id) {
-            for (let j = 0; j < data.players[i].animales.length; j++) {
-                if (data.players[i].animales[j].nombre === animal_name) {
-                    switch (option) {
-                        case 0:
-                            data.players[i].animales[j].cansancio = value;
-                            break;
-                        case 1:
-                            data.players[i].animales[j].hambre = value;
-                            break;
-                        case 2:
-                            data.players[i].animales[j].felicidad = value;
-                            break;
-                        case 3:
-                            data.players[i].animales[j].salud = value;
-                            break;
-                        default:
-                            break;
+                let animals;
+                try {
+                    animals = rows[0].Animales ? JSON.parse(rows[0].Animales) : {};
+                } catch (parseError) {
+                    animals = {};
+                }
+                if(animals[tipo] === undefined){
+                    animals[tipo] = []
+                }
+                animals[tipo].forEach((animal) => {
+                    if(animal.nombre === name){
+                        reject('Ya tienes un animal con ese nombre');
+                        return;
                     }
-                    fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                    break;
-                }
-            }
-            break;
-        }
-    }
+                })
+                animals[tipo].push({
+                    "nombre": name,
+                    "cansado": 0,
+                    "hambre": 0,
+                    "salud": 3,
+                    "felicidad": 100
+                })
+            
+                const query = `UPDATE players SET Animales = ? WHERE id = ?`;
+                db.run(query, [JSON.stringify(animals, null, 4), id_player], (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve();
+                });
+            });
+        });
+    });
 }
 /**
  * 
- * @param {number} player_id id del jugador
- * @param {string} animal_name nombre del animal
+ * @param {string} player_id 
+ * @param {string} type_return 
+ * @param {string} name_animal 
  * @returns 
+ * [{ nombre: 'gato', tipo: 'gato' }] 
+retorna un array con todos los nombres de los animales y el tipo.
+Si es all retorna un objeto con todos los datos del animal
+
  */
-async function getAnimalParameters(player_id, animal_name){
-    // Esta función devuelve los parámetros de un animal en específico con este formato:
-    /* {
-        "nombre": "",
-        "tipo": "",
-        "cansancio": 0,
-        "hambre": 0,
-        "felicidad": 0,
-        "salud": 0,
-    } */
-    let playerRead = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(playerRead);
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === player_id) {
-            for (let j = 0; j < data.players[i].animales.length; j++) {
-                if (data.players[i].animales[j].nombre === animal_name) {
-                    return data.players[i].animales[j];
+function getAnimals(player_id, type_return, name_animal){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Animales FROM players WHERE id = ?`, [player_id], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
                 }
-            }
-            break;
-        }
-    }
+                let animals = rows[0].Animales ? JSON.parse(rows[0].Animales) : reject('No tienes animales');
+                if(type_return === 'names'){
+                    let allAnimalsnames = [];
+                    let typesAnimals = [];
+                    for(const type in animals){
+                        if(animals.hasOwnProperty(type)){
+                            animals[type].forEach((animal) => {
+                                allAnimalsnames.push({nombre: animal.nombre, tipo: type});
+                            })
+                        }
+                    }
+                    resolve(allAnimalsnames, typesAnimals);
+                }else if(type_return === 'all'){
+                    for(const animal in animals){
+                        if(animals.hasOwnProperty(animal)){
+                            animals[animal].forEach((element) => {
+                                if(element.nombre === name_animal){
+                                    resolve(element);
+                                }
+                            })
+                        }
+                    }
+                }
+            });
+        });
+    });
 }
+
 /**
  * 
- * @param {number} player_id id del jugador 
- * @returns devuelve un array con todos los animales del jugador
+ * @param {string} player_id id del jugador
+ * @param {string} name nombre del animal
+ * @param {string} parameter parametro a modificar
+ * @param {*} value valor a modificar
+ * @returns retorna una promesa
  */
-function getAnimals(player_id){
-    // Esta función devuelve todos los animales que tiene el jugador
-    let playerRead = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(playerRead);
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === player_id) {
-            return data.players[i].animales;
-        }
-    }
+function modifyAnimalsParameters(player_id ,name, parameter, value){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Animales FROM players WHERE id = ?`, [player_id], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                let animals;
+                try {
+                    animals = rows[0].Animales ? JSON.parse(rows[0].Animales) : {};
+                } catch (parseError) {
+                    reject(parseError);
+                }
+         
+                for(const type in animals){
+                if(animals.hasOwnProperty(type)){
+                    animals[type].forEach((elemet) => {
+                        if(elemet.nombre === name){
+                            elemet[parameter] = value;
+                            const query = `UPDATE players SET Animales = ? WHERE id = ?`;
+                            db.run(query, [JSON.stringify(animals, null, 4), player_id], (err) => {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
+                                resolve();
+                            });
+                        }
+                    })
+                }
+                }
+            });
+        });
+    });
 }
 function deleteAnimal(player_id, animal_name){
-    // Esta función elimina un animal del jugador
-    let playerRead = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(playerRead);
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === player_id) {
-            for (let j = 0; j < data.players[i].animales.length; j++) {
-                if (data.players[i].animales[j].nombre === animal_name) {
-                    data.players[i].animales.splice(j, 1);
-                    fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                    break;
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Animales FROM players WHERE id = ?`, [player_id], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
                 }
-            }
-            break;
-        }
-    }
-}
-/**
- * 
- * @param {number} player_id el id del jugador
- * @param {string} animal_name nombre del animal
- * @returns devuelve true si el animal ya existe en el jugador, false si no existe
- */
-function animalExist(player_id ,animal_name){
-    // Esta función verifica si el animal ya existe en el jugador
-    let playerRead = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(playerRead);
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === player_id) {
-            for (let j = 0; j < data.players[i].animales.length; j++) {
-                if (data.players[i].animales[j].nombre === animal_name) {
-                    return true;
+                let animals;
+                try {
+                    animals = rows[0].Animales ? JSON.parse(rows[0].Animales) : {};
+                } catch (parseError) {
+                    reject(parseError);
                 }
-            }
-            break;
-        }
-    }
-    return false;
+                for(const type in animals){
+                    if(animals.hasOwnProperty(type)){
+                        animals[type].forEach((animal, index) => {
+                            if(animal.nombre === animal_name){
+                                animals[type].splice(index, 1);
+                                const query = `UPDATE players SET Animales = ? WHERE id = ?`;
+                                db.run(query, [JSON.stringify(animals, null, 4), player_id], (err) => {
+                                    if (err) {
+                                        reject(err);
+                                        return;
+                                    }
+                                    resolve();
+                                });
+                            }
+                        })
+                    }
+                }
+            });
+        });
+    });
 }
 
 module.exports = {
     addAnimal,
     modifyAnimalsParameters,
-    getAnimalParameters,
     getAnimals,
-    deleteAnimal,
-    animalExist
+    deleteAnimal
 }

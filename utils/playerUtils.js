@@ -1,114 +1,14 @@
 const fs = require('fs');
-const directory = './data.json'
-/**
- * 
- * @param {number} player id del jugador 
- * @returns devuelve true si el jugador ya existe en el archivo data.json, false si no existe
- */
-function jsonread(player) {
-    let jsonfile = fs.readFileSync(directory, 'utf-8');
-    let data = JSON.parse(jsonfile);
-    dataplayer =
-    {
-        id: player,
-        casado: "nadie :(",
-        dias: 0,
-        nivel: 0,
-        ganadas: 0,
-        dinero: 0,
-        mensajes: 0,
-        banco: 0,
-        roles: "vagabundo",
-        animales: [
-            {
-                "nombre": "",
-                "tipo": "",
-                "cansancio": 0,
-                "hambre": 0,
-                "felicidad": 100,
-                "salud": 100,
-            }
-        ],
-        objetos: []
-    };
-    let encuentra = false;
-    for (let i = 0; i < data.players.length; i++) {
-        if (data.players[i].id === player) {
-            encuentra = true;
-            break;
-        }
-    }
-    if (encuentra === false) {
-        data.players.push(dataplayer);
-        fs.writeFileSync(directory, JSON.stringify(data, null, 4), 'utf-8');
-    }
-    return encuentra;
-}
-/**
- * @param {id} player el id del jugador
- * @param {string} type el tipo de dato que se quiere actualizar
- * @param {string} value el valor que se quiere agregar
- * @param {boolean} rem si es true se reemplaza el valor si es false se agrega al array
- *   
- */
-function update_info_player(player, type, value, rem) {
+const {db} = require('./base');
+
+async function update_dias(player, dias, opcion) {
     try {
-        let jsonfile = fs.readFileSync(directory, 'utf-8');
-        let data = JSON.parse(jsonfile);
-        if (rem === false) {
-            
-            for (let i = 0; i < data.players.length; i++) {
-                if (data.players[i].id === player) {
-                    data.players[i][type].push(value);
-                }
-            }
-        }else{
-            for (let i = 0; i < data.players.length; i++) {
-                if (data.players[i].id === player) {
-                    data.players[i][type] = value;
-                }
-            }
-        }
-        fs.writeFileSync(directory, JSON.stringify(data, null, 2));
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
-}
-/**
- * 
- * @param {number} player id del jugador 
- * @returns devuelve toda la información del jugador
- */
-function getAllInfoPlayer(player) {
-    try {
-        let jsonfile = fs.readFileSync(directory, 'utf-8');
-        let data = JSON.parse(jsonfile);
-        for (let i = 0; i < data.players.length; i++) {
-            if (data.players[i].id === player) {
-                return data.players[i];
-            }
-        }
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
-}
-/**
- * 
- * @param {number} player id del jugador
- * @param {number} dias el dia actual
- * @param {number} opcion si es 1 se actualiza el valor por el de dias, si es 2 se compara el valor con el valor en el json
- * @returns 
- */
-function update_dias(player ,dias, opcion) {
-    try {
-        if(opcion === 1){    
-            update_info_player(player, "dias", dias, true);
-        }else if(opcion === 2){
-            if(getAllInfoPlayer(player).dias !== dias){
+        if (opcion === 1) {
+            await update_info_player(player, "dias", dias, true);
+        } else if (opcion === 2) {
+            if (await getAllInfoPlayer(player).dias !== dias) {
                 return false;
-            }else{
+            } else {
                 return true;
             }
         }
@@ -117,67 +17,157 @@ function update_dias(player ,dias, opcion) {
         return null;
     }
 }
-function topPlayersWithMostMoney() {
-    let jsonfile = fs.readFileSync(directory, 'utf-8');
-    let json = JSON.parse(jsonfile);
-    let top = [];
-    let sortedPlayers = json.players.sort((a, b) => b.banco - a.banco);
-    for (let i = 0; i < 5; i++) {
-        top.push(sortedPlayers[i].id);
-    }
-    return top;
-}
-function moneyTopPlayers(){
-    let jsonfile = fs.readFileSync(directory, 'utf-8');
-    let json = JSON.parse(jsonfile);
-    let top = [];
-    let sortedPlayers = json.players.sort((a, b) => b.banco - a.banco);
-    for (let i = 0; i < 5; i++) {
-        top.push(sortedPlayers[i].banco);
-    }
-    return top;
-}
-function topPlayersWithMostLevel(){
-    let jsonfile = fs.readFileSync(directory, 'utf-8');
-    let json = JSON.parse(jsonfile);
-    let top = [];
-    let sortedPlayers = json.players.sort((a, b) => b.nivel - a.nivel);
-    for (let i = 0; i < 5; i++) {
-        top.push(sortedPlayers[i].id);
-    }
-    return top;
 
+function getAllInfoPlayer(id) {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT * FROM players WHERE id = ?`, [id], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows[0]);
+            });
+        });
+    });
 }
-function levelTopPlayers(){
-    let jsonfile = fs.readFileSync(directory, 'utf-8');
-    let json = JSON.parse(jsonfile);
-    let top = [];
-    let sortedPlayers = json.players.sort((a, b) => b.nivel - a.nivel);
-    for (let i = 0; i < 5; i++) {
-        top.push(sortedPlayers[i].nivel);
-    }
-    return top;
+
+async function update_info_player(player, type, value, rem) {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT * FROM players WHERE id = ?`, [player], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (rows.length === 0) {
+                    reject('No existe el jugador');
+                    return;
+                }
+                let player = rows[0];
+                rem ? player[type] = value : player[type].push(value);
+
+                const query = `UPDATE players SET ${type} = ? WHERE id = ?`;
+                db.run(query, [player[type], player.id], (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve(player);
+                });
+            });
+        });
+    });
 }
-function topUsersMessages(){
-    let jsonfile = fs.readFileSync(directory, 'utf-8');
-    let json = JSON.parse(jsonfile);
-    let top = [];
-    let sortedPlayers = json.players.sort((a, b) => b.mensajes - a.mensajes);
-    for (let i = 0; i < 5; i++) {
-        top.push(sortedPlayers[i].id);
-    }
-    return top;
+
+async function jsonread(player) {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT * FROM players WHERE id = ?`, [player], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (!rows.length > 0) {
+                    const n = `INSERT INTO players (id, Nombre, Casado, Rool, Puntos, Nivel, Dinero, Banco, Mensajes, Objetos, Animales) VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?)`;
+                    db.run(n, [player, '', 'nadie :(', 'Vagabundo', 0, 0, 0, 0, 0, '{}', '{}'], (err) => {
+                        if (err) {
+                            return console.log(err.message);
+                        }
+                    });
+                    resolve(false);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    });
 }
-function messageUsers(){
-    let jsonfile = fs.readFileSync(directory, 'utf-8');
-    let json = JSON.parse(jsonfile);
-    let top = [];
-    let sortedPlayers = json.players.sort((a, b) => b.mensajes - a.mensajes);
-    for (let i = 0; i < 5; i++) {
-        top.push(sortedPlayers[i].mensajes);
-    }
-    return top;
+
+async function topPlayersWithMostMoney() {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT id FROM players ORDER BY Banco DESC LIMIT 5`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows.map(row => row.id));
+            });
+        });
+    });
 }
+
+async function moneyTopPlayers() {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Banco FROM players ORDER BY Banco DESC LIMIT 5`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows.map(row => row.Banco));
+            });
+        });
+    });
+}
+
+async function topPlayersWithMostLevel() {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT id FROM players ORDER BY Nivel DESC LIMIT 5`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows.map(row => row.id));
+            });
+        });
+    });
+}
+
+async function levelTopPlayers() {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Nivel FROM players ORDER BY Nivel DESC LIMIT 5`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows.map(row => row.Nivel));
+            });
+        });
+    });
+}
+
+async function topUsersMessages() {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT id FROM players ORDER BY Mensajes DESC LIMIT 5`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows.map(row => row.id));
+            });
+        });
+    });
+}
+
+async function messageUsers() {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Mensajes FROM players ORDER BY Mensajes DESC LIMIT 5`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(rows.map(row => row.Mensajes));
+            });
+        });
+    });
+}
+
 module.exports = {
     jsonread,
     update_info_player,

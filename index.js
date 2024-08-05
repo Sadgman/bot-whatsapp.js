@@ -18,13 +18,13 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
-const esp = require('languagetool-api')
-const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers } = require('./utils/playerUtils.js');
-const { error, info } = require('console');
 const quest = require('preguntas');
-const { addAnimal, modifyAnimalsParameters, getAnimalParameters, getAnimals, animalExist } = require('./utils/animals.js');
+const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils');
+const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan} = require('./utils/groupTools');
+const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals');
+const { cerrarBase } = require('./utils/base');
 dayjs.extend(utc);
-dayjs.extend(timezone);
+dayjs.extend(timezone); 
 
 let client;
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -44,13 +44,15 @@ function activateClientBot(browserPath){
 }
 
 if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath === '/usr/bin/node') {
-    activateClientBot('/usr/bin/chromium-browser');
+    activateClientBot('/usr/bin/chromium-browser');const mysql = require('sqlite3');
+    const db = new mysql.Database('data.db');
+    
 }else if(process.platform === 'win32'){
     activateClientBot('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
 }
 else{
     ///bin/chromium-browser
-    activateClientBot('/usr/bin/google-chrome-stable');
+    activateClientBot('/bin/chromium-browser');
 }
 
 client.on('qr', qr => {
@@ -72,201 +74,7 @@ function RandomTwoIndex(array) {
     }
     return [randomIndex, randomIndex2];
 }
-/**
- * 
- * @param {string} group recibe el id del grupo en formato string
- * @returns retorna true si el grupo ya esta en la lista de grupos y si no esta lo crea y retorna true
- */
-function addgroup(group) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    let datagroup =
-    {
-        id: group,
-        bot_admin: false,
-        bot_activado: true,
-        index_p: 0,
-        title_quest: "",
-        activate_quest: false,
-        correctAnswer: 0,
-        baba: false,
-        juegos: [{ "todos": false, baneados: ["admins", "menciones"] }]
-    }
-    // Comprueba si grouplist existe antes de intentar acceder a su longitud
-    if (data.grouplist) {
-        for (let i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === group) {
-                return true;
-            }
-        }
-    } else {
-        // Si grouplist no existe, inicialízalo como un array vacío
-        data.grouplist = [];
-    }
-    data.grouplist.push(datagroup);
-    fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-    return true;
-}
-/**
- * 
- * @param {string} id_group recibe el id del grupo en formato string 
- * @param {string} game recibe el nombre del juego a banear en formato string 
- */
-function Bangame(id_group, game) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    let i;
-    for (i = 0; i < data.grouplist.length; i++) {
-        if (data.grouplist[i].id === id_group) {
-            data.grouplist[i].juegos[0].todos = false;
-            fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-            break;
-        }
-    }
-    for (let games of game) {
-        if (data.grouplist[i].juegos[0].todos == false && !data.grouplist[i].juegos[0].baneados.includes(games)) {
-            data.grouplist[i].juegos[0].baneados.push(games);
-            fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-        }
-    }
-}
-/**
- * 
- * @param {string} id_group id del grupo 
- * @param {string} game nombre del juego
- * @returns retorna true si el juego no esta baneado y false si esta baneado
- */
-function watchBan(id_group, game) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    let i;
-    for (i = 0; i < data.grouplist.length; i++) {
-        if (data.grouplist[i].id === id_group) {
-            if (data.grouplist[i].juegos[0].todos == true) {
-                return true
-            } else {
-                if (data.grouplist[i].juegos[0].baneados.includes(game)) {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        }
-    }
-}
-/**
- * 
- * @param {string} id_group el id del grupo 
- * @param {string} game el juego que se quiere quitar de la lista de baneados
- * @returns retorna true si se pudo quitar el juego de la lista de baneados, false si no se pudo
- */
-function QuitBan(id_group, game) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    for (i = 0; i < data.grouplist.length; i++) {
-        if (data.grouplist[i].id === id_group) {
-            if (data.grouplist[i].juegos[0].todos == false) {
-                if (data.grouplist[i].juegos[0].baneados.includes(game)) {
-                    let index = data.grouplist[i].juegos[0].baneados.indexOf(game);
-                    data.grouplist[i].juegos[0].baneados.splice(index, 1);
-                    fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                return false
-            }
-        }
-    }
-}
-function watchBot(id_group) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    for (i = 0; i < data.grouplist.length; i++) {
-        if (data.grouplist[i].id === id_group) {
-            return data.grouplist[i].bot_activado
-        }
-    }
-}
-/**
- * @param {number} option si es 1 retorna el estado de la pregunta si es 2 activa o desactiva la pregunta si es 3 pone el indice de respuesta correcta, si es 4 retorna el indice de la respuesta correcta si es 5 retorna el indice de la pregunta si es 6 pone el indice de la pregunta si es 7 retorna el titulo de la pregunta si es 8 pone el titulo de la pregunta
- * @param {*} boolean si es true activa la pregunta si es false la desactiva, tambien se puede usar para poner el indice de la respuesta correcta
- * @param {string} id_group el id del grupo
- * @returns retorna true si la pregunta esta activa y false si no lo esta 
-*/
-function groupActiveQuestions(option, id_group, boolean) {  
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    if(option === 1){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                return data.grouplist[i].activate_quest
-            }
-        }
-    }else if(option === 2){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                data.grouplist[i].activate_quest = boolean;
-                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                break;
-            }
-        }
-    }else if(option === 3){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                data.grouplist[i].correctAnswer = boolean;
-                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                break;
-            }
-        }
-    }else if(option === 4){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                return data.grouplist[i].correctAnswer;
-            }
-        }
-    }else if(option === 5){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                return data.grouplist[i].index_p;
-            }
-        }
-    }else if(option === 6){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                data.grouplist[i].index_p = boolean;
-                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                break;
-            }
-        }
-    }else if(option === 7){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                return data.grouplist[i].title_quest;
-            }
-        }
-    }else if(option === 8){
-        for (i = 0; i < data.grouplist.length; i++) {
-            if (data.grouplist[i].id === id_group) {
-                data.grouplist[i].title_quest = boolean;
-                fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-                break;
-            }
-        }
-    }
-}
-function activeBot(id_group, boolean) {
-    let jsonfile = fs.readFileSync('data.json', 'utf-8');
-    let data = JSON.parse(jsonfile);
-    for (i = 0; i < data.grouplist.length; i++) {
-        if (data.grouplist[i].id === id_group) {
-            data.grouplist[i].bot_activado = boolean;
-            fs.writeFileSync('data.json', JSON.stringify(data, null, 4), 'utf-8');
-            break;
-        }
-    }
-}
+
 let option = {
     juego: 0,
     ajustes: 0
@@ -325,13 +133,13 @@ let menu = `
 
 ¡Por ahora estas son todas las opciones que puedes disfrutar! Sigue apoyando.
 `
+let menu_juego;
 const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
 const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n> formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> BlackJack(bj)\n\n> !q crea una pregunta" + "\n\n> cz (cara o cruz)" + "\n\n*Los Roles tienen sus juegos propios*"
 const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "in.ru", "ln.ru", "https://xxnx", "https://pornhub", "https://xvideos", "https://xnxx", "xnxx", "xhamster", "redtube", "youporn", "te odio baba", "odio baba", "odio a baba"]
 let golpear;
 let counterListRequestMusic = 0;
 let counterListRequestVideo = 0;
-let cuentos = []
 let groupTimes = {};
 let contadordia = {};
 let cartas_jugador = {};
@@ -339,11 +147,20 @@ let dealer = {};
 let dinero_bj = {};
 const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770"]
 const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
-
+process.on('SIGINT', async () => {
+    await client.destroy();
+    await cerrarBase();
+    process.exit();
+})
 client.on('message_create', async (message) => {
     const chat = await message.getChat();
     let contact = await message.getContact();
     const group = await message.getChat();
+    await jsonread(contact.id.user);
+    if(chat.isGroup){
+        addgroup(chat.id._serialized);
+    }
+    const viewPlayer = await getAllInfoPlayer(contact.id.user);
 
     if(message.body === ''){
         return;
@@ -379,16 +196,15 @@ client.on('message_create', async (message) => {
     if(insultos.includes(message.body.toLocaleLowerCase())){
         message.reply('Tu madre me dijo otra cosa');
     }
-    if (jsonread(contact.id.user)) {
-        update_info_player(contact.id.user, "mensajes", getAllInfoPlayer(contact.id.user).mensajes + 1, true);
-    }
-    const infoPlayer = getAllInfoPlayer(contact.id.user);
-    const currentLevel = parseInt(infoPlayer.nivel);
+    jsonread(contact.id.user).then( async () => {
+        await update_info_player(contact.id.user, "Mensajes", viewPlayer.Mensajes + 1, true);
+    })
+    const currentLevel = viewPlayer.Nivel;
     let winsNeeded = (currentLevel + 1) * 10;
 
-    if(parseInt(infoPlayer.ganadas) === winsNeeded){
-        update_info_player(contact.id.user, "nivel", currentLevel + 1, true);
-        update_info_player(contact.id.user, "ganadas", 0, true);
+    if(viewPlayer.Puntos >= winsNeeded){
+        update_info_player(contact.id.user, "Nivel", currentLevel + 1, true);
+        update_info_player(contact.id.user, "Puntos", 0, true);
         message.reply('Felicidades has subido de nivel');
     }
     /**
@@ -397,33 +213,22 @@ client.on('message_create', async (message) => {
     * @returns {boolean}  si el usuario es admin devuelve true si no false
     */
     function participantes(userId) {
-        const groupParticipants = chat.participants
+        const groupParticipants = chat.participants;
         const participant = groupParticipants.find(part => part.id.user === userId);
         if (!participant) {
             return false;
         }
-        return participant.isAdmin;
+        return participant.isAdmin || Alastor_Number.includes(userId);
     }
 
-    if (chat.isGroup) {
-        addgroup(chat.id._serialized);
-
-
-        if (message.body.toLocaleLowerCase() === 'ab') {
-            if ((participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && watchBot(chat.id._serialized) === false) {
-                activeBot(chat.id._serialized, true);
-                message.reply('El bot ha sido activado');
-            }
-        }
-        if (watchBot(chat.id._serialized) == false) {
-            return;
-        }
-        if (message.body.toLocaleLowerCase() === 'db') {
-            if (participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) {
-                activeBot(chat.id._serialized, false);
-                message.reply('El bot ha sido desactivado');
-            }
-        }
+    if (chat.isGroup && message.body.toLocaleLowerCase() === 'ab' && participantes(contact.id.user)) {
+        await addgroup(chat.id._serialized);
+        bot_off_on(chat.id._serialized, true);
+        const watch = await watchBot(chat.id._serialized);
+        message.reply(`El bot ha sido ${watch ? 'desactivado' : 'activado'}`);
+    }
+    if (!(await watchBot(chat.id._serialized))) {
+        return;
     }
     if(chat.isGroup){
         group.iAmadmin().then(resp => {
@@ -469,7 +274,7 @@ client.on('message_create', async (message) => {
         if(chat.isGroup){
             //verifico si el bot es admin y si el que añade es admin
             group.iAmadmin().then(resp =>{
-                if((participantes(contact.id.user) && resp) || Alastor_Number.includes(contact.id.user)){
+                if((participantes(contact.id.user) && resp)){
                     let parte = message.body.split(" ");
                     parte = parte[1];
                     parte = parte.replace('@', '');
@@ -483,7 +288,7 @@ client.on('message_create', async (message) => {
         }
     }
     //remover a todos del grupo solo si es Alastor quien envia en comando
-    if(message.body.toLocaleLowerCase() === '!re todos'){
+    if(message.body.toLocaleLowerCase() === '!re t'){
         if(chat.isGroup){
             if(Alastor_Number.includes(contact.id.user)){
                 chat.getParticipants().then((participants) => {
@@ -499,32 +304,35 @@ client.on('message_create', async (message) => {
         let info;
         try {
             if (chat.isGroup) {
-                jsonread(contact.id.user);
                 if (message.hasQuotedMsg) { 
                     const quotedMsg = await message.getQuotedMessage();
                     let contact = await quotedMsg.getContact();
-                    info = getAllInfoPlayer(contact.id.user);
-                    const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
-                    if (info.casado === 'nadie :(') {
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*total de mensajes enviados:* ${info.mensajes}`, {
+                    info = await getAllInfoPlayer(contact.id.user);
+                    console.log(info)
+                    const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
+                    if (info.Casado === 'nadie :(') {
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*total de mensajes enviados:* ${info.Mensajes}`, {
                             quotedMessageId: quotedMsg.id._serialized
                         });
                     } else {
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
-                            mentions: info.casado + '@c.us',
+                        const contacto_casado = await client.getNumberId(info.Casado);
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}`, {
+                            mentions: contacto_casado._serialized,
                             quotedMessageId: quotedMsg.id._serialized
                         });
                     }
-                } else {
-                    info = getAllInfoPlayer(contact.id.user);
-                    const casado = info.casado && info.casado !== 'nadie :(' ? `@${info.casado}` : info.casado;
-                    if (info.casado === 'nadie :(') {
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
+                }else {
+                    info = await getAllInfoPlayer(contact.id.user);
+                    console.log(info)
+                    const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
+                    if (info.Casado === 'nadie :(') {
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}`, {
                             quotedMessageId: message.id._serialized
                         });
                     } else {
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.nivel}\n*Puntuacion:* ${info.ganadas}\n*Rool:* ${info.roles}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.dinero}\n*Dinero en el banco:* ${info.banco}\n*Total de mensajes enviados:* ${info.mensajes}`, {
-                            mentions: info.casado + '@c.us',
+                        const contacto_casado = await client.getNumberId(info.Casado);
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}`, {
+                            mentions: contacto_casado._serialized,
                             quotedMessageId: message.id._serialized
                         });
                     }
@@ -536,15 +344,16 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() === 'divorciarse' || message.body.toLocaleLowerCase() === 'divorcio') {
-        if (getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
+        if (viewPlayer.Casado === "nadie :(") {
             message.reply('No estas casad@');
         } else {
-            if (getAllInfoPlayer(contact.id.user).ganadas > 0 && getAllInfoPlayer(contact.id.user).mensajes >= 20) {
-                update_info_player(getAllInfoPlayer(contact.id.user).casado, "ganadas", getAllInfoPlayer(getAllInfoPlayer(contact.id.user).casado).ganadas + 1, true);
-                update_info_player(getAllInfoPlayer(contact.id.user).casado, "casado", "nadie :(", true);
-                update_info_player(contact.id.user, "casado", "nadie :(", true);
-                update_info_player(contact.id.user, "mensajes", getAllInfoPlayer(contact.id.user).mensajes - 20, true);
-                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
+            if (viewPlayer.Puntos > 0 && viewPlayer.Mensajes >= 20) {
+                let casadoPlayer = await getAllInfoPlayer(viewPlayer.Casado);
+                update_info_player(viewPlayer.Casado, "Puntos", casadoPlayer.Puntos + 1, true);
+                update_info_player(viewPlayer.Casado, "Casado", "nadie :(", true);
+                update_info_player(contact.id.user, "Casado", "nadie :(", true);
+                update_info_player(contact.id.user, "Mensajes", viewPlayer.Mensajes - 20, true);
+                update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
                 message.reply('Ahora estas divorciad@');
             } else {
                 message.reply('No tienes suficientes mensajes o puntuacion para divorciarte');
@@ -557,9 +366,9 @@ client.on('message_create', async (message) => {
             try {
                 if (chat.isGroup) {
                     jsonread(prometido);
-                    if (getAllInfoPlayer(prometido).casado === "nadie :(") {
-                        update_info_player(contact.id.user, "casado", prometido, true);
-                        update_info_player(prometido, "casado", contact.id.user, true);
+                    if (viewPlayer.Casado === "nadie :(") {
+                        update_info_player(contact.id.user, "Casado", prometido, true);
+                        update_info_player(prometido, "Casado", contact.id.user, true);
                         message.reply("*🎉Felicidades ahora estas casad@!!*");
                     }
                 }
@@ -576,7 +385,7 @@ client.on('message_create', async (message) => {
         prometido = prometido.replace('@', '');
         prometido = prometido + '@c.us';
         if(prometido.replace('@c.us', '') != contact.id.user){
-            if(getAllInfoPlayer(contact.id.user).casado === "nadie :("){
+            if(viewPlayer.Casado === "nadie :("){
                 client.getContactById(prometido).then((c) => {
                     chat.sendMessage(`*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
                 }).catch(error => {
@@ -589,6 +398,7 @@ client.on('message_create', async (message) => {
             message.reply("Eres imbécil o que, no puedes casarte contigo mismo")
         }
     }
+    
     if(message.body.toLocaleLowerCase() === 'si' || message.body.toLocaleLowerCase() === 'sí'){
         if(message.hasQuotedMsg){
             const quotedMsg = await message.getQuotedMessage();
@@ -605,12 +415,13 @@ client.on('message_create', async (message) => {
             }
         }
     }
+
     if (message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú') {
         let tempMenu = menu;
         await chat.sendSeen();
         await chat.sendStateTyping();
         if (chat.isGroup) {
-            if (watchBan(chat.id._serialized, 'todo') === false) {
+            if (await watchBan(chat.id._serialized, 'todo') === false) {
                 tempMenu = tempMenu.replace('🎮 — jugar.\n', '');
                 message.reply(tempMenu);
             } else {
@@ -661,10 +472,10 @@ client.on('message_create', async (message) => {
     
             if (diferenciaJugador < diferenciaMaquina) {
                 ganador = 'ganó el Jugador';
-                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
+                update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
             } else if (diferenciaMaquina < diferenciaJugador) {
                 ganador = 'ganó la Máquina';
-                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
+                update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
             } else {
                 ganador = 'quedó Empate';
             }
@@ -701,88 +512,86 @@ client.on('message_create', async (message) => {
         let parts = message.body.split(' ');
         let cantidad = parts[1];
         let tiene_pollo = getAnimals(contact.id.user)
-        for(let i = 0; i < tiene_pollo.length; i++){
-            if(tiene_pollo[i].tipo === "pollo"){
-                tiene_pollo === true;
-            }
-        }
+        tiene_pollo.forEach(element => {
+            tiene_pollo = element.pollo !== undefined
+        });
         if (cantidad === "all" && isNaN(cantidad)) {
-            cantidad = getAllInfoPlayer(contact.id.user).dinero;
+            cantidad = viewPlayer.Dinero;
         }
         if (isNaN(cantidad)) {
             message.reply('Introduce una cantidad valida');
             return;
         }
-        if (getAllInfoPlayer(contact.id.user).dinero >= cantidad && getAllInfoPlayer(contact.id.user).dinero > 0 && tiene_pollo) {
+        if (viewPlayer.Dinero >= cantidad && viewPlayer.Dinero > 0 && tiene_pollo) {
             
         }        
     }
-    if (message.body.toLocaleLowerCase() === 'jugar piedra papel o tijera' || message.body.toLocaleLowerCase() === 'ppt') {
+    if (message.body.toLocaleLowerCase() === 'ppt') {
         await chat.sendSeen();
         await chat.sendStateTyping();
-        ppt_menu =
+        let ppt_menu =
             "Piedra 🪨, papel 🧻 o tiejeras ✂️\n\n" +
             "Usa los siguientes comandos para jugar:\n\n" +
             "ppt piedra\n" +
             "ppt papel\n" +
             "ppt tijera\n";
         if (chat.isGroup) {
-            if (addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'ppt') && watchBan(chat.id._serialized, 'todos')) {
-                jsonread(contact.id.user);
+            if (addgroup(chat.id._serialized) && await watchBan(chat.id._serialized, 'ppt') && await watchBan(chat.id._serialized, 'todos')) {
+                ppt_menu = await watchBan(chat.id._serialized, 'ppt') ? ppt_menu : ppt_menu = 'Lo siento Banearon este juego del grupo';
                 message.reply(ppt_menu);
             }
         } else {
-            jsonread(contact.id.user);
             message.reply(ppt_menu);
         }
     }
     // Skills de Roles
-    if (message.body.toLocaleLowerCase().startsWith("robar ") && message.hasQuotedMsg && getAllInfoPlayer(contact.id.user).roles === "ladron"){
+    if (message.body.toLocaleLowerCase().startsWith("robar ") && message.hasQuotedMsg && viewPlayer.Rool === "ladron"){
         let futuro = ["lograste robar", "te atraparon"];
         let randomIndex = Math.floor(Math.random() * futuro.length);
         const quotedMsg = await message.getQuotedMessage();
         let contacto = await quotedMsg.getContact();
-        let infoJugador = getAllInfoPlayer(contact.id.user);
-        let infoContacto = getAllInfoPlayer(contacto.id.user);
+        let infoContacto = await getAllInfoPlayer(contacto.id.user);
 
         if (futuro[randomIndex] === "lograste robar") {
             if (infoContacto.dinero > 0) {
-                update_info_player(contact.id.user, "dinero", infoJugador.dinero + infoContacto.dinero, true);
-                update_info_player(contacto.id.user, "dinero", 0, true); // El contacto se queda sin dinero
+                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + infoContacto.dinero, true);
+                update_info_player(contacto.id.user, "Dinero", 0, true); // El contacto se queda sin dinero
                 message.reply(futuro[randomIndex]);
             } else {
                 message.reply("No hay nada que robar");
             }
         }else if (futuro[randomIndex] === "te atraparon") {
-            update_info_player(contact.id.user, "dinero", infoJugador.dinero - 1, true);
-            update_info_player(contact.id.user, "ganadas", infoJugador.ganadas - 1, true);
+            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - 1, true);
+            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
             
             message.reply(futuro[randomIndex]);
         }
     }
-    if(getAllInfoPlayer(contact.id.user).roles === "ama"){
+    if(viewPlayer.Rool === "ama"){
         let day = parseInt(dayjs().tz("America/Santo_Domingo").format('D'))
         if(update_dias(contact.id.user,day, 2) === false){
-            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 10, true);
-            update_info_player(getAllInfoPlayer(contact.id.user).casado, "dinero", getAllInfoPlayer(getAllInfoPlayer(contact.id.user).casado).dinero - 10, true);
+            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
+            let casado = await getAllInfoPlayer(viewPlayer.Casado)
+            update_info_player(viewPlayer.Casado, "Dinero", casado.Dinero - 10, true);
             update_dias(contact.id.user,day, 1);
             message.reply("Has recibido 10 monedas por ser ama de casa");
         }
     }
     if(message.body.toLocaleLowerCase() === 'arrestar'){
         console.log(golpear);
-        if(getAllInfoPlayer(contact.id.user).roles === "policia" && golpear === true){
+        if(viewPlayer.Rool === "policia" && golpear === true){
             console.log("es policia");
             if(message.hasQuotedMsg){
                 console.log("tiene mensaje citado");
                 const quotedMsg = await message.getQuotedMessage();
                 let contacto = await quotedMsg.getContact();
-                if(getAllInfoPlayer(contacto.id.user).roles === "ladron"){
-                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 10, true);
-                    if(getAllInfoPlayer(contacto.id.user).dinero > 0){
+                let contacto_info = await getAllInfoPlayer(contacto.id.user);
+                if(contacto_info.Rool === "ladron"){
+                    update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
+                    if(contacto_info.Dinero > 0){
                         message.reply("este ladron no tenia dinero deberias golpearlo con un palo");
                     }
-                    update_info_player(contacto.id.user, "roles", "vagabundo", true);
+                    update_info_player(contacto.id.user, "Rool", "vagabundo", true);
                     message.reply("Has arrestado al ladron el jefe te dio 10 monedas por tu buen trabajo");
                 }else{
                     message.reply("No puedes arrestar a alguien que no es un ladron y que no lo hayas golpeado");
@@ -798,10 +607,11 @@ client.on('message_create', async (message) => {
                 let parte = message.body.split(" ")
                 parte = parte[1]
                 parte = parte.replace('@', '');
-                if(getAllInfoPlayer(parte).roles === "policia"){
+                const persona_golpeada = await getAllInfoPlayer(parte);
+                if(persona_golpeada.Rool === "policia"){
                     message.reply("No puedes golpear a un policia");
-                }else if(getAllInfoPlayer(parte).roles === "ladron"){
-                    update_info_player(parte, "dinero", getAllInfoPlayer(parte).dinero - 10, true);
+                }else if(persona_golpeada.Rool === "ladron"){
+                    update_info_player(parte, "Dinero", persona_golpeada.Dinero - 10, true);
                     let respuestas = [
                     "le diste en un riñon", 
                     "le diste en la cabeza", 
@@ -821,8 +631,8 @@ client.on('message_create', async (message) => {
             console.log(err);
         }
     }
-    if(message.body.toLocaleLowerCase().startsWith('escribir')){
-        if(getAllInfoPlayer(contact.id.user).roles === "escritor"){
+   /*  if(message.body.toLocaleLowerCase().startsWith('escribir')){
+        if(viewPlayer.Rool === "escritor"){
             if(getAllInfoPlayer(contact.id.user).objetos.includes("papel") && getAllInfoPlayer(contact.id.user).objetos.includes("lapiz")){
                 let texto = message.body.split(" ");
                 texto = texto.slice(1).join(" ");
@@ -887,7 +697,7 @@ client.on('message_create', async (message) => {
                 await client.sendMessage(message.from,`${contact.id.user} te ha bailado sexualmente ${part}, deberias darle dos monedas por su servicio`, { mentions: [obtenerusuario, obtenerpart] });
             }
         }
-    }
+    } */
     //-----------------------------------------------------------------------------------------------------------------------
 
     if (message.body.toLocaleLowerCase().startsWith('cz')) {
@@ -915,7 +725,7 @@ client.on('message_create', async (message) => {
                 return;
             }
             cantidad = parseInt(cantidad);
-            if(getAllInfoPlayer(contact.id.user).dinero >= cantidad){
+            if(viewPlayer.Dinero >= cantidad){
                 let resultado = Math.floor(Math.random() * 2);
                 let respuesta;
                 let foto;
@@ -928,7 +738,7 @@ client.on('message_create', async (message) => {
                     foto = "./assets/cruz.jpg";
                 }
                 if(opcion === respuesta){
-                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + cantidad, true);
+                    update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + cantidad, true);
                     message.reply(`Has ganado`);
                     const media = MessageMedia.fromFilePath(foto)
                     const medi = new MessageMedia('image/jpg', media.data, 'sticker');
@@ -1051,9 +861,9 @@ client.on('message_create', async (message) => {
                 if(!cartas_jugador[contact.id.user]){
                     const cantidad = opcion[2];
                     if(cantidad > 0){
-                        if(getAllInfoPlayer(contact.id.user).dinero >= cantidad){
+                        if(viewPlayer.Dinero >= cantidad){
                             dinero_bj[contact.id.user] = cantidad;
-                            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
+                            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
                             message.reply("Tu carta es: " + repartir(contact.id.user));
                         }else{
                             message.reply('No tienes suficiente dinero para apostar esa cantidad');
@@ -1077,7 +887,7 @@ client.on('message_create', async (message) => {
                 if(cartas_jugador[contact.id.user]){
                     const ganador_juego = ganador(contact.id.user);
                     if(ganador_juego === 'jugador'){
-                        update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + dinero_bj[contact.id.user] * 2, true);
+                        update_info_player(contact.id.user, "Dinero", viewPlayer.dinero + dinero_bj[contact.id.user] * 2, true);
                         message.reply('Has ganado' + " las cartas del deler son: " + dealer[contact.id.user]);
                     }else if(ganador_juego === 'dealer'){
                         message.reply('Has perdido' + " las cartas del deler son: " + dealer[contact.id.user]);
@@ -1110,10 +920,10 @@ client.on('message_create', async (message) => {
             message.reply('Empate el bot escogio piedra');
         } else if (options[randomIndex] === 'papel') {
             message.reply('Perdiste el bot escogio papel');
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
+            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
         } else {
             message.reply('Ganaste el bot escogio tijera');
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
+            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
         }
     }
     if (message.body.toLocaleLowerCase() === 'ppt papel') {
@@ -1125,10 +935,10 @@ client.on('message_create', async (message) => {
             message.reply('Empate el bot escogio papel');
         } else if (options[randomIndex] === 'tijera') {
             message.reply('Perdiste el bot escogio tijera');
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
+            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
         } else {
             message.reply('Ganaste el bot escogio piedra');
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
+            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
         }
     }
     if (message.body.toLocaleLowerCase() === 'ppt tijera') {
@@ -1140,22 +950,22 @@ client.on('message_create', async (message) => {
             message.reply('Empate el bot escogio tijera');
         } else if (options[randomIndex] === 'piedra') {
             message.reply('Perdiste el bot escogio piedra');
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 1, true);
+            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
         } else {
-            update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
+            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
             message.reply('Ganaste el bot escogio papel');
         }
     }
     if(message.body.toLocaleLowerCase() === 'top ricos'){
         if(chat.isGroup){
-            const los_ricos =  topPlayersWithMostMoney();
-            const dinero_ricos = moneyTopPlayers();
+            const los_ricos = await topPlayersWithMostMoney();
+            const dinero_ricos = await moneyTopPlayers();
             let menciones = []
             
             let messageToSend = "*Los Ricos*\n\n";
 
             for(mention of los_ricos){
-                menciones.push(`${mention}@c.us`);
+                menciones.push(`${mention}@c.us`);top
             }
 
             for (let i = 0; i < los_ricos.length; i++) {
@@ -1166,8 +976,8 @@ client.on('message_create', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'top nivel'){
         if(chat.isGroup){
-            const los_niveles = topPlayersWithMostLevel();
-            const niveles = levelTopPlayers();
+            const los_niveles = await topPlayersWithMostLevel();
+            const niveles = await levelTopPlayers();
             let menciones = []
             let messageToSend = "*Los Mejores*\n\n";
 
@@ -1183,8 +993,8 @@ client.on('message_create', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === 'top mensajes'){
         if(chat.isGroup){
-            const personas = topUsersMessages();
-            const mensajes = messageUsers();
+            const personas = await topUsersMessages();
+            const mensajes = await messageUsers();
             let menciones = []
             let messageToSend = "*Los mas habladores*\n\n";
             for(mention of personas){
@@ -1209,17 +1019,13 @@ client.on('message_create', async (message) => {
         await chat.sendSeen();
         await chat.sendStateTyping();
         if (chat.isGroup) {
-            jsonread(contact.id.user);
-            addgroup(message.from);
-            if (watchBan(chat.id._serialized, 'menciones') == false && watchBan(chat.id._serialized, 'todos') == true) {
+            if (!(await watchBan(chat.id._serialized, 'menciones'))) {
                 tempmenu_game = tempmenu_game.replace('formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻', '');
                 message.reply(tempmenu_game);
             } else {
                 message.reply(tempmenu_game);
             }
         } else {
-
-            jsonread(contact.id.user);
             tempmenu_game = tempmenu_game.replace('formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻', '');
             message.reply(tempmenu_game);
         }
@@ -1310,7 +1116,7 @@ client.on('message_create', async (message) => {
             return;
         }else if(chat.isGroup){
             message.reply('Uff trabajaste duro, alguien te pagó 1 moneda');
-            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 1, true);
+            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 1, true);
             ContadorDeUnDia(contact.id.user);
         }
     }
@@ -1371,9 +1177,8 @@ client.on('message_create', async (message) => {
             return;
         }
 
-        groupTimes[id_group] = setTimeout(() => {
-
-            groupActiveQuestions(2, id_group, false);
+        groupTimes[id_group] = setTimeout(async() => {
+            await groupActiveQuestions(2, id_group, false);
             chat.sendMessage('La pregunta ha expirado');
 
             delete groupTimes[id_group];
@@ -1381,12 +1186,13 @@ client.on('message_create', async (message) => {
     }
     if(message.body.toLocaleLowerCase() === '!q'){
         if(chat.isGroup){
-            if(groupActiveQuestions(1 ,chat.id._serialized) === false && watchBan(chat.id._serialized, 'todos') === true){
+            if(!(await groupActiveQuestions(1 ,chat.id._serialized)) && await watchBan(chat.id._serialized, 'todos')){
                 let indexp = quest.newIndexP();
-                groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
-                groupActiveQuestions(6, chat.id._serialized, indexp);
-                groupActiveQuestions(2, chat.id._serialized, true);
-                groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
+                await groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
+                console.log(quest.readTitle());
+                await groupActiveQuestions(6, chat.id._serialized, indexp);
+                await groupActiveQuestions(2, chat.id._serialized, true);
+                await groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
                 message.reply(quest.readTitle() + "\n\n" + quest.readResponse());
                 TempQuest(chat.id._serialized);
             }else{
@@ -1396,48 +1202,31 @@ client.on('message_create', async (message) => {
             message.reply('Este juego solo funciona en grupos');
         }
     }
-    if (message.body.toLocaleLowerCase() === 'formar pareja' || message.body.toLocaleLowerCase() === 'fp') {
-        if (chat.isGroup) {
-            if (addgroup(chat.id._serialized) && watchBan(chat.id._serialized, 'fp') && watchBan(chat.id._serialized, 'todos') && watchBan(chat.id._serialized, 'menciones')) {
-                if (watchBan(chat.id._serialized, 'admins') == false && participantes(contact.id.user) && getAllInfoPlayer(contact.id.user).casado === "nadie :(") {
-                    await chat.sendSeen();
-                    await chat.sendStateTyping();
-                    let participantes = [];
-                    let pareja = [];
-                    chat.participants.forEach((participant) => {
-                        participantes.push(participant.id.user);
-                    });
-                    let random = RandomTwoIndex(participantes);
-                    pareja.push(participantes[random[0]]);
-                    pareja.push(participantes[random[1]]);
-                    let mensaje =
-                        `                *¡Felicidades a* 
-                    *esta hermosa pareja!*
-                        (ɔ ˘⌣˘)˘⌣˘ c)
-                    @${pareja[0]} ❤️ @${pareja[1]}`;
-                    chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`] });
-                } else if (watchBan(chat.id._serialized, 'admins') == true) {
-                    await chat.sendSeen();
-                    await chat.sendStateTyping();
-
-                    let participantes = [];
-                    let pareja = [];
-                    chat.participants.forEach((participant) => {
-                        participantes.push(participant.id.user);
-                    });
-                    let random = RandomTwoIndex(participantes);
-                    pareja.push(participantes[random[0]]);
-                    pareja.push(participantes[random[1]]);
-                    let mensaje =
-                        `                *¡Felicidades a* 
-                    *esta hermosa pareja!*
-                        (ɔ ˘⌣˘)˘⌣˘ c)
-                    @${pareja[0]} ❤️ @${pareja[1]}`;
-                    chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`] });
-                }
+    const fp = async () => {
+        
+    }
+    if (message.body.toLocaleLowerCase() === 'fp') {
+        if (chat.isGroup && await watchBan(chat.id._serialized, 'fp') && await watchBan(chat.id._serialized, 'todos') && await watchBan(chat.id._serialized, 'menciones')){
+            if (!participantes(contact.id.user) && !(await watchBan(chat.id._serialized, 'admins'))) {
+                message.reply('*No puedes participar en este juego solo los administradores pueden*');
+            }else{
+                await chat.sendSeen();
+                await chat.sendStateTyping();
+                let participantes = [];
+                let pareja = [];
+                chat.participants.forEach((participant) => {
+                    participantes.push(participant.id.user);
+                });
+                let random = RandomTwoIndex(participantes);
+                pareja.push(participantes[random[0]]);
+                pareja.push(participantes[random[1]]);
+                let mensaje =
+                    `                *¡Felicidades a* 
+                *esta hermosa pareja!*
+                    (ɔ ˘⌣˘)˘⌣˘ c)
+                @${pareja[0]} ❤️ @${pareja[1]}`;
+                chat.sendMessage(mensaje, { mentions: [`${pareja[0]}@c.us`, `${pareja[1]}@c.us`] });
             }
-        } else {
-            message.reply('Este comando solo funciona en grupos');
         }
     }
     // Economia ----------------------------------------------------
@@ -1447,18 +1236,18 @@ client.on('message_create', async (message) => {
         
         if (opcion === 'depositar' || opcion === 'dp') {
             let cantidad = parts[2];
-            if (cantidad > 0 && cantidad <= getAllInfoPlayer(contact.id.user).dinero) {
-                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - parseInt(cantidad), true);
-                update_info_player(contact.id.user, "banco", getAllInfoPlayer(contact.id.user).banco + parseInt(cantidad), true);
+            if (cantidad > 0 && cantidad <= viewPlayer.Dinero) {
+                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - parseInt(cantidad), true);
+                update_info_player(contact.id.user, "Banco", viewPlayer.Banco + parseInt(cantidad), true);
                 message.reply(`Has depositado ${cantidad} a tu cuenta bancaria`);
             } else {
                 message.reply('No tienes suficiente dinero');
             }
         } else if (opcion === 'retirar' || opcion === 'rt') {
             let cantidad = parts[2];
-            if (cantidad > 0 && cantidad <= getAllInfoPlayer(contact.id.user).banco) {
-                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + parseInt(cantidad), true);
-                update_info_player(contact.id.user, "banco", getAllInfoPlayer(contact.id.user).banco - parseInt(cantidad), true);
+            if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
+                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + parseInt(cantidad), true);
+                update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
                 message.reply(`Has retirado ${cantidad} de tu cuenta bancaria`);
             } else {
                 message.reply('No tienes suficiente dinero en el banco');
@@ -1469,11 +1258,12 @@ client.on('message_create', async (message) => {
                 let cantidad = parts[2];
                 let id = parts[3];
                 id = id.replace('@', '');
+                let tres = await getAllInfoPlayer(id); 
                 console.log(cantidad);
                 if (!isNaN(cantidad)) {
-                    if (cantidad > 0 && cantidad <= getAllInfoPlayer(contact.id.user).banco) {
-                        update_info_player(contact.id.user, "banco", getAllInfoPlayer(contact.id.user).banco - parseInt(cantidad), true);
-                        update_info_player(id, "banco", getAllInfoPlayer(id).banco + parseInt(cantidad), true);
+                    if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
+                        update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
+                        update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
                         message.reply(`Has transferido ${cantidad} a ${id}`);
                     } else {
                         message.reply('No tienes suficiente dinero en el banco');
@@ -1487,9 +1277,9 @@ client.on('message_create', async (message) => {
             try{
                 let cantidad = parts[2];
                 cantidad = parseInt(cantidad);
-                if(cantidad > 0 && cantidad <= getAllInfoPlayer(contact.id.user).ganadas){
-                    update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - parseInt(cantidad), true);
-                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + parseInt(cantidad), true);
+                if(cantidad > 0 && cantidad <= viewPlayer.Puntos){
+                    update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - parseInt(cantidad), true);
+                    update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + parseInt(cantidad), true);
                     message.reply(`Has cambiado ${cantidad} puntos por dinero`);
                 }else{
                     message.reply('No tienes suficientes puntos');
@@ -1508,10 +1298,10 @@ client.on('message_create', async (message) => {
         //verifico que sea solo dp (cantidadad) que sea un numero y que sea mayor a 0
         if (mensaje.length === 2 && !isNaN(dinero) && dinero > 0) {
             //verifico que tenga el dinero suficiente
-            if (getAllInfoPlayer(contact.id.user).dinero >= dinero) {
+            if (viewPlayer.Dinero >= dinero) {
                 //actualizo el dinero y el banco
-                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - dinero, true);
-                update_info_player(contact.id.user, "banco", getAllInfoPlayer(contact.id.user).banco + dinero, true);
+                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - dinero, true);
+                update_info_player(contact.id.user, "Banco", viewPlayer.Banco + dinero, true);
                 message.reply(`Has depositado ${dinero} a tu cuenta bancaria`);
             } else {
                 message.reply('No tienes suficiente dinero');
@@ -1519,7 +1309,7 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLocaleLowerCase() === 'tienda') {
-        let articulos = {
+       /*  let articulos = {
             "roles": {
                 "panadero": 200,    
                 "cocinero": 1000,
@@ -1577,9 +1367,10 @@ client.on('message_create', async (message) => {
         for (let objeto in articulos.objetos) {
             mensaje1 += `${objeto}: ${articulos.objetos[objeto]} monedas\n`;
         }
-        message.reply(mensaje1);
+        message.reply(mensaje1); */
+        message.reply('la tienda estara disponible pronto')
     }
-    if (message.body.toLocaleLowerCase().startsWith('comprar ')) {
+    /* if (message.body.toLocaleLowerCase().startsWith('comprar ')) {
         let parts = message.body.split(' ');
         let articulo = parts[1];
         articulo = quitar_acentos(articulo.toLocaleLowerCase());
@@ -1623,19 +1414,20 @@ client.on('message_create', async (message) => {
 
             }
         }
-        if (getAllInfoPlayer(contact.id.user).dinero >= 0 && getAllInfoPlayer(contact.id.user).nivel > 1){
+        if (viewPlayer.Dinero >= 0 && viewPlayer.Nivel > 1){
             if(articulo in articulos.roles){
                 for (let rol in articulos.roles) {
                     if (articulo === rol) {
-                        if (getAllInfoPlayer(contact.id.user).roles !== rol){
-                            if(getAllInfoPlayer(contact.id.user).dinero >= articulos.roles[rol]){
-                                if(rol === "ama" && !getAllInfoPlayer(getAllInfoPlayer(contact.id.user).casado).roles === "ama" && !getAllInfoPlayer(getAllInfoPlayer(contact.id.user).casado).roles === "vagabundo"){
-                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - articulos.roles[rol], true);
-                                    update_info_player(contact.id.user, "roles", rol, true);
+                        if (viewPlayer.Rool !== rol){
+                            if(viewPlayer.Dinero >= articulos.roles[rol]){
+                                const casado = getAllInfoPlayer(viewPlayer.casado);
+                                if(rol === "ama" && !casado.Rool === "ama" && !casado.Rool === "vagabundo"){
+                                    update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - articulos.roles[rol], true);
+                                    update_info_player(contact.id.user, "Rool", rol, true);
                                     message.reply('Has comprado el articulo');
                                 }else{
-                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - articulos.roles[rol], true);
-                                    update_info_player(contact.id.user, "roles", rol, true);
+                                    update_info_player(contact.id.user, "dinero", viewPlayer.Dinero - articulos.roles[rol], true);
+                                    update_info_player(contact.id.user, "Rool", rol, true);
                                     message.reply('Has comprado el articulo');
                                 }
                             }else{
@@ -1644,33 +1436,6 @@ client.on('message_create', async (message) => {
                         } else {
                             message.reply('Ya tienes ese articulo');
                             break;
-                        }
-                    }
-                }
-            }else if(articulo in articulos.objetos){
-                for (let objeto in articulos.objetos) {
-                    if (articulo === objeto) {
-                        if(getAllInfoPlayer(contact.id.user).dinero >= articulos.objetos[objeto]){
-                            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - articulos.objetos[objeto], true);
-                            update_info_player(contact.id.user, "objetos", objeto, false);
-                            message.reply('Has comprado el articulo');
-                        }else{
-                            message.reply('No tienes suficiente dinero');
-                        }
-                    }
-                }
-            }else if(articulo in articulos.Animales){
-                for (let animal in articulos.Animales) {
-                    if (articulo === animal) {
-                        if(getAllInfoPlayer(contact.id.user).dinero >= articulos.Animales[animal]){
-                            if(addAnimal(contact.id.user, animal)){
-                                message.reply('Ya tenias este animal');
-                            }else{
-                                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - articulos.Animales[animal], true);
-                                message.reply('Has comprado el articulo');
-                            }
-                        }else{
-                            message.reply('No tienes suficiente dinero');
                         }
                     }
                 }
@@ -1687,16 +1452,18 @@ client.on('message_create', async (message) => {
             let pareja2 = parts[2];
             pareja1 = pareja1.replace('@', '');
             pareja2 = pareja2.replace('@', '');
+            const pareja1_info = getAllInfoPlayer(pareja1); 
+            const pareja2_info = getAllInfoPlayer(pareja2);
             if(!isNaN(pareja1) && !isNaN(pareja2)){
                 if(pareja1 === pareja2){
                     message.reply('No puedes tener sexo contigo mismo');
                 }else{
-                    if(getAllInfoPlayer(pareja1).casado === pareja2 && getAllInfoPlayer(pareja2).casado === pareja1){
+                    if(pareja1.Casado === pareja2 && viewPlayer.Casado === pareja1){
                         chat.sendMessage(`@${pareja1} y @${pareja2} tuvieron sexo`, {mentions: [pareja1 + '@c.us', pareja2 + '@c.us']})
                     }else{
-                        if(getAllInfoPlayer(pareja1).casado === "nadie :(" && getAllInfoPlayer(pareja2).casado !== "nadie :("){
+                        if(pareja1_info.Casado === "nadie :(" && pareja2_info.Casado !== "nadie :("){
                             chat.sendMessage(`@${pareja2} tuvo sexo y es infiel`, {mentions: [pareja2 + '@c.us']}) 
-                        }else if(getAllInfoPlayer(pareja1).casado !== pareja2 && getAllInfoPlayer(pareja2).casado !== pareja1){
+                        }else if(pareja1_info.Casado !== pareja2 && pareja2_info.Casado !== pareja1){
                             chat.sendMessage(`@${pareja1} y @${pareja2} tuvieron sexo par de infieles`, {mentions: [pareja1 + '@c.us', pareja2 + '@c.us']})               
                         }
                         else{
@@ -1711,7 +1478,7 @@ client.on('message_create', async (message) => {
             message.reply('El comando es:\nsexo @numero1 @numero2');
         }
 
-    }  
+    }   */
     if (message.body.toLocaleLowerCase() == 'sf') {
         await chat.sendSeen();
         await chat.sendStateTyping();
@@ -1784,23 +1551,6 @@ client.on('message_create', async (message) => {
             mensaje += `${pokemon.nombre}\n`;
         }
         message.reply(mensaje);
-    }
-    if(message.body.toLocaleLowerCase().startsWith('stats ')){
-        pokemon = message.body.split(' ');
-        pokemon = pokemon.slice(1).join(' ');
-        console.log(pokemon)
-        if(animalExist(contact.id.user, pokemon)){
-            let stats = await getAnimalParameters(contact.id.user, pokemon);
-            let mensaje = `
-            *Estadisticas de ${pokemon}*\n\n
-            *Nombre:* ${stats.nombre}\n
-            *Tipo:* ${stats.tipo}\n
-            *Cansancio:* ${stats.cansancio}\n
-            *Hambre:* ${stats.hambre}\n
-            *Felicidad:* ${stats.felicidad}\n
-            *Salud:* ${stats.salud}\n`;
-            message.reply(mensaje);
-        }
     }
     async function descargarM(stream, mensaje_error, url) {
         try {
@@ -2067,25 +1817,19 @@ client.on('message_create', async (message) => {
         }
     }    
     if (message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as') {
-        if (chat.isGroup) {
-            addgroup(message.from);
-            if (participantes(contact.id.user)) {
-                await chat.sendSeen();
-                await chat.sendStateTyping();
-                option.ajustes = 1;
-                message.reply(
-                    "*Opciones*\n\n" +
-                    "Juego (j)\n" +
-                    "Comandos (cd)\n" +
-                    "Desactivar bot (db)\n" +
-                    "Activar bot (ab)\n\n" +
-                    "Este menu aun esta en desarrollo por lo que puede que no funcione correctamente")
-            }
+        if (chat.isGroup && participantes(contact.id.user)) {
+            await chat.sendSeen();
+            await chat.sendStateTyping();
+            option.ajustes = 1;
+            message.reply(
+                "*Opciones*\n\n" +
+                "Juego (j)\n" +
+                "Comandos (cd)\n" +
+                "Activar o Desactivar (ab)\n\n" +
+                "Este menu aun esta en desarrollo por lo que puede que no funcione correctamente")
         }
-
     }
-
-    else if (message.body.toLocaleLowerCase() == 'juego' || message.body.toLocaleLowerCase() == 'j') {
+    if (message.body.toLocaleLowerCase() == 'juego' || message.body.toLocaleLowerCase() == 'j') {
         if (chat.isGroup) {
             if (option.ajustes == 1) {
                 await chat.sendSeen();
@@ -2093,17 +1837,17 @@ client.on('message_create', async (message) => {
                 if (participantes(contact.id.user)) {
                     option.juego = 1;
                     option.ajustes = 0;
-                    let menu_juego = option_game;
-                    if (watchBan(chat.id._serialized, 'todos') == false) {
+                    menu_juego = option_game;message.hasQuotedMsg
+                    if (!(await watchBan(chat.id._serialized, 'todos'))) {
                         menu_juego = menu_juego.replace('1. Quitar la opción Juego\n', '1. Devolver la opción Juego\n');
                         menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '');
                         menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '');
                     }
-                    if (watchBan(chat.id._serialized, 'menciones') == false) {
+                    if (!(await watchBan(chat.id._serialized, 'menciones'))) {
                         menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '2. Devolver los Juegos con menciones\n');
                         menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '');
                     }
-                    if (watchBan(chat.id._serialized, 'admins') == false) {
+                    if (!(await watchBan(chat.id._serialized, 'admins'))) {
                         menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '3. Solo los administradores pueden utilizar los juegos con menciones');
                     }
                     message.reply(menu_juego);
@@ -2112,76 +1856,85 @@ client.on('message_create', async (message) => {
         }
     }
     async function comp(resp){ 
+        const title = await groupActiveQuestions(7, chat.id._serialized)
         const quotedMsg = await message.getQuotedMessage();
-        if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(groupActiveQuestions(7, chat.id._serialized).toLocaleLowerCase())){
-            groupActiveQuestions(2, chat.id._serialized, false);
+        if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(title.toLocaleLowerCase())){
+            await groupActiveQuestions(2, chat.id._serialized, false);
             if (groupTimes[chat.id._serialized]) {
                 clearTimeout(groupTimes[chat.id._serialized]);
                 delete groupTimes[chat.id._serialized];
             }
-            if(resp === groupActiveQuestions(4, chat.id._serialized)){
-                message.reply("Respuesta correcta ganaste 1 punto 👍 ");
-                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas + 1, true);
-            }else{
-                message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(groupActiveQuestions(5, chat.id._serialized), groupActiveQuestions(4, chat.id._serialized))} perdiste dos puntos 👎👎`);
-                update_info_player(contact.id.user, "ganadas", getAllInfoPlayer(contact.id.user).ganadas - 2, true);
-            }
+            groupActiveQuestions(4, chat.id._serialized).then(async queste => {
+                if(resp === queste){
+                    message.reply("Respuesta correcta ganaste 1 punto 👍 ");
+                    update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
+                }else{
+                    message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(await groupActiveQuestions(5, chat.id._serialized), await groupActiveQuestions(4, chat.id._serialized))} perdiste dos puntos 👎👎`);
+                    update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 2, true);
+                }
+            })
+           
         }
     }
     if (message.body.toLocaleLowerCase() == '1') {
-        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized)){      
+        if(message.hasQuotedMsg && (await groupActiveQuestions(1, chat.id._serialized))){      
             comp(1);     
         }
-        if (option.juego == 1) {
-            if (watchBan(chat.id._serialized, 'todos') == false) {
-                QuitBan(chat.id._serialized, 'todos');
-                option.juego = 0;
-                message.reply("Se ha devuelto la opción Juego");
-            } else {
-                Bangame(message.from, ['todos']);
-                option.juego = 0;
-                message.reply("Se ha quitado la opción Juego");
+        if (option.juego == 1 && participantes(contact.id.user) && message.hasQuotedMsg) {
+            const quotedMsg = await message.getQuotedMessage();
+            if(quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLowerCase()) && quotedMsg.fromMe){
+                watchBan(chat.id._serialized, 'todos').then(async res => {
+                    if (res) {
+                        message.reply("Se ha quitado la opción Juego");
+                        Bangame(message.from, 'todos');
+                        option.juego = 0;
+                    } else {
+                        message.reply("Se ha devuelto la opción Juego");
+                        QuitBan(chat.id._serialized, 'todos');
+                        option.juego = 0;
+                    }
+                })
             }
         }
     }
     if (message.body.toLocaleLowerCase() == '2') {
-        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized)){
+        if(message.hasQuotedMsg && (await groupActiveQuestions(1, chat.id._serialized))){
             comp(2);
         }
-        if (option.juego == 1) {
-            if (watchBan(chat.id._serialized, 'todos')) {
-                if (watchBan(chat.id._serialized, 'menciones')) {
-                    Bangame(message.from, ['menciones']);
-                    option.juego = 0;
-                    message.reply("Se han quitado los juegos con menciones");
-                } else {
-                    QuitBan(chat.id._serialized, 'menciones');
-                    option.juego = 0;
-                    message.reply("Se han devuelto los juegos con menciones");
-                }
+        if (option.juego == 1 && participantes(contact.id.user) && message.hasQuotedMsg) {
+            const quotedMsg = await message.getQuotedMessage();
+            if (await watchBan(chat.id._serialized, 'menciones') && await watchBan(chat.id._serialized, 'todos') && quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLocaleLowerCase()) && quotedMsg.fromMe) {
+                Bangame(message.from, 'menciones');
+                option.juego = 0;
+                message.reply("Se han quitado los juegos con menciones");
+            } else {
+                QuitBan(chat.id._serialized, 'menciones');
+                option.juego = 0;
+                message.reply("Se han devuelto los juegos con menciones");
             }
         }
     }
     if (message.body.toLocaleLowerCase() == '3') {
-        if(message.hasQuotedMsg && groupActiveQuestions(1, chat.id._serialized)){
+        if(message.hasQuotedMsg && (await groupActiveQuestions(1, chat.id._serialized))){
             comp(3);
         }
-        if (option.juego == 1) {
-            if (watchBan(chat.id._serialized, 'todos')) {
-                if (watchBan(chat.id._serialized, 'admins')) {
-                    Bangame(message.from, ['admins']);
-                    option.juego = 0;
-                    message.reply("Ahora solo los administradores pueden utilizar los juegos con menciones");
-                } else {
-                    QuitBan(chat.id._serialized, 'admins');
-                    option.juego = 0;
-                    message.reply("Ahora todos pueden utilizar los juegos con menciones");
-                }
+        if (option.juego == 1 && participantes(contact.id.user) && message.hasQuotedMsg) {
+            const quotedMsg = await message.getQuotedMessage();
+            if ((await watchBan(chat.id._serialized, 'admins')) && (await watchBan(chat.id._serialized, 'todos')) && quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLocaleLowerCase()) && quotedMsg.fromMe) {
+                Bangame(message.from, 'admins');
+                option.juego = 0;
+                message.reply("Ahora solo los administradores pueden utilizar los juegos con menciones");
+            } else {
+                QuitBan(chat.id._serialized, 'admins');
+                option.juego = 0;
+                message.reply("Ahora todos pueden utilizar los juegos con menciones");
             }
+        
         }
     }
     if(message.body.toLocaleLowerCase() === 'sb' && Alastor_Number.includes(contact.id.user)){
         client.destroy();
+        cerrarBase();
         process.exit();
     }
     if(message.body.toLocaleLowerCase() == 'donacion' || message.body.toLocaleLowerCase() == 'donar'){
@@ -2222,6 +1975,6 @@ client.on('message_create', async (message) => {
     wa.me/5144637126`
     
         );
-    }
+    } 
 });
 client.initialize()
