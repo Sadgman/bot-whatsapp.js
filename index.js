@@ -53,7 +53,7 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
 else{
     // /bin/chromium-browser
     // /usr/bin/google-chrome-stable
-    activateClientBot('/usr/bin/chromium-browser');
+    activateClientBot('/usr/bin/google-chrome-stable');
 }
 
 client.on('qr', qr => {
