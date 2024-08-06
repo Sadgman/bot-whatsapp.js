@@ -144,6 +144,7 @@ let counterListRequestVideo = 0;
 let groupTimes = {};
 let contadordia = {};
 let cartas_jugador = {};
+let valorAS;
 let dealer = {};
 let dinero_bj = {};
 const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770"]
@@ -774,7 +775,7 @@ client.on('message_create', async (message) => {
             const sumar_cartas_dealer = (jugador) => {
                 let suma = 0;
                 let as = 0;
-                for(carta of dealer[jugador]){
+                for(let carta of dealer[jugador]){
                     if(cartas.includes(carta)){
                         suma += carta;
                     }else if(cartas_especiales.includes(carta)){
@@ -786,12 +787,15 @@ client.on('message_create', async (message) => {
                 for(let i = 0; i < as; i++){
                     if(suma + 11 <= 21){
                         suma += 11;
+                        valorAS = 11;
                     }else{
                         suma += 1;
+                        valorAS = 1;
                     }
                 }
                 return suma;
             }
+            
             const dealer_bot = (jugador) =>{
                 let numero = Math.floor(Math.random() * cartas_completas.length);
                 let carta = cartas_completas[numero];
@@ -825,7 +829,7 @@ client.on('message_create', async (message) => {
             const sumar_cartas_jugador = (jugador) => {
                 let suma = 0;
                 let as = 0;
-                for(carta of cartas_jugador[jugador]){
+                for(let carta of cartas_jugador[jugador]){
                     if(cartas.includes(carta)){
                         suma += carta;
                     }else if(cartas_especiales.includes(carta)){
@@ -835,11 +839,7 @@ client.on('message_create', async (message) => {
                     }
                 }
                 for(let i = 0; i < as; i++){
-                    if(suma + 11 <= 21){
-                        suma += 11;
-                    }else{
-                        suma += 1;
-                    }
+                    suma += valorAS
                 }
                 return suma;
             }
@@ -861,11 +861,12 @@ client.on('message_create', async (message) => {
             }
             if(opcion[1] === 'apostar'){
                 if(!cartas_jugador[contact.id.user]){
-                    const cantidad = opcion[2];
+                    let cantidad = opcion[2];
+                    cantidad = parseInt(cantidad);
                     if(cantidad > 0){
                         if(viewPlayer.Dinero >= cantidad){
                             dinero_bj[contact.id.user] = cantidad;
-                            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
+                            await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
                             message.reply("Tu carta es: " + repartir(contact.id.user));
                         }else{
                             message.reply('No tienes suficiente dinero para apostar esa cantidad');
@@ -889,7 +890,7 @@ client.on('message_create', async (message) => {
                 if(cartas_jugador[contact.id.user]){
                     const ganador_juego = ganador(contact.id.user);
                     if(ganador_juego === 'jugador'){
-                        update_info_player(contact.id.user, "Dinero", viewPlayer.dinero + dinero_bj[contact.id.user] * 2, true);
+                        await update_info_player(contact.id.user, "Dinero", viewPlayer.dinero + dinero_bj[contact.id.user] * 2, true);
                         message.reply('Has ganado' + " las cartas del deler son: " + dealer[contact.id.user]);
                     }else if(ganador_juego === 'dealer'){
                         message.reply('Has perdido' + " las cartas del deler son: " + dealer[contact.id.user]);
