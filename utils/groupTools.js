@@ -22,7 +22,7 @@ function addgroup(group, name) {
                     }
                 ];
                 jsonStruct = JSON.stringify(jsonStruct, null, 4);
-                const n = `INSERT INTO groups (id, Nombre, modo_admin, bot_off_on, activeQuest ,correctAnswer, title_quest, Baneados) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+                const n = `INSERT INTO groups (id, Nombre, modo_admin, bot, activeQuest ,correctAnswer, title_quest, Baneados) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
                 db.run(n, [group, name, false, true , false, '', '', jsonStruct], (err) => {
                     if (err) {
                         reject(err);
@@ -141,14 +141,14 @@ async function QuitBan(id_group, game){
 async function bot_off_on(id_group){
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.all(`SELECT bot_off_on FROM groups WHERE id = ?`, [id_group], (err, rows) => {
+            db.all(`SELECT bot FROM groups WHERE id = ?`, [id_group], (err, rows) => {
                 if (err) {
                     console.error(err.message);
                     reject(err);
                 }
-                let bot = rows[0].bot_off_on;
+                let bot = rows[0].bot;
                 bot = !bot;
-                const query = `UPDATE groups SET bot_off_on = ? WHERE id = ?`;
+                const query = `UPDATE groups SET bot = ? WHERE id = ?`;
                 db.run(query, [bot, id_group], (err) => {
                     if (err) {
                         console.error(err.message);
@@ -169,12 +169,12 @@ async function bot_off_on(id_group){
 async function watchBot(id_group) {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.all(`SELECT bot_off_on FROM groups WHERE id = ?`, [id_group], (err, rows) => {
+            db.all(`SELECT bot FROM groups WHERE id = ?`, [id_group], (err, rows) => {
                 if (err) {
                     console.error(err.message);
                     reject(err);
                 }
-                resolve(rows[0].bot_off_on);
+                resolve(rows[0].bot);
             });
         });
     });
