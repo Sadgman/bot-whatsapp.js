@@ -970,7 +970,7 @@ client.on('message_create', async (message) => {
             let messageToSend = "*Los Ricos*\n\n";
 
             for(mention of los_ricos){
-                menciones.push(`${mention}@c.us`);top
+                menciones.push(`${mention}@c.us`);
             }
 
             for (let i = 0; i < los_ricos.length; i++) {
