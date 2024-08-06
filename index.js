@@ -456,19 +456,21 @@ client.on('message_create', async (message) => {
         if(parts.length > 2){
             return
         }
-        if(contadordia[contact.id.user + 'dado']){
-            message.reply(`Debes esperar ${Tiempo_restante(contact.id.user + 'dado')} segundos para volver a jugar`);
-            return;
-        }
         // condiciono que el numero este entre 1 y 6 y que sea un numero
         else if(!isNaN(parsedNum) && parsedNum <= 6 && parsedNum > 0) {
-            const eleccionMaquina = Math.floor(Math.random() * 6) + 1;
-            message.reply(`yo escojo el numero ${eleccionMaquina}`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
             const numeroObjetivo = Math.floor(Math.random() * 6) + 1;
+            const eleccionMaquina = (numeroObjetivo) => {
+                if(numeroObjetivo + 1 > 6){
+                    return numeroObjetivo - 1;
+                }else{
+                    return numeroObjetivo + 1;
+                }
+            }
+            message.reply(`yo escojo el numero ${eleccionMaquina(numeroObjetivo)}`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
             //verifico si la maquina o el jugador este mas cerca del numero objetivo
             const diferenciaJugador = Math.abs(numeroObjetivo - parsedNum);
-            const diferenciaMaquina = Math.abs(numeroObjetivo - eleccionMaquina);
+            const diferenciaMaquina = Math.abs(numeroObjetivo - eleccionMaquina(numeroObjetivo));
     
             let ganador;
             let dado;
