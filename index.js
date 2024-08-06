@@ -1019,7 +1019,7 @@ client.on('message_create', async (message) => {
         message.reply(contactf);
         message.reply(id)
     }
-    if (message.body.toLocaleLowerCase() === 'jugar' && watchBan(chat.id._serialized, 'todos') == true) {
+    if (message.body.toLocaleLowerCase() === 'jugar' && await watchBan(chat.id._serialized, 'todos')) {
         let tempmenu_game = menu_game;
         await chat.sendSeen();
         await chat.sendStateTyping();
