@@ -1554,7 +1554,7 @@ client.on('message_create', async (message) => {
         }
         message.reply(mensaje);
     }
-    function descargarM(stream, mensaje_error, url) {
+    function descargarM(stream, url) {
         return new Promise(async (resolve, reject) => {
             try {
                 await new Promise((resolve, reject) => {
@@ -1583,7 +1583,7 @@ client.on('message_create', async (message) => {
                     const file = fs.readFileSync('n.mp3');
                     const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                     await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
-                    reject()
+                    resolve();
                 } catch (err) {
                     console.error(err);
                     console.log("\n\n Error my module");
@@ -1606,6 +1606,10 @@ client.on('message_create', async (message) => {
             chat: chat,
             quotedMessageId: message.id._serialized
         };
+        if(requestM.includes(petition)){
+            message.reply('Ya la estoy descargando no tienes que pedirla de nuevo');
+            return;
+        }
         requestM.push(petition);
         
         if (counterListRequestMusic > 0) {
@@ -1628,7 +1632,6 @@ client.on('message_create', async (message) => {
         }
     }
     if (message.body.toLowerCase().startsWith("m ")) {
-            message.reply('Descargando la canción, espera un momento...');
             const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
             try {
                 const parts = message.body.split(' ');
