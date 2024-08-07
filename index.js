@@ -53,7 +53,7 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
 else{
     // /bin/chromium-browser
     // /usr/bin/google-chrome-stable
-    activateClientBot('/usr/bin/google-chrome-stable');
+    activateClientBot('/usr/bin/chromium-browser');
 }
 
 client.on('qr', qr => {
@@ -223,6 +223,7 @@ client.on('message_create', async (message) => {
         }
         return participant.isAdmin || Alastor_Number.includes(userId);
     }
+    console.log(participantes(client.info.me.user));
 
     if (chat.isGroup && message.body.toLocaleLowerCase() === 'ab' && participantes(contact.id.user)) {
         await addgroup(chat.id._serialized);
@@ -250,42 +251,38 @@ client.on('message_create', async (message) => {
     }
     // Añadir un miembro al grupo con solo su número
     if (message.body.toLocaleLowerCase().startsWith("aña")) {
-        if (chat.isGroup) {
-            // Verifico si el bot es admin y si el que añade es admin 
-            if ((participantes(contact.id.user)) || Alastor_Number.includes(contact.id.user)) {
-                let parte = message.body.split(" ")[1];
-                if (parte && /^\d+$/.test(parte)) { // Verifica que parte sea un número
-                    parte = parte + '@c.us';
-                    chat.addParticipants([parte]).catch(err => {
-                        console.error('Error al añadir participante:', err);
-                        message.reply('Hubo un error al intentar añadir el participante. Asegúrate de que el número es correcto y está registrado en WhatsApp.');
-                    });
-                } else {
-                    message.reply('Por favor, proporciona un número de teléfono válido.');
-                }
+        // Verifico si el bot es admin y si el que añade es admin 
+        if ((chat.isGroup && participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && participantes(client.info.me.user)) {
+            let parte = message.body.split(" ")[1];
+            if (parte && /^\d+$/.test(parte)) { // Verifica que parte sea un número
+                parte = parte + '@c.us';
+                chat.addParticipants([parte]).catch(err => {
+                    console.error('Error al añadir participante:', err);
+                    message.reply('Hubo un error al intentar añadir el participante. Asegúrate de que el número es correcto y está registrado en WhatsApp.');
+                });
+            } else {
+                message.reply('Por favor, proporciona un número de teléfono válido.');
             }
         }
     }
     //remover un miembro del grupo
     if(message.body.toLocaleLowerCase().startsWith("!re")){
-        if(chat.isGroup){
+        if(chat.isGroup && participantes(client.info.me.user) && participantes(contact.id.user)){
             //verifico si el bot es admin y si el que añade es admin   
-            if((participantes(contact.id.user))){
-                let parte = message.body.split(" ");
-                parte = parte[1];
-                parte = parte.replace('@', '');
-                if(Alastor_Number.includes(parte)){
-                    return
-                }
-                parte = parte + '@c.us';
-                chat.removeParticipants([parte]);
+            let parte = message.body.split(" ");
+            parte = parte[1];
+            parte = parte.replace('@', '');
+            if(Alastor_Number.includes(parte)){
+                return
             }
+            parte = parte + '@c.us';
+            chat.removeParticipants([parte]);
         }
     }
     //remover a todos del grupo solo si es Alastor quien envia en comando
     if(message.body.toLocaleLowerCase() === '!re t'){
         if(chat.isGroup){
-            if(Alastor_Number.includes(contact.id.user)){
+            if(Alastor_Number.includes(contact.id.user) && participantes(client.info.me.user)){
                 chat.getParticipants().then((participants) => {
                     let participantsIds = participants.map((participant) => {
                         return participant.id._serialized;
