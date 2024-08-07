@@ -174,7 +174,12 @@ async function watchBot(id_group) {
                     console.error(err.message);
                     reject(err);
                 }
-                resolve(rows[0].bot);
+                if (rows.length > 0 && rows[0].bot !== undefined) {
+                    resolve(rows[0].bot);
+                } else {
+                    console.error("No se encontró el bot o está undefined");
+                    resolve(1);
+                }
             });
         });
     });
