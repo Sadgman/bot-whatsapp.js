@@ -53,7 +53,7 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
 else{
     // /bin/chromium-browser
     // /usr/bin/google-chrome-stable
-    activateClientBot('/usr/bin/chromium-browser');
+    activateClientBot('/usr/bin/google-chrome-stable');
 }
 
 client.on('qr', qr => {
@@ -223,8 +223,6 @@ client.on('message_create', async (message) => {
         }
         return participant.isAdmin || Alastor_Number.includes(userId);
     }
-    console.log(participantes(client.info.me.user));
-
     if (chat.isGroup && message.body.toLocaleLowerCase() === 'ab' && participantes(contact.id.user)) {
         await addgroup(chat.id._serialized);
         bot_off_on(chat.id._serialized, true);
