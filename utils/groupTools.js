@@ -1,4 +1,4 @@
-const {db, cerrarBase} = require('./base');
+const {db} = require('./base');
 /**
  * @param {string} group id del grupo
  * @param {string} game nombre del grupo 
@@ -82,7 +82,7 @@ async function watchBan(id_group, game){
         db.serialize(() => {
             db.all(`SELECT Baneados FROM groups WHERE id = ?`, [id_group], (err, rows) => {
                 if (err) {
-                    console.error(err.message);
+                    console.error(err.message);, cerrarBase
                     reject(err);
                 }
                 let baneados = JSON.parse(rows[0].Baneados);
@@ -174,12 +174,7 @@ async function watchBot(id_group) {
                     console.error(err.message);
                     reject(err);
                 }
-                if (rows.length > 0 && rows[0].bot !== undefined) {
-                    resolve(rows[0].bot);
-                } else {
-                    console.error("No se encontró el bot o está undefined");
-                    resolve(1);
-                }
+                resolve(rows[0].bot);
             });
         });
     });

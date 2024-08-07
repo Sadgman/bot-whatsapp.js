@@ -224,12 +224,11 @@ client.on('message_create', async (message) => {
         return participant.isAdmin || Alastor_Number.includes(userId);
     }
     if (chat.isGroup && message.body.toLocaleLowerCase() === 'ab' && participantes(contact.id.user)) {
-        await addgroup(chat.id._serialized);
         bot_off_on(chat.id._serialized, true);
         const watch = await watchBot(chat.id._serialized);
         message.reply(`El bot ha sido ${watch ? 'desactivado' : 'activado'}`);
     }
-    if (!(await watchBot(chat.id._serialized))) {
+    if (chat.isGroup && !(await watchBot(chat.id._serialized))) {
         return;
     }
     if(chat.isGroup){   
