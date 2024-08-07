@@ -16,7 +16,7 @@
     "sqlite3": "^5.1.7",
     "tiktok-downloaders": "^1.0.5",
     "twitter-downloader": "^1.1.8",
-    "whatsapp-web.js": "github:Sadgman/whatsapp-web.js#webpack-exodus",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js",
     "youtube-sr": "^4.3.10",
     "ytdp": "1.1.0"
   }
