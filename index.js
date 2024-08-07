@@ -303,7 +303,6 @@ client.on('message_create', async (message) => {
                     const quotedMsg = await message.getQuotedMessage();
                     let contact = await quotedMsg.getContact();
                     info = await getAllInfoPlayer(contact.id.user);
-                    console.log(info) // O cualquier valor por defecto que tenga sentido en tu contexto
                     const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
                     if (info.Casado === 'nadie :(') {
                         chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*total de mensajes enviados:* ${info.Mensajes}`, {
@@ -318,7 +317,6 @@ client.on('message_create', async (message) => {
                     }
                 }else {
                     info = await getAllInfoPlayer(contact.id.user);
-                    console.log(info)
                     const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
                     if (info.Casado === 'nadie :(') {
                         chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}`, {
