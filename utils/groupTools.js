@@ -82,7 +82,7 @@ async function watchBan(id_group, game){
         db.serialize(() => {
             db.all(`SELECT Baneados FROM groups WHERE id = ?`, [id_group], (err, rows) => {
                 if (err) {
-                    console.error(err.message);, cerrarBase
+                    console.error(err.message);
                     reject(err);
                 }
                 let baneados = JSON.parse(rows[0].Baneados);
