@@ -155,11 +155,11 @@ process.on('SIGINT', async () => {
     await cerrarBase();
     process.exit();
 })
-client.on('message_create', async (message) => {
+client.on('message', async (message) => {
     
     const chat = await message.getChat();
     let contact = await message.getContact();
-    if(message.body === '' || contact.id.user !== client.info.me.user){
+    if(message.body === ''){
         return;
     }
     const group = await message.getChat();
