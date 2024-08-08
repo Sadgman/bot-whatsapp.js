@@ -156,11 +156,12 @@ process.on('SIGINT', async () => {
     process.exit();
 })
 client.on('message_create', async (message) => {
+    
+    const chat = await message.getChat();
+    let contact = await message.getContact();
     if(message.body === '' || contact.id.user !== client.info.me.user){
         return;
     }
-    const chat = await message.getChat();
-    let contact = await message.getContact();
     const group = await message.getChat();
 
     await jsonread(contact.id.user);
