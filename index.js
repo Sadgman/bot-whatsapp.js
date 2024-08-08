@@ -156,18 +156,19 @@ process.on('SIGINT', async () => {
     process.exit();
 })
 client.on('message_create', async (message) => {
+    if(message.body === '' || contact.id.user !== client.info.me.user){
+        return;
+    }
     const chat = await message.getChat();
     let contact = await message.getContact();
     const group = await message.getChat();
+
     await jsonread(contact.id.user);
     if(chat.isGroup){
         await addgroup(chat.id._serialized);
     }
     const viewPlayer = await getAllInfoPlayer(contact.id.user);
 
-    if(message.body === ''){
-        return;
-    }
     function quitar_acentos(palabra){
         const palabras_raras = ["á", "é", "í", "ó", "ú", "ñ", "ü"];
         const letras_normales = ["a", "e", "i", "o", "u", "n", "u"];
