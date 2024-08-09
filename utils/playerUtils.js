@@ -87,7 +87,7 @@ async function jsonread(player) {
 async function topPlayersWithMostMoney() {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.all(`SELECT id FROM players ORDER BY Banco DESC LIMIT 5`, (err, rows) => {
+            db.all(`SELECT id, Banco + Dinero as total FROM players ORDER BY total DESC LIMIT 5`, (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
