@@ -101,12 +101,12 @@ async function topPlayersWithMostMoney() {
 async function moneyTopPlayers() {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.all(`SELECT Banco + Dinero FROM players ORDER BY Banco + Dinero DESC LIMIT 5`, (err, rows) => {
+            db.all(`SELECT Banco + Dinero as total FROM players ORDER BY total DESC LIMIT 5`, (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                resolve(rows.map(row => row.Banco));
+                resolve(rows.map(row => row.total));
             });
         });
     });
