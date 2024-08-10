@@ -71,7 +71,12 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
         
         client.on('qr', async (qr) => {
             if (qqr) {
-                data_session !== './session' ? await eliminarBot(data_session) : qrcode.generate(qr, { small: true });
+                if (data_session !== './session') {
+                    await eliminarBot(data_session);
+                    client.destroy();
+                } else {
+                    qrcode.generate(qr, { small: true });
+                }
             } else {
                 const pairingCode = await client.requestPairingCode(num);
                 console.log(pairingCode);
