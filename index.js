@@ -22,7 +22,8 @@ const quest = require('preguntas');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils');
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan} = require('./utils/groupTools');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals');
-const { cerrarBase } = require('./utils/base');
+const { insertarBot, encontrarBot, cantidadBots } = require('./utils/bots');
+const { cerrarBase, db } = require('./utils/base');
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
@@ -31,48 +32,88 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 // Alastor Bot
 // Version 1.0.0
+let browserPath;
+function getUniqueDirectory(baseDir) {
+    let counter = 1;
+    let uniqueDir = baseDir;
 
-function activateClientBot(browserPath){
-    client = new Client({
-        authStrategy: new LocalAuth({
-            dataPath: './session'
-        }),
-        puppeteer: {
-            args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-            executablePath: browserPath
-        },       
-        ffmpegPath: ffmpegPath
+    while (fs.existsSync(uniqueDir)) {
+        uniqueDir = `${baseDir}${counter}`;
+        counter++;
+    }
+
+    return uniqueDir;
+}
+async function getExistingDirectories(baseDir) {
+    let counter = 0;
+
+    const cantidad = await cantidadBots();
+
+    while (counter <= cantidad) {
+        counter === 0? await activateClientBot(browserPath, `${baseDir}`, true, counter, null) : await activateClientBot(browserPath, `${baseDir}${counter}`, true, counter, null);
+        counter++;
+    }
+}
+async function activateClientBot(browserPath, data_session, qqr, num, message) {
+    return new Promise((resolve, reject) => {
+        client = new Client({
+            authStrategy: new LocalAuth({
+                dataPath: data_session
+            }),
+            puppeteer: {
+                args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+                executablePath: browserPath
+            },
+            ffmpegPath: ffmpegPath
+        });
+
+        client.on('qr', async (qr) => {
+            if (qqr) {
+                qrcode.generate(qr, { small: true });
+            } else {
+                const pairingCode = await client.requestPairingCode(num);
+                console.log(pairingCode);
+                message.reply(`${pairingCode}`);
+            
+            }
+        });
+
+        client.on('loading_screen', (percent, message) => {
+            console.log('Pantalla de Carga', percent, message);
+        });
+
+        client.on('ready', () => {
+            console.log('Todo esta listo!');
+            resolve();
+        });
+        client.on('group_join', (notification) => {
+            notification.getChat().then((chat) => {
+                addgroup(chat.id._serialized);
+                if(watchBot(chat.id._serialized)){
+                    notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${chat.description}`, {
+                        mentions: [notification.recipientIds[0]]
+                    });
+                }
+            })
+        });
+        client.on('message', mensaje)
+        client.initialize()
     });
 }
 
 if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath === '/usr/bin/node') {
-    activateClientBot('/usr/bin/chromium-browser');const mysql = require('sqlite3');
-    const db = new mysql.Database('data.db');
+    browserPath = '/usr/bin/chromium-browser'
     
 }else if(process.platform === 'win32'){
-    activateClientBot('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
+    browserPath = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 }
 else{
     // /bin/chromium-browser
     // /usr/bin/google-chrome-stable
-    activateClientBot('/usr/bin/google-chrome-stable');
+    browserPath = '/usr/bin/google-chrome-stable'
 }
-let qqr = true
-client.on('qr', async (qr) => {
-    if(qqr){
-        qrcode.generate(qr, { small: true });
-    }else{
-        const pairingCode = await client.requestPairingCode('6287851571042');
-    }
-});
+getExistingDirectories('./session');
 
-client.on('loading_screen', (percent, message) => {
-    console.log('Pantalla de Carga', percent, message);
-});
-
-client.on('ready', () => {
-    console.log('Todo esta listo!');
-});
 function RandomTwoIndex(array) {
     let randomIndex = Math.floor(Math.random() * array.length);
     let randomIndex2 = Math.floor(Math.random() * array.length);
@@ -86,16 +127,7 @@ let option = {
     juego: 0,
     ajustes: 0
 };
-client.on('group_join', (notification) => {
-    notification.getChat().then((chat) => {
-        addgroup(chat.id._serialized);
-        if(watchBot(chat.id._serialized)){
-            notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${chat.description}`, {
-                mentions: [notification.recipientIds[0]]
-            });
-        }
-    })
-});
+
 
 let menu = `
 ~*MENU*~
@@ -156,12 +188,14 @@ let dinero_bj = {};
 const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770"]
 const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
 let requestM = []
+
 process.on('SIGINT', async () => {
     await client.destroy();
     await cerrarBase();
     process.exit();
 })
-client.on('message', async (message) => {
+
+async function mensaje(message){
     
     const chat = await message.getChat();
     let contact = await message.getContact();
@@ -253,6 +287,18 @@ client.on('message', async (message) => {
                 }
             }
         })
+    }
+    //agregar otro cliente
+    if (message.body.toLocaleLowerCase() === 'otro' && await encontrarBot(contact.id.user)) {
+        try {
+            message.reply('Activando nuevo bot enviando codigo...');
+            await activateClientBot(browserPath, getUniqueDirectory('./session'), false , contact.id.user, message);
+            await insertarBot(contact.id.user, contact.pushname);
+            message.reply('Usted se convirtio en un bot');
+        } catch (error) {
+            console.error('Error al activar el nuevo cliente:', error);
+            message.reply('Lo siento no pude volverte bot');
+        }
     }
     // Añadir un miembro al grupo con solo su número
     if (message.body.toLocaleLowerCase().startsWith("aña")) {
@@ -2000,5 +2046,4 @@ client.on('message', async (message) => {
     
         );
     } 
-});
-client.initialize()
+};
