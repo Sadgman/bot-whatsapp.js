@@ -72,7 +72,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
         client.on('qr', async (qr) => {
             if (qqr) {
                 if (data_session !== './session') {
-                    fs.rmdirSync(data_session, { recursive: true });
+                    fs.rm(data_session, { recursive: true });
                     await eliminarBot(data_session);
                     await client.destroy();
                 } else {
