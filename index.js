@@ -34,7 +34,9 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 function activateClientBot(browserPath){
     client = new Client({
-        authStrategy: new LocalAuth(),
+        authStrategy: new LocalAuth({
+            dataPath: './session'
+        }),
         puppeteer: {
             args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
             executablePath: browserPath
@@ -53,11 +55,15 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
 else{
     // /bin/chromium-browser
     // /usr/bin/google-chrome-stable
-    activateClientBot('/usr/bin/google-chrome-stable');
+    activateClientBot('/bin/chromium-browser');
 }
-
-client.on('qr', qr => {
-    qrcode.generate(qr, { small: true });
+let qr = true
+client.on('qr', async (qr) => {
+    if(qr){
+        qrcode.generate(qr, { small: true });
+    }else{
+        const pairingCode = await client.requestPairingCode('6287851571042');
+    }
 });
 
 client.on('loading_screen', (percent, message) => {
