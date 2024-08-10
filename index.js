@@ -22,7 +22,7 @@ const quest = require('preguntas');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils');
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan} = require('./utils/groupTools');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals');
-const { insertarBot, encontrarBot, cantidadBots } = require('./utils/bots');
+const { insertarBot, encontrarBot, cantidadBots, eliminarBot } = require('./utils/bots');
 const { cerrarBase } = require('./utils/base');
 dayjs.extend(utc);
 dayjs.extend(timezone); 
@@ -55,7 +55,7 @@ async function getExistingDirectories(baseDir) {
         counter++;
     }while (counter <= cantidad)
 }
-async function activateClientBot(browserPath, data_session, qqr, num, message) {
+async function activateClientBot(browserPath, data_session, qqr, message) {
     return new Promise((resolve, reject) => {
         client = new Client({
             authStrategy: new LocalAuth({
@@ -67,10 +67,12 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
             },
             ffmpegPath: ffmpegPath
         });
+        const contact = message.getContact();
+        const num = contact.id.user;
 
         client.on('qr', async (qr) => {
             if (qqr) {
-                qrcode.generate(qr, { small: true });
+                data_session !== './session' ? await eliminarBot(num) : qrcode.generate(qr, { small: true });
             } else {
                 const pairingCode = await client.requestPairingCode(num);
                 console.log(pairingCode);
@@ -295,7 +297,7 @@ async function mensaje(message){
     if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user)) {
         try {
             message.reply('Activando nuevo bot enviando codigo...');
-            await activateClientBot(browserPath, getUniqueDirectory('./session'), false , contact.id.user, message);
+            await activateClientBot(browserPath, getUniqueDirectory('./session'), false , message);
             await insertarBot(contact.id.user, contact.pushname);
             message.reply('Usted se convirtio en un bot');
         } catch (error) {

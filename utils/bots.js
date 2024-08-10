@@ -51,8 +51,22 @@ async function cantidadBots(){
         });
     });
 }
+async function eliminarBot(){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run(`DELETE FROM bots WHERE numero = ?`, [numero], (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    })
+}
 module.exports = {
     encontrarBot,
     insertarBot,
-    cantidadBots
+    cantidadBots,
+    eliminarBot
 }
