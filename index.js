@@ -23,7 +23,7 @@ const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersW
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan} = require('./utils/groupTools');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals');
 const { insertarBot, encontrarBot, cantidadBots } = require('./utils/bots');
-const { cerrarBase, db } = require('./utils/base');
+const { cerrarBase } = require('./utils/base');
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
@@ -31,7 +31,8 @@ let client;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 // Alastor Bot
-// Version 1.0.0
+// Version 4.0.0
+
 let browserPath;
 function getUniqueDirectory(baseDir) {
     let counter = 1;
