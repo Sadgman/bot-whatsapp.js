@@ -55,11 +55,11 @@ if ((process.arch === 'arm' || process.arch === "arm64") && process.execPath ===
 else{
     // /bin/chromium-browser
     // /usr/bin/google-chrome-stable
-    activateClientBot('/bin/chromium-browser');
+    activateClientBot('/usr/bin/google-chrome-stable');
 }
-let qr = true
+let qqr = true
 client.on('qr', async (qr) => {
-    if(qr){
+    if(qqr){
         qrcode.generate(qr, { small: true });
     }else{
         const pairingCode = await client.requestPairingCode('6287851571042');
