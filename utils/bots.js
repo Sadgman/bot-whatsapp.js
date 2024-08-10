@@ -51,10 +51,14 @@ async function cantidadBots(){
         });
     });
 }
-async function eliminarBot(){
+/**
+ * 
+ * @param {string} nombre 
+ */
+async function eliminarBot(nombre){
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.run(`DELETE FROM bots WHERE numero = ?`, [numero], (err) => {
+            db.run(`DELETE FROM bots WHERE Nombre = ?`, [nombre], (err) => {
                 if (err) {
                     reject(err);
                     return;
