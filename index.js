@@ -73,7 +73,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
             if (qqr) {
                 if (data_session !== './session') {
                     await eliminarBot(data_session);
-                    client.destroy();
+                    await client.destroy();
                 } else {
                     qrcode.generate(qr, { small: true });
                 }
