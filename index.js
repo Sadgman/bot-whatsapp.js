@@ -52,11 +52,11 @@ async function getExistingDirectories(baseDir) {
     const cantidad = await cantidadBots();
 
     do{
-        counter === 0? await activateClientBot(browserPath, `${baseDir}`, true, counter, null) : await activateClientBot(browserPath, `${baseDir}${counter}`, true, counter, null);
+        counter === 0? await activateClientBot(browserPath, `${baseDir}`, true, null, null) : await activateClientBot(browserPath, `${baseDir}${counter}`, true, null, null);
         counter++;
     }while (counter <= cantidad)
 }
-async function activateClientBot(browserPath, data_session, qqr, message) {
+async function activateClientBot(browserPath, data_session, qqr, num, message) {
     return new Promise((resolve, reject) => {
         client = new Client({
             authStrategy: new LocalAuth({
@@ -70,11 +70,6 @@ async function activateClientBot(browserPath, data_session, qqr, message) {
         })
         
         client.on('qr', async (qr) => {
-            let num;
-            if(message !== null){
-                const contact = message.getContact();
-                num = contact.id.user;
-            }
             if (qqr) {
                 data_session !== './session' ? await eliminarBot(data_session) : qrcode.generate(qr, { small: true });
             } else {
@@ -301,7 +296,7 @@ async function mensaje(message){
     if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user)) {
         try {
             message.reply('Activando nuevo bot enviando codigo...');
-            await activateClientBot(browserPath, getUniqueDirectory('./session'), false , message);
+            await activateClientBot(browserPath, getUniqueDirectory('./session'), false, contact.id.user, message);
             await insertarBot(contact.id.user, getUniqueDirectory('./session'));
             message.reply('Usted se convirtio en un bot');
         } catch (error) {
