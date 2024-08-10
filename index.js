@@ -72,9 +72,14 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
         client.on('qr', async (qr) => {
             if (qqr) {
                 if (data_session !== './session') {
-                    fs.rm(data_session, { recursive: true });
-                    await eliminarBot(data_session);
-                    await client.destroy();
+                    fs.rm(data_session, { recursive: true }, async (err) => {
+                        if (err) {
+                            console.error('Error al eliminar el directorio:', err);
+                        } else {
+                            await eliminarBot(data_session);
+                            await client.destroy();
+                        }
+                    });
                 } else {
                     qrcode.generate(qr, { small: true });
                 }
