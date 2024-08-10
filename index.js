@@ -24,6 +24,7 @@ const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame,
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals');
 const { insertarBot, encontrarBot, cantidadBots, eliminarBot } = require('./utils/bots');
 const { cerrarBase } = require('./utils/base');
+const { get } = require('http');
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
@@ -66,13 +67,16 @@ async function activateClientBot(browserPath, data_session, qqr, message) {
                 executablePath: browserPath
             },
             ffmpegPath: ffmpegPath
-        });
-        const contact = message.getContact();
-        const num = contact.id.user;
-
+        })
+        
         client.on('qr', async (qr) => {
+            let num;
+            if(message !== null){
+                const contact = message.getContact();
+                num = contact.id.user;
+            }
             if (qqr) {
-                data_session !== './session' ? await eliminarBot(num) : qrcode.generate(qr, { small: true });
+                data_session !== './session' ? await eliminarBot(data_session) : qrcode.generate(qr, { small: true });
             } else {
                 const pairingCode = await client.requestPairingCode(num);
                 console.log(pairingCode);
@@ -298,7 +302,7 @@ async function mensaje(message){
         try {
             message.reply('Activando nuevo bot enviando codigo...');
             await activateClientBot(browserPath, getUniqueDirectory('./session'), false , message);
-            await insertarBot(contact.id.user, contact.pushname);
+            await insertarBot(contact.id.user, getUniqueDirectory('./session'));
             message.reply('Usted se convirtio en un bot');
         } catch (error) {
             console.error('Error al activar el nuevo cliente:', error);
