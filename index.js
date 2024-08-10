@@ -50,10 +50,10 @@ async function getExistingDirectories(baseDir) {
 
     const cantidad = await cantidadBots();
 
-    while (counter <= cantidad) {
+    do{
         counter === 0? await activateClientBot(browserPath, `${baseDir}`, true, counter, null) : await activateClientBot(browserPath, `${baseDir}${counter}`, true, counter, null);
         counter++;
-    }
+    }while (counter <= cantidad)
 }
 async function activateClientBot(browserPath, data_session, qqr, num, message) {
     return new Promise((resolve, reject) => {
