@@ -84,7 +84,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
 
         client.on('ready', () => {
             console.log('Todo esta listo!');
-            
+            client.on('message', mensaje)
             numCodesSent = 0;
             resolve();
         });
@@ -96,7 +96,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
             console.error('Cliente desconectado:', reason);
             reject(new Error('Cliente desconectado'));
         });
-        client.on('message', mensaje)
+        
         client.on('group_join', (notification) => {
             notification.getChat().then((chat) => {
                 addgroup(chat.id._serialized);
@@ -211,7 +211,7 @@ async function mensaje(message){
     
     const chat = await message.getChat();
     let contact = await message.getContact();
-    if(message.body === ''){
+    if(message.body === '' && client.info.wid && client){
         return;
     }
     const group = await message.getChat();
