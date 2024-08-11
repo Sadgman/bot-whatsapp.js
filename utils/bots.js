@@ -78,7 +78,7 @@ async function searchPathbots(){
                 }
                 let pathrows = [];
                 rows.forEach((row) => {
-                    pathrows.push(row.Nombre);
+                    pathrows.push(row.numero);
                 });
                 resolve(pathrows);
             });
