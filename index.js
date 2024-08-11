@@ -217,6 +217,7 @@ async function mensaje(message){
         }
     }catch(err){
         console.log("dice que no")
+        return
     }
     const group = await message.getChat();
 
