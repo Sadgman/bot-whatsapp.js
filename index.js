@@ -52,6 +52,8 @@ async function getExistingDirectories(baseDir) {
     await activateClientBot(browserPath, `${baseDir}`, true, null, null);
     if(paths.length > 0){
         paths.forEach(async (path) => {
+            new Promise((resolve) => {setTimeout(() => {resolve()},7000)});
+
             await activateClientBot(browserPath, `${path}`, true, null, null);
         })
     }
