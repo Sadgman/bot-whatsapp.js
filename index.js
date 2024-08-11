@@ -300,7 +300,7 @@ async function mensaje(message){
     if (chat.isGroup && !(await watchBot(chat.id._serialized))) {
         return;
     }
-    if(chat.isGroup){   
+    if(chat.isGroup && participantes(client.info.me.user)){   
         let mmsg = message.body.toLocaleLowerCase();
         addgroup(chat.id._serialized);
         chat.getInviteCode().then((linkg) => {
