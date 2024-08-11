@@ -34,13 +34,13 @@ let numCodesSent = 0;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 // Alastor Bot
-// Version 4.0.0
+// Version 4.0.1
 
 let browserPath;
 
 async function getExistingDirectories(baseDir) {
     const paths = await searchPathbots();
-    await activateClientBot(browserPath, `${baseDir}`, true, "AlastorBot", null);
+    await activateClientBot(browserPath, `${baseDir}`, true, null, null);
     if(paths.length > 0){
         paths.forEach(async (path) => {
             await activateClientBot(browserPath, `${baseDir}`, true, path, null);
@@ -211,8 +211,12 @@ async function mensaje(message){
     
     const chat = await message.getChat();
     let contact = await message.getContact();
-    if(message.body === '' && client.info.wid && client){
-        return;
+    try{
+        if(message.body === '' && client.info.wid === undefined && client){
+            return;
+        }
+    }catch(err){
+        console.log("dice que no")
     }
     const group = await message.getChat();
 
