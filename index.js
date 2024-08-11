@@ -82,9 +82,9 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
 
         client.on('ready', () => {
             console.log('Todo esta listo!');
+            resolve();
             client.on('message', mensaje)
             numCodesSent = 0;
-            resolve();
         });
         client.on('auth_failure', async () => {
             console.error('Error de autenticación');
