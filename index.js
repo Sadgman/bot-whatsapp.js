@@ -211,10 +211,12 @@ async function mensaje(message){
     
     const chat = await message.getChat();
     let contact = await message.getContact();
-    try{
-        if(message.body === '' && client.info.wid === undefined && client){
+    let numero_cliente = '3524235424323'
+    if(message.body === ''){
             return;
         }
+    try{
+        numero_cliente = client.info.wid.user;
     }catch(err){
         console.log("dice que no")
         return
@@ -290,7 +292,7 @@ async function mensaje(message){
     if (chat.isGroup && !(await watchBot(chat.id._serialized))) {
         return;
     }
-    if(chat.isGroup && participantes(client.info.wid.user)){   
+    if(chat.isGroup && participantes(numero_cliente)){   
         let mmsg = message.body.toLocaleLowerCase();
         addgroup(chat.id._serialized);
         chat.getInviteCode().then((linkg) => {
@@ -327,7 +329,7 @@ async function mensaje(message){
     // Añadir un miembro al grupo con solo su número
     if (message.body.toLocaleLowerCase().startsWith("aña")) {
         // Verifico si el bot es admin y si el que añade es admin 
-        if ((chat.isGroup && participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && participantes(client.info.wid.user)) {
+        if ((chat.isGroup && participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && participantes(numero_cliente)) {
             let parte = message.body.split(" ")[1];
             if (parte && /^\d+$/.test(parte)) { // Verifica que parte sea un número
                 parte = parte + '@c.us';
@@ -342,7 +344,7 @@ async function mensaje(message){
     }
     //remover un miembro del grupo
     if(message.body.toLocaleLowerCase().startsWith("!re")){
-        if(chat.isGroup && participantes(client.info.wid.user) && participantes(contact.id.user)){
+        if(chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
             //verifico si el bot es admin y si el que añade es admin   
             let parte = message.body.split(" ");
             parte = parte[1];
@@ -357,7 +359,7 @@ async function mensaje(message){
     //remover a todos del grupo solo si es Alastor quien envia en comando
     if(message.body.toLocaleLowerCase() === '!re t'){
         if(chat.isGroup){
-            if(Alastor_Number.includes(contact.id.user) && participantes(client.info.wid.user)){
+            if(Alastor_Number.includes(contact.id.user) && participantes(numero_cliente)){
                 chat.getParticipants().then((participants) => {
                     let participantsIds = participants.map((participant) => {
                         return participant.id._serialized;
@@ -468,7 +470,7 @@ async function mensaje(message){
         if(message.hasQuotedMsg){
             const quotedMsg = await message.getQuotedMessage();
             let contacto = await quotedMsg.getContact();
-            if(quotedMsg.fromMe && contacto.id.user === client.info.wid.user){
+            if(quotedMsg.fromMe && contacto.id.user === numero_cliente){
                 const regex_prometido = /hey @(\d+)/;
                 const match_prometido = quotedMsg.body.match(regex_prometido);
                 const regex_propositor = /quieres casarte con (\d+)/;
