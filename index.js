@@ -106,6 +106,10 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
             numCodesSent = 0;
             resolve();
         });
+        client.on('disconnected', (reason) => {
+            console.error('Cliente desconectado:', reason);
+            reject(new Error('Cliente desconectado'));
+        });
         client.on('group_join', (notification) => {
             notification.getChat().then((chat) => {
                 addgroup(chat.id._serialized);
