@@ -193,16 +193,11 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
             
             const chat = await message.getChat();
             let contact = await message.getContact();
-            let numero_cliente = '3524235424323'
+            let numero_cliente = client.info.wid.user
             if(message.body === ''){
                     return;
-                }
-            try{
-                numero_cliente = client.info.wid.user;
-            }catch(err){
-                console.log("dice que no")
-                return
             }
+            
             const group = await message.getChat();
 
             await jsonread(contact.id.user);
