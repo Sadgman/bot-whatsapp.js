@@ -53,7 +53,11 @@ async function getExistingDirectories(baseDir) {
     const cantidad = await cantidadBots();
 
     do{
-        counter === 0? await activateClientBot(browserPath, `${baseDir}`, true, null, null) : await activateClientBot(browserPath, `${baseDir}${counter}`, true, null, null);
+        if (counter === 0) {
+            await activateClientBot(browserPath, `${baseDir}`, true, null, null);
+        } else {
+            await activateClientBot(browserPath, `${baseDir}${counter}`, true, null, null);
+        }
         counter++;
     }while (counter <= cantidad)
 }
