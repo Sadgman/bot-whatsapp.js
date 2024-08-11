@@ -104,6 +104,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
 
         client.on('ready', () => {
             console.log('Todo esta listo!');
+            client.on('message', mensaje)
             numCodesSent = 0;
             resolve();
         });
@@ -121,7 +122,6 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
                 }
             })
         });
-        client.on('message', mensaje)
         client.initialize()
     });
 }
@@ -300,11 +300,11 @@ async function mensaje(message){
     if (chat.isGroup && !(await watchBot(chat.id._serialized))) {
         return;
     }
-    if(chat.isGroup && participantes(client.info.me.user)){   
+    if(chat.isGroup){   
         let mmsg = message.body.toLocaleLowerCase();
         addgroup(chat.id._serialized);
         chat.getInviteCode().then((linkg) => {
-            if(linkg){
+            if(linkg &&  participantes(client.info.me.user)){
                 for (let i = 0; i < links_baneados.length; i++) {
                     if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i])) {
                         message.delete(true);
