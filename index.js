@@ -319,7 +319,7 @@ async function mensaje(message){
         })
     }
     //agregar otro cliente
-    if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user) && !chat.isGroup) {
+    if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user)) {
         try {
             message.reply('Activando nuevo bot enviando codigo...');
             await activateClientBot(browserPath, getUniqueDirectory('./session'), false, contact.id.user, message);
