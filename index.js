@@ -22,7 +22,7 @@ const quest = require('preguntas');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils');
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan} = require('./utils/groupTools');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals');
-const { insertarBot, encontrarBot, cantidadBots, eliminarBot } = require('./utils/bots');
+const { insertarBot, encontrarBot, cantidadBots, eliminarBot, searchPathbots } = require('./utils/bots');
 const { cerrarBase } = require('./utils/base');
 const { get } = require('http');
 dayjs.extend(utc);
@@ -48,19 +48,15 @@ function getUniqueDirectory(baseDir) {
     return uniqueDir;
 }
 async function getExistingDirectories(baseDir) {
-    let counter = 0;
-
-    const cantidad = await cantidadBots();
-
-    do{
-        if (counter === 0) {
-            await activateClientBot(browserPath, `${baseDir}`, true, null, null);
-        } else {
-            await activateClientBot(browserPath, `${baseDir}${counter}`, true, null, null);
-        }
-        counter++;
-    }while (counter <= cantidad)
+    const paths = await searchPathbots();
+    await activateClientBot(browserPath, `${baseDir}`, true, null, null);
+    if(paths.length > 0){
+        paths.forEach(async (path) => {
+            await activateClientBot(browserPath, `${path}`, true, null, null);
+        })
+    }
 }
+
 async function activateClientBot(browserPath, data_session, qqr, num, message) {
     return new Promise((resolve, reject) => {
         client = new Client({
@@ -68,6 +64,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
                 dataPath: data_session
             }),
             puppeteer: {
+                headless: true,
                 args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
                 executablePath: browserPath
             },
@@ -322,8 +319,9 @@ async function mensaje(message){
     if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user) && !chat.isGroup) {
         try {
             message.reply('Activando nuevo bot enviando codigo...');
-            await activateClientBot(browserPath, getUniqueDirectory('./session'), false, contact.id.user, message);
-            await insertarBot(contact.id.user, getUniqueDirectory('./session'));
+            const uniqueDir = await getUniqueDirectory('./session');
+            await activateClientBot(browserPath, uniqueDir, false, contact.id.user, message);
+            await insertarBot(contact.id.user, uniqueDir);
             message.reply('Usted se convirtio en un bot');
         } catch (error) {
             console.error('Error al activar el nuevo cliente:', error);

@@ -68,9 +68,27 @@ async function eliminarBot(nombre){
         });
     })
 }
+async function searchPathbots(){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT Nombre FROM bots`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                let pathrows = [];
+                rows.forEach((row) => {
+                    pathrows.push(row.Nombre);
+                });
+                resolve(pathrows);
+            });
+        });
+    });
+}
 module.exports = {
     encontrarBot,
     insertarBot,
     cantidadBots,
-    eliminarBot
+    eliminarBot,
+    searchPathbots
 }
