@@ -28,7 +28,6 @@ const { cerrarBase } = require('./utils/base');
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
-let client;
 let numCodesSent = 0;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -49,7 +48,7 @@ async function getExistingDirectories(baseDir) {
 
 async function activateClientBot(browserPath, data_session, qqr, num, message) {
     return new Promise((resolve, reject) => {
-        client = new Client({
+        const client = new Client({
             authStrategy: new LocalAuth({
                 clientId: num,
                 dataPath: data_session
