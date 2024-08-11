@@ -25,6 +25,7 @@ const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/anim
 const { insertarBot, encontrarBot, cantidadBots, eliminarBot, searchPathbots } = require('./utils/bots');
 const { cerrarBase } = require('./utils/base');
 const { get } = require('http');
+const { getEventListeners } = require('events');
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
@@ -36,25 +37,13 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 // Version 4.0.0
 
 let browserPath;
-function getUniqueDirectory(baseDir) {
-    let counter = 1;
-    let uniqueDir = baseDir;
 
-    while (fs.existsSync(uniqueDir)) {
-        uniqueDir = `${baseDir}${counter}`;
-        counter++;
-    }
-
-    return uniqueDir;
-}
 async function getExistingDirectories(baseDir) {
     const paths = await searchPathbots();
-    await activateClientBot(browserPath, `${baseDir}`, true, null, null);
+    await activateClientBot(browserPath, `${baseDir}`, true, "AlastorBot", null);
     if(paths.length > 0){
         paths.forEach(async (path) => {
-            new Promise((resolve) => {setTimeout(() => {resolve()},7000)});
-
-            await activateClientBot(browserPath, `${path}`, true, null, null);
+            await activateClientBot(browserPath, `${baseDir}`, true, path, null);
         })
     }
 }
@@ -63,6 +52,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
     return new Promise((resolve, reject) => {
         client = new Client({
             authStrategy: new LocalAuth({
+                clientId: num,
                 dataPath: data_session
             }),
             puppeteer: {
@@ -71,22 +61,10 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
                 executablePath: browserPath
             },
             ffmpegPath: ffmpegPath
-        })
-        
+        });
         client.on('qr', async (qr) => {
             if (qqr) {
-                if (data_session !== './session') {
-                    fs.rm(data_session, { recursive: true }, async (err) => {
-                        if (err) {
-                            console.error('Error al eliminar el directorio:', err);
-                        } else {
-                            await eliminarBot(data_session);
-                            await client.destroy();
-                        }
-                    });
-                } else {
-                    qrcode.generate(qr, { small: true });
-                }
+                qrcode.generate(qr, { small: true });
             } else {
                 if (numCodesSent < 4) {
                     const pairingCode = await client.requestPairingCode(num);
@@ -106,14 +84,19 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
 
         client.on('ready', () => {
             console.log('Todo esta listo!');
-            client.on('message', mensaje)
+            
             numCodesSent = 0;
             resolve();
+        });
+        client.on('auth_failure', async () => {
+            console.error('Error de autenticación');
+            await eliminarBot(num);
         });
         client.on('disconnected', (reason) => {
             console.error('Cliente desconectado:', reason);
             reject(new Error('Cliente desconectado'));
         });
+        client.on('message', mensaje)
         client.on('group_join', (notification) => {
             notification.getChat().then((chat) => {
                 addgroup(chat.id._serialized);
@@ -302,11 +285,11 @@ async function mensaje(message){
     if (chat.isGroup && !(await watchBot(chat.id._serialized))) {
         return;
     }
-    if(chat.isGroup){   
+    if(chat.isGroup && participantes(client.info.wid.user)){   
         let mmsg = message.body.toLocaleLowerCase();
         addgroup(chat.id._serialized);
         chat.getInviteCode().then((linkg) => {
-            if(linkg &&  participantes(client.info.me.user)){
+            if(linkg){
                 for (let i = 0; i < links_baneados.length; i++) {
                     if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i])) {
                         message.delete(true);
@@ -320,11 +303,17 @@ async function mensaje(message){
     //agregar otro cliente
     if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user) && !chat.isGroup) {
         try {
-            message.reply('Activando nuevo bot enviando codigo...');
-            const uniqueDir = await getUniqueDirectory('./session');
-            await activateClientBot(browserPath, uniqueDir, false, contact.id.user, message);
-            await insertarBot(contact.id.user, uniqueDir);
-            message.reply('Usted se convirtio en un bot');
+            if(contadordia[contact.id.user + '!otro']){
+                message.reply(`Debes esperar ${Tiempo_restante(contact.id.user + '!otro')} segundos para volver a volverte bot`);
+                return;
+                
+            }else{
+                message.reply('Activando nuevo bot enviando codigo...');
+                const uniqueDir = './session'
+                await activateClientBot(browserPath, uniqueDir, false, contact.id.user, message);
+                await insertarBot(contact.id.user, uniqueDir);
+                message.reply('Usted se convirtio en un bot');
+            }
         } catch (error) {
             console.error('Error al activar el nuevo cliente:', error);
             message.reply('Lo siento no pude volverte bot');
@@ -333,7 +322,7 @@ async function mensaje(message){
     // Añadir un miembro al grupo con solo su número
     if (message.body.toLocaleLowerCase().startsWith("aña")) {
         // Verifico si el bot es admin y si el que añade es admin 
-        if ((chat.isGroup && participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && participantes(client.info.me.user)) {
+        if ((chat.isGroup && participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && participantes(client.info.wid.user)) {
             let parte = message.body.split(" ")[1];
             if (parte && /^\d+$/.test(parte)) { // Verifica que parte sea un número
                 parte = parte + '@c.us';
@@ -348,7 +337,7 @@ async function mensaje(message){
     }
     //remover un miembro del grupo
     if(message.body.toLocaleLowerCase().startsWith("!re")){
-        if(chat.isGroup && participantes(client.info.me.user) && participantes(contact.id.user)){
+        if(chat.isGroup && participantes(client.info.wid.user) && participantes(contact.id.user)){
             //verifico si el bot es admin y si el que añade es admin   
             let parte = message.body.split(" ");
             parte = parte[1];
@@ -363,7 +352,7 @@ async function mensaje(message){
     //remover a todos del grupo solo si es Alastor quien envia en comando
     if(message.body.toLocaleLowerCase() === '!re t'){
         if(chat.isGroup){
-            if(Alastor_Number.includes(contact.id.user) && participantes(client.info.me.user)){
+            if(Alastor_Number.includes(contact.id.user) && participantes(client.info.wid.user)){
                 chat.getParticipants().then((participants) => {
                     let participantsIds = participants.map((participant) => {
                         return participant.id._serialized;
@@ -474,7 +463,7 @@ async function mensaje(message){
         if(message.hasQuotedMsg){
             const quotedMsg = await message.getQuotedMessage();
             let contacto = await quotedMsg.getContact();
-            if(quotedMsg.fromMe && contacto.id.user === client.info.me.user){
+            if(quotedMsg.fromMe && contacto.id.user === client.info.wid.user){
                 const regex_prometido = /hey @(\d+)/;
                 const match_prometido = quotedMsg.body.match(regex_prometido);
                 const regex_propositor = /quieres casarte con (\d+)/;

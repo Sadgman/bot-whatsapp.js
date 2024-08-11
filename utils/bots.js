@@ -58,7 +58,7 @@ async function cantidadBots(){
 async function eliminarBot(nombre){
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.run(`DELETE FROM bots WHERE Nombre = ?`, [nombre], (err) => {
+            db.run(`DELETE FROM bots WHERE numero = ?`, [nombre], (err) => {
                 if (err) {
                     reject(err);
                     return;
@@ -71,7 +71,7 @@ async function eliminarBot(nombre){
 async function searchPathbots(){
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.all(`SELECT Nombre FROM bots`, (err, rows) => {
+            db.all(`SELECT numero FROM bots`, (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
