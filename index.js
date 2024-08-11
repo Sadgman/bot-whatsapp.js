@@ -186,7 +186,7 @@ let menu = `
 
 📝⚙️🪛 | As (Ajustes)
 
-🤖 👹 | !otro (Vuelvete un bot de Alastor)
+🤖 👹 | !otro (Vuelvete un bot de Alastor solo funciona en priv)
 
 🎁 🎉— donar
 
@@ -311,7 +311,7 @@ async function mensaje(message){
         })
     }
     //agregar otro cliente
-    if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user)) {
+    if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user) && !chat.isGroup) {
         try {
             message.reply('Activando nuevo bot enviando codigo...');
             await activateClientBot(browserPath, getUniqueDirectory('./session'), false, contact.id.user, message);
