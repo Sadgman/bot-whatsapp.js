@@ -29,6 +29,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone); 
 
 let client;
+let numCodesSent = 0;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 // Alastor Bot
@@ -84,10 +85,15 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
                     qrcode.generate(qr, { small: true });
                 }
             } else {
-                const pairingCode = await client.requestPairingCode(num);
-                console.log(pairingCode);
-                message.reply(`${pairingCode}`);
-            
+                if (numCodesSent < 4) {
+                    const pairingCode = await client.requestPairingCode(num);
+                    console.log(pairingCode);
+                    message.reply(`${pairingCode}`);
+                    numCodesSent++;
+                } else {
+                    numCodesSent = 0;
+                    message.reply('Límite de códigos de emparejamiento alcanzado.');
+                }
             }
         });
 
@@ -97,6 +103,7 @@ async function activateClientBot(browserPath, data_session, qqr, num, message) {
 
         client.on('ready', () => {
             console.log('Todo esta listo!');
+            numCodesSent = 0;
             resolve();
         });
         client.on('group_join', (notification) => {
