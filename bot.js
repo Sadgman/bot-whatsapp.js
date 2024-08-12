@@ -70,9 +70,18 @@ class AlastorBot {
                 },
                 ffmpegPath: ffmpegPath
             });
+            client.on('disconnected', async (reason) => {
+                console.error('Cliente desconectado:');
+                const paths = await searchPathbots();
+                if(paths.length > 0){
+                    await eliminarBot(num);
+                }
+                client.destroy();
+                reject();
+            });
             client.on('qr', async (qr) => {
-                if (qqr && num === null) {
-                    qrcode.generate(qr, { small: true });
+                if (qqr) {
+                    qrcode.generate(qr, { small: true });  
                 } else {
                     if (numCodesSent < 4) {
                         const pairingCode = await client.requestPairingCode(num);
@@ -102,16 +111,6 @@ class AlastorBot {
                 console.error('Error de autenticación');
                 await eliminarBot(num);
             });
-            client.on('disconnected', async (reason) => {
-                console.error('Cliente desconectado:');
-                const paths = await searchPathbots();
-                if(paths.length > 0){
-                    await eliminarBot(num);
-                }
-                client.destroy();
-                reject();
-            });
-            
             client.on('group_join', (notification) => {
                 notification.getChat().then((chat) => {
                     addgroup(chat.id._serialized);
