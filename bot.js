@@ -361,17 +361,32 @@ class AlastorBot {
                     }
                 }
                 //remover un miembro del grupo
-                if(message.body.toLocaleLowerCase().startsWith("!re")){
-                    if(chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
-                        //verifico si el bot es admin y si el que añade es admin   
-                        let parte = message.body.split(" ");
-                        parte = parte[1];
-                        parte = parte.replace('@', '');
-                        if(Alastor_Number.includes(parte)){
-                            return
+                if(message.body.toLocaleLowerCase().startsWith("!re") || message.body.toLocaleLowerCase().startsWith("!re")){
+                    if(message.hasQuotedMsg){
+                        const quotedMsg = await message.getQuotedMessage();
+                        let contacto = await quotedMsg.getContact();
+                        if(chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
+                            //verifico si el bot es admin y si el que añade es admin   
+                            if(Alastor_Number.includes(contacto.id.user)){
+                                return
+                            }
+                            chat.removeParticipants([contacto.id.user]);
                         }
-                        parte = parte + '@c.us';
-                        chat.removeParticipants([parte]);
+                    }else{
+                        if(chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
+                            //verifico si el bot es admin y si el que añade es admin   
+                            let parte = message.body.split(" ");
+                            if(parts.length > 2){
+                                return
+                            }
+                            parte = parte[1];
+                            parte = parte.replace('@', '');
+                            if(Alastor_Number.includes(parte)){
+                                return
+                            }
+                            parte = parte + '@c.us';
+                            chat.removeParticipants([parte]);
+                        }
                     }
                 }
                 //remover a todos del grupo solo si es Alastor quien envia en comando
@@ -1276,7 +1291,6 @@ class AlastorBot {
                         if(!(await groupActiveQuestions(1 ,chat.id._serialized)) && await watchBan(chat.id._serialized, 'todos')){
                             let indexp = quest.newIndexP();
                             await groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
-                            console.log(quest.readTitle());
                             await groupActiveQuestions(6, chat.id._serialized, indexp);
                             await groupActiveQuestions(2, chat.id._serialized, true);
                             await groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
@@ -1346,7 +1360,6 @@ class AlastorBot {
                             let id = parts[3];
                             id = id.replace('@', '');
                             let tres = await getAllInfoPlayer(id); 
-                            console.log(cantidad);
                             if (!isNaN(cantidad)) {
                                 if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
                                     update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
