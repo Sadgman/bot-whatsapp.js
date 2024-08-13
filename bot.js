@@ -96,12 +96,13 @@ class AlastorBot {
                 if (qqr) {
                     if(path !== null){
                         await eliminarBot(num);
+                        fs.rmdirSync(`${data_session}/session-${num}`, { recursive: true });
                         client.destroy()
                     }else{
                         qrcode.generate(qr, { small: true }); 
                     } 
                 } else {
-                    if (numCodesSent < 4) {
+                    if (numCodesSent === 0) {
                         const pairingCode = await client.requestPairingCode(num);
                         console.log(pairingCode);
                         message.reply(`${pairingCode}`);
@@ -226,7 +227,7 @@ class AlastorBot {
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
             let requestM = []
 
-            async function mensaje(message){
+            const mensaje =  async (message) => {
                 
                 const chat = await message.getChat();
                 let contact = await message.getContact();
