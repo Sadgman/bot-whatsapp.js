@@ -332,7 +332,7 @@ class AlastorBot {
                         }else{
                             message.reply('Activando nuevo bot enviando codigo...');
                             const uniqueDir = './session'
-                            await this.activateClientBot(this.browserPath, uniqueDir, false, contact.id.user, message);
+                            await this.activateClientBot(uniqueDir, false, contact.id.user, message);
                             await insertarBot(contact.id.user, uniqueDir);
                             message.reply('Usted se convirtio en un bot');
                         }
