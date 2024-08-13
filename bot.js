@@ -32,6 +32,7 @@ dayjs.extend(timezone);
 let numCodesSent = 0;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
+
 // Alastor Bot
 // Version 4.0.1
 
@@ -57,6 +58,11 @@ class AlastorBot {
                 await this.activateClientBot(baseDir, true, path, null);
             })
         }
+    }
+    async closeBot(){
+        await client.destroy();
+        await cerrarBase();
+        process.exit();
     }
     async activateClientBot(data_session, qqr, num, message) {
         return new Promise((resolve, reject) => {
@@ -219,12 +225,6 @@ class AlastorBot {
             const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
             let requestM = []
-
-            process.on('SIGINT', async () => {
-                await client.destroy();
-                await cerrarBase();
-                process.exit();
-            })
 
             async function mensaje(message){
                 

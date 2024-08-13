@@ -1,6 +1,11 @@
 const fs = require('fs');
 const readline = require('readline');
 
+process.on('SIGINT', async () => {
+    const { AlastorBot } = require('./bot')
+    new AlastorBot().closeBot();
+})
+
 if(fs.existsSync('config.json')){
     const browserPath = JSON.parse(fs.readFileSync('config.json'))[0].path;
     if(browserPath){
