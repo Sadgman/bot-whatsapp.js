@@ -222,7 +222,7 @@ class AlastorBot {
             let valorAS;
             let dealer = {};
             let dinero_bj = {};
-            const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770"]
+            const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770", "595973819264"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
             let requestM = []
 
