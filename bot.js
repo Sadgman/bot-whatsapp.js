@@ -94,9 +94,11 @@ class AlastorBot {
             //client.on('authenticated', async (session) => {})
             client.on('qr', async (qr) => {
                 if (qqr) {
-                    if(path !== null){
+                    if(num !== null){
                         await eliminarBot(num);
-                        fs.rmdirSync(`${data_session}/session-${num}`, { recursive: true });
+                        if(fs.existsSync(`${data_session}/session-${num}`, { recursive: true })){
+                            fs.rmSync(`${data_session}/session-${num}`, { recursive: true });
+                        }
                         client.destroy()
                     }else{
                         qrcode.generate(qr, { small: true }); 
@@ -989,11 +991,12 @@ class AlastorBot {
                             if(cartas_jugador[contact.id.user]){
                                 const ganador_juego = ganador(contact.id.user);
                                 if(ganador_juego === 'jugador'){
-                                    await update_info_player(contact.id.user, "Dinero", viewPlayer.dinero + dinero_bj[contact.id.user] * 2, true);
+                                    await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + dinero_bj[contact.id.user] * 2, true);
                                     message.reply('Has ganado' + " las cartas del deler son: " + dealer[contact.id.user]);
                                 }else if(ganador_juego === 'dealer'){
                                     message.reply('Has perdido' + " las cartas del deler son: " + dealer[contact.id.user]);
                                 }else{
+                                    await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + dinero_bj[contact.id.user]); 
                                     message.reply('Empate');
                                 }
                                 delete cartas_jugador[contact.id.user];
