@@ -102,7 +102,7 @@ class AlastorBot {
                         qrcode.generate(qr, { small: true }); 
                     } 
                 } else {
-                    if (numCodesSent === 0) {
+                    if (numCodesSent === 4) {
                         const pairingCode = await client.requestPairingCode(num);
                         console.log(pairingCode);
                         message.reply(`${pairingCode}`);
@@ -336,8 +336,7 @@ class AlastorBot {
                             await insertarBot(contact.id.user, uniqueDir);
                             message.reply('Usted se convirtio en un bot');
                         }
-                    } catch (error) {
-                        console.error('Error al activar el nuevo cliente:', error);
+                    } catch(err) {
                         message.reply('Lo siento no pude volverte bot');
                     }
                 }
