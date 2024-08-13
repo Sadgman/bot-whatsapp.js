@@ -24,6 +24,7 @@ const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame,
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
 const { insertarBot, encontrarBot, cantidadBots, eliminarBot, searchPathbots } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
+const { path } = require('@ffmpeg-installer/ffmpeg');
 
 dayjs.extend(utc);
 dayjs.extend(timezone); 
@@ -79,9 +80,19 @@ class AlastorBot {
                 client.destroy();
                 reject();
             });
+            client.on('auth_failure', async () => {
+                console.error('Error de autenticación');
+                await eliminarBot(num);
+            });
+            //client.on('authenticated', async (session) => {})
             client.on('qr', async (qr) => {
                 if (qqr) {
-                    qrcode.generate(qr, { small: true });  
+                    if(path !== null){
+                        await eliminarBot(num);
+                        client.destroy()
+                    }else{
+                        qrcode.generate(qr, { small: true }); 
+                    } 
                 } else {
                     if (numCodesSent < 4) {
                         const pairingCode = await client.requestPairingCode(num);
@@ -107,10 +118,7 @@ class AlastorBot {
                 client.on('message', mensaje)
                 numCodesSent = 0;
             });
-            client.on('auth_failure', async () => {
-                console.error('Error de autenticación');
-                await eliminarBot(num);
-            });
+            
             client.on('group_join', (notification) => {
                 notification.getChat().then((chat) => {
                     addgroup(chat.id._serialized);
