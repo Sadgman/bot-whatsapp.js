@@ -98,7 +98,7 @@ class AlastorBot {
                         const pairingCode = await client.requestPairingCode(num);
                         console.log(pairingCode);
                         message.reply(`${pairingCode}`);
-                        numCodesSent++;
+                        numCodesSent++; 
                     } else {
                         numCodesSent = 0;
                         message.reply('Límite de códigos de emparejamiento alcanzado.');
@@ -1200,7 +1200,7 @@ class AlastorBot {
                     }
                     let mensaje_citado;
                     let text;
-                    valid_language_codes = ['in', 'es', 'fr', 'de', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'zh', 'pt'];
+                    const valid_language_codes = ['in', 'es', 'fr', 'de', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'zh', 'pt'];
                     if (parts.length <= 2) {
                         text = parts.slice(1).join(' ');
                     } else {
