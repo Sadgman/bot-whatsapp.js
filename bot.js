@@ -49,6 +49,7 @@ class AlastorBot {
      */
     async activate() {
         const baseDir = './session';
+        
         const paths = await searchPathbots();
         await this.activateClientBot(baseDir, true, null, null);
         if(paths.length > 0){
@@ -111,9 +112,20 @@ class AlastorBot {
             client.on('loading_screen', (percent, message) => {
                 console.log('Pantalla de Carga', percent, message);
             });
-
+            let directemp;
             client.on('ready', () => {
                 console.log('Todo esta listo!');
+                if(num){
+                    directemp = `${data_session}/session-${client.info.wid.user}/Default/temp`;
+                    if(!fs.existsSync(directemp)){
+                        fs.mkdirSync(directemp, { recursive: true });
+                    }
+                }else{
+                    directemp = `${data_session}/session/Default/temp`;
+                    if(!fs.existsSync(directemp)){
+                        fs.mkdirSync(directemp, { recursive: true });
+                    }
+                }
                 resolve();
                 client.on('message', mensaje)
                 numCodesSent = 0;
@@ -1631,12 +1643,12 @@ class AlastorBot {
                                 ffmpeg()
                                     .input(stream)
                                     .audioBitrate(128)
-                                    .save('n.mp3')
+                                    .save(`${directemp}/audio.mp3`)
                                     .on('end', resolve)
                                     .on('error', reject);
                             });
                             // lo envio
-                            const file = fs.readFileSync('n.mp3');
+                            const file = fs.readFileSync(`${directemp}/audio.mp3`);
                             const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                             await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
                             resolve();
@@ -1648,8 +1660,8 @@ class AlastorBot {
                                 const n = await YTDownloadMusic(url);
                                 const response = await fetch(n);
                                 const buffer = await response.buffer();
-                                fs.writeFileSync('n.mp3', buffer);
-                                const file = fs.readFileSync('n.mp3');
+                                fs.writeFileSync(`${directemp}/audio.mp3`, buffer);
+                                const file = fs.readFileSync(`${directemp}/audio.mp3`);
                                 const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                                 await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
                                 resolve();
@@ -1660,8 +1672,8 @@ class AlastorBot {
                             }
                         } finally {
                             // Limpia el archivo temporal
-                            if (fs.existsSync('n.mp3')) {
-                                fs.unlinkSync('n.mp3');
+                            if (fs.existsSync(`${directemp}/audio.mp3`)) {
+                                fs.unlinkSync(`${directemp}/audio.mp3`);
                             }
                         }
                     });
@@ -1739,12 +1751,12 @@ class AlastorBot {
                         message.reply(mensaje_error);
                     }
                 }
-                function descargarV(stream, mensaje_error){
+                function descargarV(stream, mensaje_error, ruta){
                     ffmpeg()
                         .input(stream)
-                        .save('video.mp4')
+                        .save(ruta)
                         .on('end', () => {
-                            const file = fs.readFileSync('video.mp4');
+                            const file = fs.readFileSync(ruta);
                             const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
                             chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                             counterListRequestVideo = 0;
@@ -1755,14 +1767,14 @@ class AlastorBot {
                             message.reply(mensaje_error);
                         })
                 }
-                async function descargarVideoIG(url, mensaje_error) {
+                async function descargarVideoIG(url, mensaje_error, ruta) {
                     try {
                         const dataList = await instagramDl(url);
                         const response = await fetch(dataList[0].download_link);
                         if (response.ok) {
                             const buffer = await response.buffer();
-                            fs.writeFile("video.mp4", buffer, () => {
-                                const file = fs.readFileSync('video.mp4');
+                            fs.writeFile(ruta, buffer, () => {
+                                const file = fs.readFileSync(ruta);
                                 const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
                                 chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                                 counterListRequestVideo = 0;
@@ -1777,13 +1789,13 @@ class AlastorBot {
                         message.reply(mensaje_error);
                     }
                 }
-                async function descargarVideoTikTok(url, mensaje_error) {
+                async function descargarVideoTikTok(url, mensaje_error, ruta) {
                     try {
                     const result = await tk.tiktokdownload(url);
                     const response = await fetch(result.nowm);
                     const buffer = await response.buffer();
-                    fs.writeFileSync('video.mp4', buffer, () => {
-                        const file = fs.readFileSync('video.mp4');
+                    fs.writeFileSync(ruta, buffer, () => {
+                        const file = fs.readFileSync(ruta);
                         const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
                         chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                         counterListRequestVideo = 0;
@@ -1794,15 +1806,15 @@ class AlastorBot {
                         message.reply(mensaje_error);
                     }
                 }
-                async function twitterDL(url, mensaje_error) {
+                async function twitterDL(url, mensaje_error, ruta) {
                     await TwitterDL(url)
                     .then((result) => {
                         if(result['result'].media[0].type == 'video') {
                             https.get(result['result'].media[0].videos[1].url, (response) => {
-                                const videoStream = fs.createWriteStream('./assets/video.mp4');
+                                const videoStream = fs.createWriteStream(ruta);
                                 response.pipe(videoStream);
                                 videoStream.on('finish', () => {
-                                    const file = fs.readFileSync('./assets/video.mp4');
+                                    const file = fs.readFileSync(ruta);
                                     const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
                                     chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                                     counterListRequestVideo = 0;
@@ -1838,26 +1850,27 @@ class AlastorBot {
                                 await chat.sendSeen();
                                 await chat.sendStateTyping();
                                 const agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
+                                const ruta = `${directemp}/video.mp4`;
 
                                 if (search.includes('https://youtu.be/')){
                                     stream = ytdl(search, { filter: 'audioandvideo', quality: 'lowest', agent: agent});
-                                    descargarV(stream, mensaje_error);
+                                    descargarV(stream, mensaje_error, ruta);
                                     return
                                 }else if(search.includes('https://www.youtube.com/shorts/') || search.includes('https://youtube.com/shorts/')){
                                     stream = ytdl(search, { filter: 'audioandvideo', quality: 'highestvideo', agent: agent});
-                                    descargarV(stream, mensaje_error);
+                                    descargarV(stream, mensaje_error, ruta);
                                     return
                                 }
                                 if(search.includes('https://www.instagram.com/')){
-                                    descargarVideoIG(search, mensaje_error);
+                                    descargarVideoIG(search, mensaje_error, ruta);
                                     return
                                 }
                                 if(search.includes('https://www.tiktok.com/') || search.includes('https://vm.tiktok.com/')){
-                                    descargarVideoTikTok(search, mensaje_error);
+                                    descargarVideoTikTok(search, mensaje_error, ruta);
                                     return
                                 }
                                 if(search.includes('https://x.com/')){
-                                    twitterDL(search, mensaje_error);
+                                    twitterDL(search, mensaje_error, ruta);
                                     return
                                 }
                                 await youtube.search(search, { limit: 1 }).then(x => {
@@ -1868,7 +1881,7 @@ class AlastorBot {
                                         return;
                                     }
                                     stream = ytdl(x[0].url, { filter: 'audioandvideo', quality: 'lowest', agent: agent});
-                                    descargarV(stream, mensaje_error);
+                                    descargarV(stream, mensaje_error, ruta);
 
                                 } catch (error) {
                                     counterListRequestVideo = 0;
