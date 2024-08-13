@@ -102,7 +102,7 @@ class AlastorBot {
                         qrcode.generate(qr, { small: true }); 
                     } 
                 } else {
-                    if (numCodesSent === 4) {
+                    if (numCodesSent < 4) {
                         const pairingCode = await client.requestPairingCode(num);
                         console.log(pairingCode);
                         message.reply(`${pairingCode}`);
