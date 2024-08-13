@@ -1027,7 +1027,7 @@ class AlastorBot {
                         
                         let messageToSend = "*Los Ricos*\n\n";
 
-                        for(mention of los_ricos){
+                        for(let mention of los_ricos){
                             menciones.push(`${mention}@c.us`);
                         }
 
@@ -1044,7 +1044,7 @@ class AlastorBot {
                         let menciones = []
                         let messageToSend = "*Los Mejores*\n\n";
 
-                        for(mention of los_niveles){
+                        for(let mention of los_niveles){
                             menciones.push(`${mention}@c.us`);
                         }
 
@@ -1060,7 +1060,7 @@ class AlastorBot {
                         const mensajes = await messageUsers();
                         let menciones = []
                         let messageToSend = "*Los mas habladores*\n\n";
-                        for(mention of personas){
+                        for(let mention of personas){
                             menciones.push(`${mention}@c.us`);
                         }
                         for (let i = 0; i < personas.length; i++) {
