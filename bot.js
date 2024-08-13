@@ -134,7 +134,7 @@ class AlastorBot {
                     }
                 }
                 resolve();
-                client.on('message', mensaje)
+                client.on('message_create', mensaje)
                 numCodesSent = 0;
             });
             
@@ -275,9 +275,9 @@ class AlastorBot {
                 if(insultos.includes(message.body.toLocaleLowerCase())){
                     message.reply('Tu madre me dijo otra cosa');
                 }
-                jsonread(contact.id.user).then( async () => {
+                if(encontrarBot(contact.id.user)){
                     await update_info_player(contact.id.user, "Mensajes", viewPlayer.Mensajes + 1, true);
-                })
+                }
                 const currentLevel = viewPlayer.Nivel;
                 let winsNeeded = (currentLevel + 1) * 10;
 

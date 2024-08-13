@@ -143,7 +143,7 @@ async function levelTopPlayers() {
 async function topUsersMessages() {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.all(`SELECT id FROM players ORDER BY Mensajes DESC LIMIT 5`, (err, rows) => {
+            db.all(`SELECT id FROM players WHERE id not in (SELECT numero FROM bots) order by Mensajes desc limit 5;`, (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
@@ -157,7 +157,7 @@ async function topUsersMessages() {
 async function messageUsers() {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.all(`SELECT Mensajes FROM players ORDER BY Mensajes DESC LIMIT 5`, (err, rows) => {
+            db.all(`SELECT Mensajes FROM players WHERE id not in (SELECT numero FROM bots) order by Mensajes desc limit 5;`, (err, rows) => {
                 if (err) {
                     reject(err);
                     return;

@@ -38,6 +38,7 @@ async function insertarBot(numero, nombre){
         });
     });
 }
+//SELECT Mensajes FROM players WHERE id not in (SELECT numero FROM bots) order by Mensajes desc limit 5;
 async function cantidadBots(){
     return new Promise((resolve, reject) => {
         db.serialize(() => {
