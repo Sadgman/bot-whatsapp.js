@@ -370,13 +370,13 @@ class AlastorBot {
                             if(Alastor_Number.includes(contacto.id.user)){
                                 return
                             }
-                            chat.removeParticipants([contacto.id.user]);
+                            chat.removeParticipants([contacto.id._serialized]);
                         }
                     }else{
                         if(chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
                             //verifico si el bot es admin y si el que añade es admin   
                             let parte = message.body.split(" ");
-                            if(parts.length > 2){
+                            if(parte.length > 2){
                                 return
                             }
                             parte = parte[1];
