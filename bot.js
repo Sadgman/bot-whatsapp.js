@@ -250,8 +250,8 @@ class AlastorBot {
                 await jsonread(contact.id.user);
                 if(chat.isGroup){
                     await addgroup(chat.id._serialized);
-                    if(await esBotAsignado(chat.id._serialized, contact.id.user) === 'no asignado'){
-                        await asignarBot(contact.id.user, chat.id._serialized);
+                    if(await esBotAsignado(chat.id._serialized, numero_cliente) === 'no asignado'){
+                        await asignarBot(numero_cliente, chat.id._serialized);
                     }else if(await esBotAsignado(chat.id._serialized, numero_cliente)){
                         return;
                     } 
