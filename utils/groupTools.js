@@ -234,10 +234,16 @@ async function groupActiveQuestions(option, id_group, value) {
         });
     });
 }
-async function asignarBot(numero, nombre){
+/**
+ * 
+ * @param {number} numero id del bot
+ * @param {string} id_group id del grupo
+ * @returns 
+ */
+async function asignarBot(numero, id_group){
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.run(`UPDATE groups SET bot_asignado = ? WHERE id = ?`, [numero, nombre], (err) => {
+            db.run(`UPDATE groups SET bot_asignado = ? WHERE id = ?`, [numero, id_group], (err) => {
                 if (err) {
                     reject(err);
                     return;

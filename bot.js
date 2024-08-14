@@ -250,11 +250,11 @@ class AlastorBot {
                 await jsonread(contact.id.user);
                 if(chat.isGroup){
                     await addgroup(chat.id._serialized);
-                    if(await esBotAsignado(chat.id._serialized, numero_cliente)){
+                    if(await esBotAsignado(chat.id._serialized, contact.id.user) === 'no asignado'){
+                        await asignarBot(contact.id.user, chat.id._serialized);
+                    }else if(await esBotAsignado(chat.id._serialized, numero_cliente)){
                         return;
-                    }else if(await esBotAsignado(chat.id._serialized, contact.id.user) === 'no asignado'){
-                        await asignarBot(chat.id._serialized, contact.id.user);
-                    }
+                    } 
                 }
                 const viewPlayer = await getAllInfoPlayer(contact.id.user);
 
