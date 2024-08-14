@@ -440,12 +440,12 @@ class AlastorBot {
                                 info = await getAllInfoPlayer(contact.id.user);
                                 const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
                                 if (info.Casado === 'nadie :(') {
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*total de mensajes enviados:* ${info.Mensajes}`, {
+                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:* ${info.create_at} `, {
                                         quotedMessageId: quotedMsg.id._serialized
                                     });
                                 } else {
                                     const contacto_casado = await client.getNumberId(info.Casado);
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}`, {
+                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:* ${info.create_at} `, {
                                         mentions: contacto_casado._serialized,
                                         quotedMessageId: quotedMsg.id._serialized
                                     });
@@ -454,12 +454,12 @@ class AlastorBot {
                                 info = await getAllInfoPlayer(contact.id.user);
                                 const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
                                 if (info.Casado === 'nadie :(') {
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}`, {
+                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:* ${info.create_at}`, {
                                         quotedMessageId: message.id._serialized
                                     });
                                 } else {
                                     const contacto_casado = await client.getNumberId(info.Casado);
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}`, {
+                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:* ${info.create_at}`, {
                                         mentions: contacto_casado._serialized,
                                         quotedMessageId: message.id._serialized
                                     });
