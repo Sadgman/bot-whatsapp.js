@@ -156,7 +156,8 @@ class AlastorBot {
                         return;
                     } 
                     if(await watchBot(chat.id._serialized)){
-                        notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${chat.description}`, {
+                        const regex = /(?:https?:\/\/)?chat\.whatsapp\.com\/\S*/g;
+                        notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${chat.description.replace(regex, '')}`, {
                             mentions: [notification.recipientIds[0]]
                         });
                     }
@@ -332,7 +333,7 @@ class AlastorBot {
                     chat.getInviteCode().then((linkg) => {
                         if(linkg){
                             for (let i = 0; i < links_baneados.length; i++) {
-                                if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i]) && mmsg !== chat.description) {
+                                if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i])) {
                                     message.delete(true);
                                     group.removeParticipants([contact.id._serialized])
                                     break
