@@ -86,10 +86,38 @@ async function searchPathbots(){
         });
     });
 }
+async function vercargoBot(numero){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.get(`SELECT cargo FROM bots WHERE numero = ?`, [numero], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row.cargo);
+            });
+        });
+    });
+}
+async function asignarCargoBot(numero, cargo){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run(`UPDATE bots SET cargo = ? WHERE numero = ?`, [cargo, numero], (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    });
+}
 module.exports = {
     encontrarBot,
     insertarBot,
     cantidadBots,
     eliminarBot,
-    searchPathbots
+    searchPathbots,
+    vercargoBot,
+    asignarCargoBot
 }

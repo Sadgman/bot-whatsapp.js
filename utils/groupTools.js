@@ -234,6 +234,57 @@ async function groupActiveQuestions(option, id_group, value) {
         });
     });
 }
+async function asignarBot(numero, nombre){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run(`UPDATE groups SET bot_asignado = ? WHERE id = ?`, [numero, nombre], (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    });
+}
+async function removerAsignacionBot(nombre){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run(`UPDATE groups SET bot_asignado = '' WHERE id = ?`, [nombre], (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    });
+}
+/**
+ * 
+ * @param {Text} id id del grupo
+ * @param {number} nombre id del bot
+ * @returns si el bot esta asignado retorna true si no esta asignado retorna false y si no hay bot asignado retorna 'no asignado'
+ */
+async function esBotAsignado(id, nombre) {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.get(`SELECT bot_asignado FROM groups WHERE id = ?`, [id], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (row.bot_asignado !== nombre) {
+                    resolve(true);
+                }else if(row.bot_asignado === ''){
+                    resolve('no asignado');
+                }else {
+                    resolve(false);
+                }
+            });
+        });
+    });
+}
 module.exports = {
     addgroup,
     Bangame,
@@ -241,5 +292,8 @@ module.exports = {
     QuitBan,
     watchBot,
     groupActiveQuestions,
+    asignarBot,
+    removerAsignacionBot,
+    esBotAsignado,
     bot_off_on
 }

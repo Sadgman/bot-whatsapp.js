@@ -20,9 +20,9 @@ const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const quest = require('preguntas');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
-const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan} = require('./utils/groupTools.js');
+const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, removerAsignacionBot, esBotAsignado} = require('./utils/groupTools.js');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
-const { insertarBot, encontrarBot, cantidadBots, eliminarBot, searchPathbots } = require('./utils/bots.js');
+const { insertarBot, encontrarBot, cantidadBots, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
 const { path } = require('@ffmpeg-installer/ffmpeg');
 
@@ -55,7 +55,9 @@ class AlastorBot {
         await this.activateClientBot(baseDir, true, null, null);
         if(paths.length > 0){
             paths.forEach(async (path) => {
-                await this.activateClientBot(baseDir, true, path, null);
+                if(!(await vercargoBot(path) === 'principal')){
+                    await this.activateClientBot(baseDir, true, path, null);
+                }
             })
         }
     }
@@ -101,7 +103,7 @@ class AlastorBot {
                         }
                         client.destroy()
                     }else{
-                        qrcode.generate(qr, { small: true }); 
+                        qrcode.generate(qr, { small: true });
                     } 
                 } else {
                     if (numCodesSent < 4) {
@@ -122,18 +124,23 @@ class AlastorBot {
                 console.log('Pantalla de Carga', percent, message);
             });
             let directemp;
-            client.on('ready', () => {
+            client.on('ready', async () => {
                 console.log('Todo esta listo!');
+                if(await encontrarBot(client.info.wid.user)){
+                    await insertarBot(client.info.wid.user, data_session);
+                }
                 if(num){
                     directemp = `${data_session}/session-${client.info.wid.user}/Default/temp`;
                     if(!fs.existsSync(directemp)){
                         fs.mkdirSync(directemp, { recursive: true });
                     }
+                    await asignarCargoBot(num, 'principal');
                 }else{
                     directemp = `${data_session}/session/Default/temp`;
                     if(!fs.existsSync(directemp)){
                         fs.mkdirSync(directemp, { recursive: true });
                     }
+                    await asignarCargoBot(client.info.wid.user, 'secundario');
                 }
                 resolve();
                 client.on('message_create', mensaje)
@@ -243,6 +250,11 @@ class AlastorBot {
                 await jsonread(contact.id.user);
                 if(chat.isGroup){
                     await addgroup(chat.id._serialized);
+                    if(await esBotAsignado(chat.id._serialized, numero_cliente)){
+                        return;
+                    }else if(await esBotAsignado(chat.id._serialized, contact.id.user) === 'no asignado'){
+                        await asignarBot(chat.id._serialized, contact.id.user);
+                    }
                 }
                 const viewPlayer = await getAllInfoPlayer(contact.id.user);
 
@@ -335,7 +347,6 @@ class AlastorBot {
                             message.reply('Activando nuevo bot enviando codigo...');
                             const uniqueDir = './session'
                             await this.activateClientBot(uniqueDir, false, contact.id.user, message);
-                            await insertarBot(contact.id.user, uniqueDir);
                             message.reply('Usted se convirtio en un bot');
                         }
                     } catch(err) {
@@ -489,7 +500,7 @@ class AlastorBot {
                     if(prometido.replace('@c.us', '') != contact.id.user){
                         if(viewPlayer.Casado === "nadie :("){
                             client.getContactById(prometido).then((c) => {
-                                chat.sendMessage(`*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
+                                chat.sendMessage(`*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.pushname}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
                             }).catch(error => {
                                 message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
                             })
