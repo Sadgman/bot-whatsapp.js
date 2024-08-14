@@ -327,7 +327,7 @@ class AlastorBot {
                     chat.getInviteCode().then((linkg) => {
                         if(linkg){
                             for (let i = 0; i < links_baneados.length; i++) {
-                                if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i])) {
+                                if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i]) && mmsg !== chat.description) {
                                     message.delete(true);
                                     group.removeParticipants([contact.id._serialized])
                                     break
