@@ -265,7 +265,7 @@ class AlastorBot {
                 }
                 if(chat.isGroup){
                     await addgroup(chat.id._serialized);
-                    if(await esBotAsignado(chat.id._serialized, numero_cliente) === 'no asignado' || searchParticipante(await verAsignadoBot(chat.id._serialized))){
+                    if(await esBotAsignado(chat.id._serialized, numero_cliente) === 'no asignado' || !searchParticipante(await verAsignadoBot(chat.id._serialized))){
                         await asignarBot(numero_cliente, chat.id._serialized);
                     }else if(await esBotAsignado(chat.id._serialized, numero_cliente)){
                         return;
