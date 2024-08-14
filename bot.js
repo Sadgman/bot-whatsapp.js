@@ -20,7 +20,7 @@ const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const quest = require('preguntas');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
-const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, removerAsignacionBot, esBotAsignado} = require('./utils/groupTools.js');
+const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, removerAsignacionBot, esBotAsignado, verAsignadoBot} = require('./utils/groupTools.js');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
 const { insertarBot, encontrarBot, cantidadBots, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
@@ -255,9 +255,17 @@ class AlastorBot {
                 const group = await message.getChat();
 
                 await jsonread(contact.id.user);
+                const searchParticipante = (userId) => {
+                    const groupParticipants = chat.participants;
+                    const participant = groupParticipants.find(part => part.id.user === userId);
+                    if (!participant) {
+                        return false;
+                    }
+                    return true;
+                }
                 if(chat.isGroup){
                     await addgroup(chat.id._serialized);
-                    if(await esBotAsignado(chat.id._serialized, numero_cliente) === 'no asignado'){
+                    if(await esBotAsignado(chat.id._serialized, numero_cliente) === 'no asignado' || searchParticipante(await verAsignadoBot(chat.id._serialized))){
                         await asignarBot(numero_cliente, chat.id._serialized);
                     }else if(await esBotAsignado(chat.id._serialized, numero_cliente)){
                         return;

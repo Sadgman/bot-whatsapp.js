@@ -291,6 +291,19 @@ async function esBotAsignado(id, nombre) {
         });
     });
 }
+async function verAsignadoBot(id_group) {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.get(`SELECT bot_asignado FROM groups WHERE id = ?`, [id_group], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row.bot_asignado);
+            });
+        });
+    });
+}
 module.exports = {
     addgroup,
     Bangame,
@@ -301,5 +314,6 @@ module.exports = {
     asignarBot,
     removerAsignacionBot,
     esBotAsignado,
+    verAsignadoBot,
     bot_off_on
 }
