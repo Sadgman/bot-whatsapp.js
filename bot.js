@@ -134,13 +134,13 @@ class AlastorBot {
                     if(!fs.existsSync(directemp)){
                         fs.mkdirSync(directemp, { recursive: true });
                     }
-                    await asignarCargoBot(num, 'principal');
+                    await asignarCargoBot(client.info.wid.user, 'secundario');
                 }else{
                     directemp = `${data_session}/session/Default/temp`;
                     if(!fs.existsSync(directemp)){
                         fs.mkdirSync(directemp, { recursive: true });
                     }
-                    await asignarCargoBot(client.info.wid.user, 'secundario');
+                    await asignarCargoBot(num, 'principal');           
                 }
                 resolve();
                 client.on('message_create', mensaje)
