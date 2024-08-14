@@ -148,9 +148,14 @@ class AlastorBot {
             });
             
             client.on('group_join', (notification) => {
-                notification.getChat().then((chat) => {
+                notification.getChat().then(async (chat) => {
                     addgroup(chat.id._serialized);
-                    if(watchBot(chat.id._serialized)){
+                    if(await esBotAsignado(chat.id._serialized, client.info.wid.user ) === 'no asignado'){
+                        await asignarBot(client.info.wid.user, chat.id._serialized);
+                    }else if(await esBotAsignado(chat.id._serialized, client.info.wid.user)){
+                        return;
+                    } 
+                    if(await watchBot(chat.id._serialized)){
                         notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${chat.description}`, {
                             mentions: [notification.recipientIds[0]]
                         });
