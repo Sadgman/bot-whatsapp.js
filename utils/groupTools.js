@@ -274,10 +274,10 @@ async function esBotAsignado(id, nombre) {
                     reject(err);
                     return;
                 }
-                if (row.bot_asignado !== nombre) {
-                    resolve(true);
-                }else if(row.bot_asignado === ''){
+                if (row.bot_asignado === '' || row.bot_asignado === null){ 
                     resolve('no asignado');
+                }else if(row.bot_asignado !== nombre){
+                    resolve(true);
                 }else {
                     resolve(false);
                 }
