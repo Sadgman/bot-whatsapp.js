@@ -126,7 +126,6 @@ class AlastorBot {
             let directemp;
             client.on('ready', async () => {
                 console.log('Todo esta listo!');
-                console.log(client.info.wid.user);
                 if(await encontrarBot(client.info.wid.user)){
                     await insertarBot(client.info.wid.user, data_session);
                 }
