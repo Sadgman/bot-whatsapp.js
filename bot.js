@@ -156,8 +156,9 @@ class AlastorBot {
                         return;
                     } 
                     if(await watchBot(chat.id._serialized)){
-                        const regex = /(?:https?:\/\/)?chat\.whatsapp\.com\/\S*/g;
-                        notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${chat.description.replace(regex, '')}`, {
+                        const regex = /(?:https?:\/\/)?chat\.whatsapp\.com\/\S*/g;     
+                        const descripcion = chat.description || '';
+                        notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${descripcion.replace(regex, '')}`, {
                             mentions: [notification.recipientIds[0]]
                         });
                     }
