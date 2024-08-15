@@ -45,7 +45,11 @@ async function update_info_player(player, type, value, rem) {
                     return;
                 }
                 let player = rows[0];
-                rem ? player[type] = value : player[type].push(value);
+                if (Array.isArray(player[type])) {
+                    rem ? player[type] = value : player[type].push(value);
+                } else {
+                    player[type] = value;
+                }
 
                 const query = `UPDATE players SET ${type} = ? WHERE id = ?`;
                 db.run(query, [player[type], player.id], (err) => {
@@ -57,7 +61,7 @@ async function update_info_player(player, type, value, rem) {
                 });
             });
         });
-    });
+    })
 }
 
 async function jsonread(player) {

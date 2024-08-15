@@ -1,18 +1,4 @@
 {
-  "players": [
-    {
-      "id": "Jugador-prueba",
-      "casado": "nadie :(",
-      "dias": 0,
-      "nivel": 0,
-      "ganadas": 0,
-      "dinero": 0,
-      "mensajes": 0,
-      "banco": 0,
-      "roles": "vagabundo",
-      "objetos": []
-    }
-  ],
   "animes": {
     "names": [
       "Fullmetal Alchemist: Brotherhood",
@@ -75,25 +61,5 @@
       "Attack on Titan (Shingeki no Kyojin)",
       "Demon Slayer: Kimetsu no Yaiba"
     ]
-  },
-  "grouplist": [
-    {
-      "id": "grupo-prueba@g.us",
-      "bot_admin": false,
-      "bot_activado": true,
-      "index_p": 0,
-      "title_quest": "",
-      "activate_quest": false,
-      "correctAnswer": 0,
-      "juegos": [
-        {
-          "todos": false,
-          "baneados": [
-            "admins",
-            "menciones"
-          ]
-        }
-      ]
-    }
-  ]
+  }
 }
