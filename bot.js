@@ -975,14 +975,14 @@ class AlastorBot {
                             const suma_dealer = sumar_cartas_dealer(jugador);
                             if(suma_jugador > 21 && suma_dealer > 21){
                                 return 'empate';
-                            }else if(suma_dealer > 21){
-                                return 'jugador';
                             }else if(suma_jugador > 21){
                                 return 'dealer';
-                            }else if(suma_jugador > suma_dealer){
+                            }else if(suma_dealer > 21){
                                 return 'jugador';
                             }else if(suma_jugador < suma_dealer){
                                 return 'dealer';
+                            }else if(suma_jugador > suma_dealer){
+                                return 'jugador';
                             }
                             return 'empate';
                         }
@@ -1396,7 +1396,7 @@ class AlastorBot {
                                     update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
                                     message.reply(`Has transferido ${n.pushname} a ${id}`);
                                 } else {
-                                    message.reply('No tienes suficiente dinero en el banco');
+                                    message.reply('No tienes suficiente dinero en e                                    echo "pm2 restart 0" | at 2:00 AMl banco');
                                 }
                             }
                         
