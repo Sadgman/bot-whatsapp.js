@@ -1389,11 +1389,12 @@ class AlastorBot {
                             let id = parts[3];
                             id = id.replace('@', '');
                             let tres = await getAllInfoPlayer(id); 
+                            const n = await client.getContactById(id + '@c.us');
                             if (!isNaN(cantidad)) {
                                 if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
                                     update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
                                     update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
-                                    message.reply(`Has transferido ${cantidad} a ${id}`);
+                                    message.reply(`Has transferido ${n.pushname} a ${id}`);
                                 } else {
                                     message.reply('No tienes suficiente dinero en el banco');
                                 }
