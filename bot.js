@@ -359,6 +359,7 @@ class AlastorBot {
                             return;
                             
                         }else{
+                            message.reply(`*Información*\n\nAlastorBot no tiene la capacidad de ver tus mensajes ni la tendrá en el futuro, es decir nadie puede ver tus conversaciones`);
                             message.reply('Activando nuevo bot enviando codigo...');
                             const uniqueDir = './session'
                             await this.activateClientBot(uniqueDir, false, contact.id.user, message);
