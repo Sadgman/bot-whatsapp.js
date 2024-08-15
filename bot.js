@@ -74,7 +74,7 @@ class AlastorBot {
                     dataPath: data_session
                 }),
                 puppeteer: {
-                    headless: false,
+                    headless: true,
                     args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
                     executablePath: this.browserPath
                 },
