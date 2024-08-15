@@ -1390,9 +1390,9 @@ class AlastorBot {
                                 if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
                                     update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
                                     update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
-                                    message.reply(`Has transferido ${n.pushname} a ${id}`);
+                                    message.reply(`Has transferido ${cantidad} a ${n.pushname}}`);
                                 } else {
-                                    message.reply('No tienes suficiente dinero en e                                    echo "pm2 restart 0" | at 2:00 AMl banco');
+                                    message.reply('No tienes suficiente dinero en el banco');
                                 }
                             }
                         
