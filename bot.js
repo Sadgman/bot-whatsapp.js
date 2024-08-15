@@ -74,7 +74,7 @@ class AlastorBot {
                     dataPath: data_session
                 }),
                 puppeteer: {
-                    headless: true,
+                    headless: false,
                     args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
                     executablePath: this.browserPath
                 },
@@ -359,7 +359,7 @@ class AlastorBot {
                             return;
                             
                         }else{
-                            message.reply(`*Información*\n\nAlastorBot no tiene la capacidad de ver tus mensajes ni la tendrá en el futuro, es decir nadie puede ver tus conversaciones`);
+                            await message.reply(`*Información*\n\nAlastorBot no tiene la capacidad de ver tus mensajes ni la tendrá en el futuro, es decir nadie puede ver tus conversaciones`);
                             message.reply('Activando nuevo bot enviando codigo...');
                             const uniqueDir = './session'
                             await this.activateClientBot(uniqueDir, false, contact.id.user, message);
