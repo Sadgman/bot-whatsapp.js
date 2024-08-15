@@ -975,13 +975,9 @@ class AlastorBot {
                             const suma_dealer = sumar_cartas_dealer(jugador);
                             if(suma_jugador > 21 && suma_dealer > 21){
                                 return 'empate';
-                            }else if(suma_jugador > 21){
+                            }else if(suma_jugador > 21 || suma_jugador < suma_dealer){
                                 return 'dealer';
-                            }else if(suma_dealer > 21){
-                                return 'jugador';
-                            }else if(suma_jugador < suma_dealer){
-                                return 'dealer';
-                            }else if(suma_jugador > suma_dealer){
+                            }else if(suma_dealer > 21 || suma_jugador > suma_dealer){
                                 return 'jugador';
                             }
                             return 'empate';
