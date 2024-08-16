@@ -975,13 +975,15 @@ class AlastorBot {
                             const suma_jugador = sumar_cartas_jugador(jugador);
                             const suma_dealer = sumar_cartas_dealer(jugador);
                             if(suma_jugador > 21 && suma_dealer > 21){
-                                return 'empate';
-                            }else if(suma_jugador > 21 || suma_jugador < suma_dealer){
                                 return 'dealer';
-                            }else if(suma_dealer > 21 || suma_jugador > suma_dealer){
+                            }else if(suma_jugador > 21){
+                                return 'dealer';
+                            }else if(suma_dealer > 21){
                                 return 'jugador';
+                            }else if(suma_jugador === suma_dealer){
+                                return 'empate';
                             }
-                            return 'empate';
+                            return suma_jugador > suma_dealer ? 'jugador' : 'dealer';
                         }
                         if(opcion[1] === 'apostar'){
                             if(!cartas_jugador[contact.id.user]){
@@ -1391,7 +1393,7 @@ class AlastorBot {
                                 if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
                                     update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
                                     update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
-                                    message.reply(`Has transferido ${cantidad} a ${n.pushname}}`);
+                                    message.reply(`Has transferido ${cantidad} a ${n.pushname}`);
                                 } else {
                                     message.reply('No tienes suficiente dinero en el banco');
                                 }
