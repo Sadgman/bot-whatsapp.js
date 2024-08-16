@@ -1448,16 +1448,16 @@ class AlastorBot {
                             "cocinero": 10000,
                             "escritor":50000,
                             "ama": 0,
-                            "stripper": 60,
-                            "bailarin": 50,
+                            "stripper": 600,
+                            "bailarin": 500,
                             "ladron": 0,
-                            "narco": 1000,
+                            "narco": 1000000,
                             "policia": 3000,
                             "detective": 5000,
                             "doctor general": 5000,
                             "cirujano": 100000,
                             "cirujano plastico": 200000,
-                            "enfermera": 40000,
+                            "enfermera": 40000
                         },
                         "Animales":{
                             "pollo": 10
@@ -1498,28 +1498,22 @@ class AlastorBot {
                     articulo = quitar_acentos(articulo.toLocaleLowerCase());
                     let articulos = {
                         "roles": {
-                            "panadero": 200,    
-                            "cocinero": 1000,
-                            "escritor":50,
-                            "abogado": 10000,
-                            "banquero": 10000,
+                            "panadero": 30000,    
+                            "cocinero": 10000,
+                            "escritor":50000,
                             "ama": 0,
-                            "carpintero": 500,
-                            "tik toker": 100,
-                            "stripper": 60,
-                            "bailarin": 50,
+                            "stripper": 600,
+                            "bailarin": 500,
                             "ladron": 0,
-                            "sicario": 500,
-                            "narco": 1000,
+                            "narco": 1000000,
                             "policia": 3000,
                             "detective": 5000,
                             "doctor general": 5000,
                             "cirujano": 100000,
                             "cirujano plastico": 200000,
-                            "enfermera": 2000,
+                            "enfermera": 40000
                         },
                         "Animales":{
-                            "baba": 5,
                             "pollo": 10,
                         },
                         "objetos":{
@@ -1533,7 +1527,6 @@ class AlastorBot {
                             "rifle": 1000,
                             "lapiz": 5,
                             "papel": 2,
-
                         }
                     }
                     if (viewPlayer.Dinero >= 0 && viewPlayer.Nivel > 1) {
