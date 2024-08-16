@@ -22,7 +22,7 @@ const quest = require('preguntas');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, removerAsignacionBot, esBotAsignado, verAsignadoBot} = require('./utils/groupTools.js');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
-const { insertarBot, encontrarBot, cantidadBots, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot } = require('./utils/bots.js');
+const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
 const { path } = require('@ffmpeg-installer/ffmpeg');
 
@@ -1442,30 +1442,24 @@ class AlastorBot {
                     }
                 }
                 if (message.body.toLocaleLowerCase() === 'tienda') {
-                /*  let articulos = {
+                 let articulos = {
                         "roles": {
-                            "panadero": 200,    
-                            "cocinero": 1000,
-                            "escritor":50,
-                            "abogado": 10000,
-                            "banquero": 10000,
+                            "panadero": 30000,    
+                            "cocinero": 10000,
+                            "escritor":50000,
                             "ama": 0,
-                            "carpintero": 500,
-                            "tik toker": 100,
                             "stripper": 60,
                             "bailarin": 50,
                             "ladron": 0,
-                            "sicario": 500,
                             "narco": 1000,
                             "policia": 3000,
                             "detective": 5000,
                             "doctor general": 5000,
                             "cirujano": 100000,
                             "cirujano plastico": 200000,
-                            "enfermera": 2000,
+                            "enfermera": 40000,
                         },
                         "Animales":{
-                            "baba": 5,
                             "pollo": 10
                         },
                         "objetos":{
@@ -1492,18 +1486,13 @@ class AlastorBot {
                             mensaje1 += "\n\n*Hospital*\n\n";
                         }
                     }
-                    mensaje1 += "\n\n*Pokemos*\n\n";
-                    for (let animal in articulos.Animales) {
-                        mensaje1 += `${animal}: ${articulos.Animales[animal]} monedas\n`;
-                    }
                     mensaje1 += "\n\n*Objetos:*\n\n";
                     for (let objeto in articulos.objetos) {
                         mensaje1 += `${objeto}: ${articulos.objetos[objeto]} monedas\n`;
                     }
-                    message.reply(mensaje1); */
-                    message.reply('la tienda estara disponible pronto')
+                    message.reply(mensaje1);
                 }
-                /* if (message.body.toLocaleLowerCase().startsWith('comprar ')) {
+                if (message.body.toLocaleLowerCase().startsWith('comprar ')) {
                     let parts = message.body.split(' ');
                     let articulo = parts[1];
                     articulo = quitar_acentos(articulo.toLocaleLowerCase());
@@ -1547,36 +1536,26 @@ class AlastorBot {
 
                         }
                     }
-                    if (viewPlayer.Dinero >= 0 && viewPlayer.Nivel > 1){
-                        if(articulo in articulos.roles){
-                            for (let rol in articulos.roles) {
-                                if (articulo === rol) {
-                                    if (viewPlayer.Rool !== rol){
-                                        if(viewPlayer.Dinero >= articulos.roles[rol]){
-                                            const casado = getAllInfoPlayer(viewPlayer.casado);
-                                            if(rol === "ama" && !casado.Rool === "ama" && !casado.Rool === "vagabundo"){
-                                                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - articulos.roles[rol], true);
-                                                update_info_player(contact.id.user, "Rool", rol, true);
-                                                message.reply('Has comprado el articulo');
-                                            }else{
-                                                update_info_player(contact.id.user, "dinero", viewPlayer.Dinero - articulos.roles[rol], true);
-                                                update_info_player(contact.id.user, "Rool", rol, true);
-                                                message.reply('Has comprado el articulo');
-                                            }
-                                        }else{
-                                            message.reply('No tienes suficiente dinero');
-                                        }
-                                    } else {
-                                        message.reply('Ya tienes ese articulo');
-                                        break;
-                                    }
+                    if (viewPlayer.Dinero >= 0 && viewPlayer.Nivel > 1) {
+                        if (articulo in articulos.roles) {
+                            const rol = articulos.roles[articulo];
+                            if (viewPlayer.Rool !== articulo) {
+                                if (viewPlayer.Dinero >= rol) {
+                                    await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - rol, true);
+                                    await update_info_player(contact.id.user, "Rool", articulo, true);
+                                    message.reply('Has comprado el articulo');
+                                } else {
+                                    message.reply('No tienes suficiente dinero');
                                 }
+                            } else {
+                                message.reply('Ya tienes ese articulo');
                             }
                         }
                     } else {
                         message.reply('> No tienes suficiente dinero \n> O\n> Necesitas al menos el nivel 2');
                     }
                 }
+                
                 //-------------------------------------------------------------------------------------------------
                 if(message.body.toLocaleLowerCase().startsWith('!sex') || message.body.toLocaleLowerCase().startsWith('!sexo')){
                     let parts = message.body.split(' ');
@@ -1585,8 +1564,8 @@ class AlastorBot {
                         let pareja2 = parts[2];
                         pareja1 = pareja1.replace('@', '');
                         pareja2 = pareja2.replace('@', '');
-                        const pareja1_info = getAllInfoPlayer(pareja1); 
-                        const pareja2_info = getAllInfoPlayer(pareja2);
+                        const pareja1_info = await getAllInfoPlayer(pareja1); 
+                        const pareja2_info = await getAllInfoPlayer(pareja2);
                         if(!isNaN(pareja1) && !isNaN(pareja2)){
                             if(pareja1 === pareja2){
                                 message.reply('No puedes tener sexo contigo mismo');
@@ -1611,7 +1590,7 @@ class AlastorBot {
                         message.reply('El comando es:\nsexo @numero1 @numero2');
                     }
 
-                }   */
+                }  
                 if (message.body.toLocaleLowerCase() == 'sf') {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
@@ -1676,14 +1655,6 @@ class AlastorBot {
                             participantes(contact.id.user) ? quotedMsg.delete(true) : message.reply('No puedes borrar mensajes de otros si no eres admin.');
                         }
                     }
-                }
-                if(message.body.toLocaleLowerCase() === 'pokemons'){
-                    let pokemons = getAllAnimals(contact.id.user);
-                    let mensaje = "*Tus pokemons son:*\n\n";
-                    for(let pokemon of pokemons){
-                        mensaje += `${pokemon.nombre}\n`;
-                    }
-                    message.reply(mensaje);
                 }
                 function descargarM(stream, url) {
                     return new Promise(async (resolve, reject) => {
@@ -2124,25 +2095,23 @@ class AlastorBot {
                     Donar Ahora 💖 https://www.patreon.com/alastor782/membership
                     `);
                 }
-                if (message.body.toLocaleLowerCase() === 'creador' || message.body.toLocaleLowerCase() === 'como se crea un bot') {
+                if (message.body.toLocaleLowerCase() === 'creador') {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     message.reply(`                 
-                        *INFORMACIÓN*
-                    *SOBRE EL CREADOR*
-                        *DEL BOT 𖠌*
+                            *INFORMACIÓN*
+                         *SOBRE EL CREADOR*
+                            *DEL BOT 𖠌*
 
-                ¡Hola! ◡̈
-                Puedes comunicarte con mi creador desde este link:
-                
-                wa.me/${Alastor_Number[2]}
-                
-                𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
-                Aquí puedes Contactar con el diseñador del menu:
+                    ¡Hola! ◡̈
+                    Puedes comunicarte con mi creador desde este link:
+                    
+                    wa.me/${Alastor_Number[2]}
+                    
+                    𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
+                    Aquí puedes Contactar con el diseñador del menu:
 
-                wa.me/5144637126`
-                
-                    );
+                    wa.me/5144637126`);
                 } 
             };
 
