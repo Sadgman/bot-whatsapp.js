@@ -990,6 +990,10 @@ class AlastorBot {
                                 let cantidad = opcion[2];
                                 cantidad = parseInt(cantidad);
                                 if(cantidad > 0){
+                                    if(cantidad > 1000){
+                                        console.log('Solo se puede apostar un maximo de 100');
+                                        return;
+                                    }
                                     if(viewPlayer.Dinero >= cantidad){
                                         dinero_bj[contact.id.user] = cantidad;
                                         await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
