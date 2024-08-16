@@ -552,14 +552,14 @@ class AlastorBot {
                     await chat.sendStateTyping();
                     if (chat.isGroup) {
                         if (await watchBan(chat.id._serialized, 'todo') === false) {
-                            tempMenu = tempMenu.replace('🎮 — jugar.\n', '');
+                            tempMenu = tempMenu.replace('🎮 👾🎧| Jugar.\n', '');
                             message.reply(tempMenu);
                         } else {
                             message.reply(tempMenu);
                         }
                     } else {
-                        tempMenu = tempMenu.replace('📝 — ajustes(as).\n', '');
-                        tempMenu = tempMenu.replace('👨‍👩‍👧‍👦🏡💞 | !t (Only Admins).', '');
+                        tempMenu = tempMenu.replace('📝⚙️🪛 | As (Ajustes)\n', '');
+                        tempMenu = tempMenu.replace('👨‍👩‍👧‍👦🏡💞 | !t (Solo Admins).\n', '');
                         message.reply(tempMenu);
                     }
                 }
