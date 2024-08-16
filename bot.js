@@ -991,7 +991,7 @@ class AlastorBot {
                                 cantidad = parseInt(cantidad);
                                 if(cantidad > 0){
                                     if(cantidad > 1000){
-                                        console.log('Solo se puede apostar un maximo de 100');
+                                        message.reply('No puedes apostar mas de 1000');
                                         return;
                                     }
                                     if(viewPlayer.Dinero >= cantidad){
@@ -1819,19 +1819,26 @@ class AlastorBot {
                 }
                 async function descargarVideoIG(url, mensaje_error, ruta) {
                     try {
-                        const dataList = await instagramDl(url);
-                        const response = await fetch(dataList[0].download_link);
+                        const dataList = await instagramDl(String(url));
+                        if (!dataList || dataList.length === 0) {
+                            throw new Error('No se encontraron datos en la respuesta de instagramDl');
+                        }
+                
+                        const downloadLink = dataList[0].download_link;
+                        if (!downloadLink) {
+                            throw new Error('El enlace de descarga no está disponible');
+                        }
+                
+                        const response = await fetch(downloadLink);
                         if (response.ok) {
                             const buffer = await response.buffer();
                             fs.writeFile(ruta, buffer, () => {
-                                const file = fs.readFileSync(ruta);
-                                const media = new MessageMedia('video/mp4', file.toString('base64'), 'video');
+                                const media = new MessageMedia('video/mp4', buffer.toString('base64'), 'video');
                                 chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                                 counterListRequestVideo = 0;
                             });
                         } else {
-                            counterListRequestVideo = 0;
-                            message.reply(mensaje_error);
+                            throw new Error('Error al descargar el video');
                         }
                     } catch (err) {
                         console.error(err);
