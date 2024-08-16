@@ -74,7 +74,7 @@ class AlastorBot {
                     dataPath: data_session
                 }),
                 puppeteer: {
-                    headless: true,
+                    headless: false,
                     args: ['-no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
                     executablePath: this.browserPath
                 },
@@ -676,11 +676,10 @@ class AlastorBot {
                     }
                 }
                 // Skills de Roles
-                if (message.body.toLocaleLowerCase().startsWith("robar ") && message.hasQuotedMsg && viewPlayer.Rool === "ladron"){
+                if (message.body.toLocaleLowerCase() === "robar" && message.hasQuotedMsg && viewPlayer.Rool == 'ladron'){
                     const quotedMsg = await message.getQuotedMessage();
                     let contacto = await quotedMsg.getContact();
                     let infoContacto = await getAllInfoPlayer(contacto.id.user);
-    
                     if (infoContacto.Dinero > 0) {
                         await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + infoContacto.Dinero, true);
                         await update_info_player(contacto.id.user, "Dinero", 0, true);
@@ -1524,6 +1523,7 @@ class AlastorBot {
                         if (articulo in articulos.roles) {
                             const rol = articulos.roles[articulo];
                             if (viewPlayer.Rool !== articulo) {
+                                if(articulo === 'ama') return;
                                 if (viewPlayer.Dinero >= rol) {
                                     await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - rol, true);
                                     await update_info_player(contact.id.user, "Rool", articulo, true);
