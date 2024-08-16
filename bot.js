@@ -331,7 +331,7 @@ class AlastorBot {
                 if (chat.isGroup && message.body.toLocaleLowerCase() === 'ab' && participantes(contact.id.user)) {
                     bot_off_on(chat.id._serialized, true);
                     const watch = await watchBot(chat.id._serialized);
-                    message.reply(`El bot ha sido ${watch ? 'desactivado' : 'activado'}`);
+                    message.reply(`El bot ha sido ${watch ? 'activado' : 'desactivado'}`);
                 }
                 if (chat.isGroup && !(await watchBot(chat.id._serialized))) {
                     return;
