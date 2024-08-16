@@ -374,7 +374,7 @@ class AlastorBot {
                     // Verifico si el bot es admin y si el que añade es admin 
                     if ((chat.isGroup && participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && participantes(numero_cliente)) {
                         let parte = message.body.split(" ");
-                        if(parts.length > 2){
+                        if(parte.length > 2){
                             return
                         }
                         parte = parte[1];
