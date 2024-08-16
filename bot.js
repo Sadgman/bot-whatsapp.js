@@ -677,25 +677,16 @@ class AlastorBot {
                 }
                 // Skills de Roles
                 if (message.body.toLocaleLowerCase().startsWith("robar ") && message.hasQuotedMsg && viewPlayer.Rool === "ladron"){
-                    let futuro = ["lograste robar", "te atraparon"];
-                    let randomIndex = Math.floor(Math.random() * futuro.length);
                     const quotedMsg = await message.getQuotedMessage();
                     let contacto = await quotedMsg.getContact();
                     let infoContacto = await getAllInfoPlayer(contacto.id.user);
-
-                    if (futuro[randomIndex] === "lograste robar") {
-                        if (infoContacto.dinero > 0) {
-                            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + infoContacto.dinero, true);
-                            update_info_player(contacto.id.user, "Dinero", 0, true); // El contacto se queda sin dinero
-                            message.reply(futuro[randomIndex]);
-                        } else {
-                            message.reply("No hay nada que robar");
-                        }
-                    }else if (futuro[randomIndex] === "te atraparon") {
-                        update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - 1, true);
-                        update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
-                        
-                        message.reply(futuro[randomIndex]);
+    
+                    if (infoContacto.Dinero > 0) {
+                        await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + infoContacto.Dinero, true);
+                        await update_info_player(contacto.id.user, "Dinero", 0, true);
+                        message.reply('lograste robarle todo el dinero a ' + contacto.pushname);
+                    } else {
+                        message.reply("No hay nada que robar");
                     }
                 }
                 if(viewPlayer.Rool === "ama"){
