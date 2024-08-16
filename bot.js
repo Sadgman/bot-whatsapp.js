@@ -898,7 +898,7 @@ class AlastorBot {
                         const cartas_palos = ['♠️', '♣️', '♥️', '♦️', '♥️', '♥️', '♥️'];
                         // cartas especiales tiene un valor de 10
                         const cartas_especiales = ['J', 'Q', 'K', 'A'];
-                        const cartas_completas = cartas.concat(cartas_especiales, cartas_palos);
+                        const cartas_completas = cartas.concat(cartas_especiales, cartas_especiales);
                         const opcion = message.body.toLocaleLowerCase().split(" ");
                         const sumar_cartas_dealer = (jugador) => {
                             let suma = 0;
