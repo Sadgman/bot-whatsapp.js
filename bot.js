@@ -281,7 +281,7 @@ class AlastorBot {
                     }
                     return palabra;
                 }
-                const ContadorDeUnDia = (player) => {
+                const ContadorDeUnDia = (player, time) => {
                     if(contadordia[player]){
                         return;
                     }
@@ -289,7 +289,7 @@ class AlastorBot {
                     contadordia[player] = {
                         timeout: setTimeout(() => {
                             delete contadordia[player];
-                        }, 60000),
+                        }, time? time : 60000),
                         startTime: startTime,
                         totalDuration: 60000
                     };
@@ -329,7 +329,7 @@ class AlastorBot {
                     return participant.isAdmin || Alastor_Number.includes(userId);
                 }
                 if (chat.isGroup && message.body.toLocaleLowerCase() === 'ab' && participantes(contact.id.user)) {
-                    bot_off_on(chat.id._serialized, true);
+                    await bot_off_on(chat.id._serialized, true);
                     const watch = await watchBot(chat.id._serialized);
                     message.reply(`El bot ha sido ${watch ? 'activado' : 'desactivado'}`);
                 }
@@ -362,6 +362,7 @@ class AlastorBot {
                             await message.reply(`*Información*\n\nAlastorBot no tiene la capacidad de ver tus mensajes ni la tendrá en el futuro, es decir nadie puede ver tus conversaciones`);
                             message.reply('Activando nuevo bot enviando codigo...');
                             const uniqueDir = './session'
+                            ContadorDeUnDia(contact.id.user + '!otro', 180000);
                             await this.activateClientBot(uniqueDir, false, contact.id.user, message);
                             message.reply('Usted se convirtio en un bot');
                         }
@@ -635,7 +636,6 @@ class AlastorBot {
                                 return;
                         }
                         message.reply(`${dado} El resultado es: ${ganador}`);
-                        ContadorDeUnDia(contact.id.user + 'dado');
                     }
                 }
                 if(message.body.toLocaleLowerCase().startsWith('pp ')){
