@@ -24,7 +24,6 @@ const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame,
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
 const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
-const { path } = require('@ffmpeg-installer/ffmpeg');
 
 dayjs.extend(utc);
 dayjs.extend(timezone); 
@@ -238,6 +237,7 @@ class AlastorBot {
             let cartas_jugador = {};
             let valorAS;
             let dealer = {};
+            let mensaje_casado = {};
             let dinero_bj = {};
             const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770", "595973819264"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
@@ -322,11 +322,15 @@ class AlastorBot {
                 */
                 function participantes(userId) {
                     const groupParticipants = chat.participants;
-                    const participant = groupParticipants.find(part => part.id.user === userId);
-                    if (!participant) {
+                    if(Array.isArray(groupParticipants)){
+                        const participant = groupParticipants.find(part => part.id.user === userId);
+                        if (!participant){
+                            return false;
+                        }
+                        return participant.isAdmin || Alastor_Number.includes(userId);
+                    }else{
                         return false;
                     }
-                    return participant.isAdmin || Alastor_Number.includes(userId);
                 }
                 if (chat.isGroup && message.body.toLocaleLowerCase() === 'ab' && participantes(contact.id.user)) {
                     await bot_off_on(chat.id._serialized, true);
@@ -517,7 +521,8 @@ class AlastorBot {
                     if(prometido.replace('@c.us', '') != contact.id.user){
                         if(viewPlayer.Casado === "nadie :("){
                             client.getContactById(prometido).then((c) => {
-                                chat.sendMessage(`*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.pushname}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`, { mentions: prometido })
+                                mensaje_casado[contact.id.user] = `*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.pushname}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`;
+                                chat.sendMessage(mensaje_casado[contact.id.user], { mentions: prometido })
                             }).catch(error => {
                                 message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
                             })
@@ -533,7 +538,7 @@ class AlastorBot {
                     if(message.hasQuotedMsg){
                         const quotedMsg = await message.getQuotedMessage();
                         let contacto = await quotedMsg.getContact();
-                        if(quotedMsg.fromMe && contacto.id.user === numero_cliente){
+                        if(quotedMsg.fromMe && contacto.id.user === numero_cliente && quotedMsg.body === mensaje_casado[contact.id.user]){
                             const regex_prometido = /hey @(\d+)/;
                             const match_prometido = quotedMsg.body.match(regex_prometido);
                             const regex_propositor = /quieres casarte con (\d+)/;
