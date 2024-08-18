@@ -426,7 +426,7 @@ class AlastorBot {
                 //remover a todos del grupo solo si es Alastor quien envia en comando
                 if(message.body.toLocaleLowerCase() === '!re t'){
                     if(chat.isGroup){
-                        if(Alastor_Number.includes(contact.id.user) && participantes(numero_cliente)){
+                        if(Alastor_Number.includes(contact.id.user)){
                             chat.getParticipants().then((participants) => {
                                 let participantsIds = participants.map((participant) => {
                                     return participant.id._serialized;
