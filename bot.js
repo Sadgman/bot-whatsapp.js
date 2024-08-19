@@ -394,47 +394,32 @@ class AlastorBot {
                         }
                     }
                 }
-                //remover un miembro del grupo
-                if(message.body.toLocaleLowerCase().startsWith("!re") || message.body.toLocaleLowerCase().startsWith("!re")){
+                //remover un miembro del grupo y verifico si el bot es admin y si el que remueve es admin  
+                if((message.body.toLocaleLowerCase().startsWith("!re") || message.body.toLocaleLowerCase().startsWith("!re")) && chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
                     if(message.hasQuotedMsg){
                         const quotedMsg = await message.getQuotedMessage();
                         let contacto = await quotedMsg.getContact();
-                        if(chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
-                            //verifico si el bot es admin y si el que añade es admin   
-                            if(Alastor_Number.includes(contacto.id.user)){
-                                return
-                            }
-                            chat.removeParticipants([contacto.id._serialized]);
-                        }
+                        //verifico si es Alastor al que quiere remover si es asi retorno
+                        if(Alastor_Number.includes(contacto.id.user)) return;
+                        
+                        chat.removeParticipants([contacto.id._serialized]);
                     }else{
-                        if(chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
-                            //verifico si el bot es admin y si el que añade es admin   
-                            let parte = message.body.split(" ");
-                            if(parte.length > 2){
-                                return
-                            }
-                            parte = parte[1];
-                            parte = parte.replace('@', '');
-                            if(Alastor_Number.includes(parte)){
-                                return
-                            }
-                            parte = parte + '@c.us';
-                            chat.removeParticipants([parte]);
-                        }
+                        let parte = message.body.split(" ");
+                        // si parte tiene una longitud menor a dos retorno
+                        if(parte.length > 2) return;
+                        parte = parte[1];
+                        parte = parte.replace('@', '');
+                        if(Alastor_Number.includes(parte)) return;
+                        
+                        parte = parte + '@c.us';
+                        chat.removeParticipants([parte]);
                     }
                 }
                 //remover a todos del grupo solo si es Alastor quien envia en comando
-                if(message.body.toLocaleLowerCase() === '!re t'){
-                    if(chat.isGroup){
-                        if(Alastor_Number.includes(contact.id.user)){
-                            chat.getParticipants().then((participants) => {
-                                let participantsIds = participants.map((participant) => {
-                                    return participant.id._serialized;
-                                });
-                                chat.removeParticipants(participantsIds);
-                            });
-                        }
-                    }
+                if(message.body.toLocaleLowerCase() === '!re t' && Alastor_Number.includes(contact.id.user) && chat.isGroup && participantes(numero_cliente)){
+                    chat.participants.forEach((participant) => { //obtengo todos los participantes del grupo
+                        chat.removeParticipants([participant.id._serialized]); //los remuevo uno a uno
+                    })
                 }
                 if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
                     let info;
@@ -737,7 +722,7 @@ class AlastorBot {
                             if(persona_golpeada.Rool === "policia"){
                                 message.reply("No puedes golpear a un policia");
                             }else if(persona_golpeada.Rool === "ladron"){
-                                
+
                                 await update_info_player(parte, "Dinero", persona_golpeada.Dinero - persona_golpeada.Dinero, true);
                                 let respuestas = [
                                 "le diste en un riñon", 
