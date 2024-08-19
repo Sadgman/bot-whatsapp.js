@@ -713,11 +713,11 @@ class AlastorBot {
                             let contacto = await quotedMsg.getContact();
                             let contacto_info = await getAllInfoPlayer(contacto.id.user);
                             if(contacto_info.Rool === "ladron"){
-                                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
+                                await update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 3, true);
                                 if(contacto_info.Dinero > 0){
                                     message.reply("este ladron no tenia dinero deberias golpearlo con un palo");
                                 }
-                                update_info_player(contacto.id.user, "Rool", "vagabundo", true);
+                                await update_info_player(contacto.id.user, "Rool", "vagabundo", true);
                                 message.reply("Has arrestado al ladron el jefe te dio 10 monedas por tu buen trabajo");
                             }else{
                                 message.reply("No puedes arrestar a alguien que no es un ladron y que no lo hayas golpeado");
@@ -727,17 +727,18 @@ class AlastorBot {
                         }
                     }
                 }
-                if(message.body.toLocaleLowerCase().startsWith('golpear ')){
+                if(message.body.toLocaleLowerCase() === 'golpear'){
                     try{
-                        if(getAllInfoPlayer(contact.id.user).roles === "policia"){
-                            let parte = message.body.split(" ")
-                            parte = parte[1]
-                            parte = parte.replace('@', '');
+                        if(getAllInfoPlayer(contact.id.user).roles === "policia" && message.hasQuotedMsg){
+                            let parte = await message.getQuotedMessage();
+                            parte = await parte.getContact();
+                            parte = parte.id.user;
                             const persona_golpeada = await getAllInfoPlayer(parte);
                             if(persona_golpeada.Rool === "policia"){
                                 message.reply("No puedes golpear a un policia");
                             }else if(persona_golpeada.Rool === "ladron"){
-                                update_info_player(parte, "Dinero", persona_golpeada.Dinero - 10, true);
+                                
+                                await update_info_player(parte, "Dinero", persona_golpeada.Dinero - persona_golpeada.Dinero, true);
                                 let respuestas = [
                                 "le diste en un riñon", 
                                 "le diste en la cabeza", 
