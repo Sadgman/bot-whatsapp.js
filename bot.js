@@ -1152,7 +1152,7 @@ class AlastorBot {
                         part = part.slice(1)
                         await chat.sendSeen();
                         await chat.sendStateTyping();
-                        let d;
+                        let d, media;
                         if (message.hasQuotedMsg) {
                             const mensaje_citado = await message.getQuotedMessage();
                             try {
@@ -1160,7 +1160,6 @@ class AlastorBot {
                             } catch (err) {
                                 message.reply('No pude descargar eso');
                             }
-                            let media;
                             if (mensaje_citado.hasMedia) {
                                 try {
                                     switch (mensaje_citado.type) {
@@ -1178,7 +1177,7 @@ class AlastorBot {
                                     message.reply('No se pudo crear el sticker');
                                 }
                             }
-                        } else if (message.hasMedia === true) {
+                        } else if (message.hasMedia) {
                             try {
                                 d = await message.downloadMedia();
                             } catch (err) {
