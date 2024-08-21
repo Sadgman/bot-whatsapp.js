@@ -873,11 +873,9 @@ class AlastorBot {
                         }
                         //cartas tiene el valor de su numero
                         const cartas =[2,3,4,5,6,7,8,9,10,11,12,13,14];
-                        // cartas_palos no tiene un valor numerico en el juego pero el as de corazones puede valer 1 u 11
-                        const cartas_palos = ['♠️', '♣️', '♥️', '♦️', '♥️', '♥️', '♥️'];
                         // cartas especiales tiene un valor de 10
-                        const cartas_especiales = ['J', 'Q', 'K', 'A'];
-                        const cartas_completas = cartas.concat(cartas_especiales, cartas_palos);
+                        const cartas_especiales = ['J', 'Q', 'K', 'A', 'A'];
+                        const cartas_completas = cartas.concat(cartas_especiales);
                         const opcion = message.body.toLocaleLowerCase().split(" ");
                         const sumar_cartas_dealer = (jugador) => {
                             let suma = 0;
