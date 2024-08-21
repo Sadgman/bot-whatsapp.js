@@ -715,13 +715,13 @@ class AlastorBot {
                         if(viewPlayer.Rool == "policia" && message.hasQuotedMsg){
                             let parte = await message.getQuotedMessage();
                             parte = await parte.getContact();
-                            parte = parte.id.user;
-                            const persona_golpeada = await getAllInfoPlayer(parte);
+                            const parte_id = parte.id.user;
+                            const persona_golpeada = await getAllInfoPlayer(parte_id);
                             if(persona_golpeada.Rool === "policia"){
                                 message.reply("No puedes golpear a un policia");
                             }else if(persona_golpeada.Rool === "ladron"){
-                                await update_info_player(parte, "Dinero", 0, true);
-                                await update_info_player(parte, "Banco", 0, true);
+                                await update_info_player(parte_id, "Dinero", 0, true);
+                                await update_info_player(parte_id, "Banco", 0, true);
                                 let respuestas = [
                                 "le diste en un riñon", 
                                 "le diste en la cabeza", 
@@ -733,7 +733,7 @@ class AlastorBot {
                                 "se orino encima"
                                 ];
                                 let randomIndex = Math.floor(Math.random() * respuestas.length);
-                                message.reply(`Has golpeado a ${parte} ${respuestas[randomIndex]}, ahora arrestalo`);
+                                message.reply(`Has golpeado a ${parte.pushname} ${respuestas[randomIndex]}, ahora arrestalo`);
                                 golpear = true;
                             }
                         }
