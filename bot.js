@@ -714,7 +714,7 @@ class AlastorBot {
                 }
                 if(message.body.toLocaleLowerCase() === 'golpear'){
                     try{
-                        if(getAllInfoPlayer(contact.id.user).roles === "policia" && message.hasQuotedMsg){
+                        if(viewPlayer.Rool == "policia" && message.hasQuotedMsg){
                             let parte = await message.getQuotedMessage();
                             parte = await parte.getContact();
                             parte = parte.id.user;
@@ -722,8 +722,8 @@ class AlastorBot {
                             if(persona_golpeada.Rool === "policia"){
                                 message.reply("No puedes golpear a un policia");
                             }else if(persona_golpeada.Rool === "ladron"){
-
-                                await update_info_player(parte, "Dinero", persona_golpeada.Dinero - persona_golpeada.Dinero, true);
+                                await update_info_player(parte, "Dinero", 0, true);
+                                await update_info_player(parte, "Banco", 0, true);
                                 let respuestas = [
                                 "le diste en un riñon", 
                                 "le diste en la cabeza", 
@@ -971,8 +971,8 @@ class AlastorBot {
                                 let cantidad = opcion[2];
                                 cantidad = parseInt(cantidad);
                                 if(cantidad > 0){
-                                    if(cantidad > 1000){
-                                        message.reply('No puedes apostar mas de 1000');
+                                    if(cantidad > 200){
+                                        message.reply('No puedes apostar mas de 200');
                                         return;
                                     }
                                     if(viewPlayer.Dinero >= cantidad){
@@ -1122,7 +1122,7 @@ class AlastorBot {
                     }
                 }
                 if(message.body.toLocaleLowerCase() === 'prueba'){
-                    const contactf = contact.name;
+                    const contactf = message.mentionedIds
                     const id = client.getNumberId(contact.id.user)
                     const contactfr = await client.getContactById(id);
                     message.reply(contactfr);
