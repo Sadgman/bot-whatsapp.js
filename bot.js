@@ -689,21 +689,19 @@ class AlastorBot {
                     }
                 }
                 if(message.body.toLocaleLowerCase() === 'arrestar'){
-                    console.log(golpear);
                     if(viewPlayer.Rool === "policia" && golpear === true){
-                        console.log("es policia");
                         if(message.hasQuotedMsg){
-                            console.log("tiene mensaje citado");
                             const quotedMsg = await message.getQuotedMessage();
                             let contacto = await quotedMsg.getContact();
                             let contacto_info = await getAllInfoPlayer(contacto.id.user);
                             if(contacto_info.Rool === "ladron"){
                                 await update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 3, true);
+                                await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
                                 if(contacto_info.Dinero > 0){
                                     message.reply("este ladron no tenia dinero deberias golpearlo con un palo");
                                 }
                                 await update_info_player(contacto.id.user, "Rool", "vagabundo", true);
-                                message.reply("Has arrestado al ladron el jefe te dio 10 monedas por tu buen trabajo");
+                                message.reply("Has arrestado al ladron el jefe te dio 10 monedas y 3 puntos por tu buen trabajo");
                             }else{
                                 message.reply("No puedes arrestar a alguien que no es un ladron y que no lo hayas golpeado");
                             }
