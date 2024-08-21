@@ -13,7 +13,7 @@ const { obtenerPais } = require('./utils/prefix.js');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const { Client, LocalAuth, MessageMedia, RemoteAuth } = require('whatsapp-web.js');
-const { constrainedMemory } = require('process');
+const events = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
@@ -30,7 +30,7 @@ dayjs.extend(timezone);
 
 let numCodesSent = 0;
 ffmpeg.setFfmpegPath(ffmpegPath);
-
+events.EventEmitter.defaultMaxListeners = 20;
 
 // Alastor Bot
 // Version 4.0.1
