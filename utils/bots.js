@@ -64,7 +64,13 @@ async function eliminarBot(nombre){
                     reject(err);
                     return;
                 }
-                resolve();
+                db.run(`UPDATE groups SET bot_asignado = '' WHERE bot_asignado = ?`, [nombre], (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve();
+                });
             });
         });
     })
