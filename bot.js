@@ -61,7 +61,6 @@ class AlastorBot {
         }
     }
     async closeBot(){
-        await client.destroy();
         await cerrarBase();
         process.exit();
     }
