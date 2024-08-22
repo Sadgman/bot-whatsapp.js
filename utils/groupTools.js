@@ -304,6 +304,31 @@ async function verAsignadoBot(id_group) {
         });
     });
 }
+/**
+ * @param {string} id_group id del grupo
+ */
+async function toggleWelcome(id_group){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT welcome FROM groups WHERE id = ?`, [id_group], (err, rows) => {
+                if (err) {
+                    console.error(err.message);
+                    reject(err);
+                }
+                let welcome = rows[0].welcome;
+                welcome = !welcome;
+                const query = `UPDATE groups SET welcome = ? WHERE id = ?`;
+                db.run(query, [welcome, id_group], (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        reject(err);
+                    }
+                    resolve(welcome);
+                });
+            });
+        });
+    });
+}
 module.exports = {
     addgroup,
     Bangame,
@@ -315,5 +340,6 @@ module.exports = {
     removerAsignacionBot,
     esBotAsignado,
     verAsignadoBot,
-    bot_off_on
+    bot_off_on,
+    toggleWelcome
 }
