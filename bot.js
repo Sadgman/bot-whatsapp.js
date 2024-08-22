@@ -1270,9 +1270,9 @@ class AlastorBot {
                             .then((base64) => {
                                 const medi = new MessageMedia('audio/mp3', base64.toString('base64'), 'audio');
                                 if (message.hasQuotedMsg) {
-                                    client.sendMessage(message.from, medi, { sendAudioAsVoice: true, quotedMessageId: mensaje_citado.id._serialized });
+                                    chat.sendMessage(medi, { sendAudioAsVoice: true, quotedMessageId: mensaje_citado.id._serialized });
                                 } else {
-                                    client.sendMessage(message.from, medi, { sendAudioAsVoice: true });
+                                    chat.sendMessage(medi, { sendAudioAsVoice: true });
                                 }
                             }).catch((err) => {
                                 message.reply('No pude crear el audio');
