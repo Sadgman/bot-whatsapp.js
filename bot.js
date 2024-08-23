@@ -331,7 +331,7 @@ class AlastorBot {
                         return false;
                     }
                 }
-                if (chat.isGroup && message.body.toLocaleLowerCase().startsWith('ab') && participantes(contact.id.user)) {
+                if (chat.isGroup && message.body.toLocaleLowerCase().startsWith('ab') && (participantes(contact.id.user)) || contact.id.user === numero_cliente) {
                     let partes = message.body.split(' ');
                     if(partes.length > 2){
                         return;
