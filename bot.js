@@ -340,6 +340,7 @@ class AlastorBot {
                         switch (partes) {
                             case 'bienvenida':
                             case 'b':
+                                await toggleWelcome(chat.id._serialized);
                                 const bienvenida = await toggleWelcome(chat.id._serialized, true);
                                 message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                 break;
