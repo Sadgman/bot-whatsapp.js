@@ -520,8 +520,12 @@ class AlastorBot {
                     if(prometido.replace('@c.us', '') != contact.id.user){
                         if(viewPlayer.Casado === "nadie :("){
                             client.getContactById(prometido).then((c) => {
-                                mensaje_casado[prometido.replace('@c.us', '')] = `*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`;
-                                chat.sendMessage(mensaje_casado[prometido.replace('@c.us', '')], { mentions: prometido })
+                                mensaje_casado[prometido.replace('@c.us', '')] = [
+                                    `*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.pushname}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`,
+                                    contact.id.user
+
+                                ]
+                                chat.sendMessage(mensaje_casado[prometido.replace('@c.us', '')][0], { mentions: prometido })
                             }).catch(error => {
                                 message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
                             })
@@ -537,15 +541,9 @@ class AlastorBot {
                     if(message.hasQuotedMsg){
                         const quotedMsg = await message.getQuotedMessage();
                         let contacto = await quotedMsg.getContact();
-                        if(quotedMsg.fromMe && quotedMsg.body === mensaje_casado[contact.id.user]){
-                            const regex_prometido = /hey @(\d+)/;
-                            const match_prometido = quotedMsg.body.match(regex_prometido);
-                            const regex_propositor = /quieres casarte con (\d+)/;
-                            const match_propositor = quotedMsg.body.match(regex_propositor);
-                            if (match_prometido[1] == contact.id.user){
-                                const phoneNumber = match_propositor[1]; 
-                                casarse(phoneNumber);
-                            }
+                        if(quotedMsg.fromMe && quotedMsg.body === mensaje_casado[contact.id.user][0]){
+                            const phoneNumber = mensaje_casado[contact.id.user][1];
+                            casarse(phoneNumber);
                         }
                     }
                 }
