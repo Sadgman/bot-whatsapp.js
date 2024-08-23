@@ -520,7 +520,7 @@ class AlastorBot {
                     if(prometido.replace('@c.us', '') != contact.id.user){
                         if(viewPlayer.Casado === "nadie :("){
                             client.getContactById(prometido).then((c) => {
-                                mensaje_casado[prometido.replace('@c.us', '')] = `*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.pushname}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`;
+                                mensaje_casado[prometido.replace('@c.us', '')] = `*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.id.user}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`;
                                 chat.sendMessage(mensaje_casado[prometido.replace('@c.us', '')], { mentions: prometido })
                             }).catch(error => {
                                 message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
@@ -532,12 +532,6 @@ class AlastorBot {
                         message.reply("Eres imbécil o que, no puedes casarte contigo mismo")
                     }
                 }
-                // creo una funcion de flecha para encontrar el numero de la persona en el grupo por su nombre publico en whatsapp pushname
-                const findContact = async (name) => {
-                    const participants = await chat.participants;
-                    const contact = participants.find(participant => participant.pushname === name);
-                    return contact;
-                }
                 
                 if(message.body.toLocaleLowerCase() === 'si' || message.body.toLocaleLowerCase() === 'sí'){
                     if(message.hasQuotedMsg){
@@ -546,14 +540,10 @@ class AlastorBot {
                         if(quotedMsg.fromMe && quotedMsg.body === mensaje_casado[contact.id.user]){
                             const regex_prometido = /hey @(\d+)/;
                             const match_prometido = quotedMsg.body.match(regex_prometido);
-                            const regex_propositor = /quieres casarte con ([a-zA-Z]+)\?/;
+                            const regex_propositor = /quieres casarte con (\d+)/;
                             const match_propositor = quotedMsg.body.match(regex_propositor);
                             if (match_prometido[1] == contact.id.user){
-                                const nombre_propositor = match_propositor[1]; 
-                                console.log(nombre_propositor);
-                                let phoneNumber = await findContact(nombre_propositor);
-                                phoneNumber = phoneNumber.id.user;
-                                console.log(phoneNumber);
+                                const phoneNumber = match_propositor[1]; 
                                 casarse(phoneNumber);
                             }
                         }
