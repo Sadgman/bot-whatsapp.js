@@ -83,6 +83,9 @@ class AlastorBot {
                 const paths = await searchPathbots();
                 if(paths.length > 0){
                     await eliminarBot(num);
+                    if(fs.existsSync(`${data_session}/session-${num}`, { recursive: true })){
+                        fs.rmSync(`${data_session}/session-${num}`, { recursive: true });
+                    }
                 }
                 client.destroy();
                 reject();
