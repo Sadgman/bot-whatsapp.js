@@ -20,7 +20,7 @@ const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const quest = require('preguntas');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
-const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, esBotAsignado, verAsignadoBot, toogleWelcome} = require('./utils/groupTools.js');
+const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, esBotAsignado, verAsignadoBot, toggleWelcome} = require('./utils/groupTools.js');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
 const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
@@ -340,7 +340,7 @@ class AlastorBot {
                         switch (partes) {
                             case 'bienvenida':
                             case 'b':
-                                const bienvenida = await toogleWelcome(chat.id._serialized, true);
+                                const bienvenida = await toggleWelcome(chat.id._serialized, true);
                                 message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                 break;
                         }
