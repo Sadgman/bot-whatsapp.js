@@ -306,9 +306,10 @@ async function verAsignadoBot(id_group) {
 }
 /**
  * @param {string} id_group id del grupo
+ * @param {boolean} view ver si esta activado o desactivado el mensaje de bienvenida
  * @returns retorna el estado de si esta activado o desactivado el mensaje de bienvenida
  */
-async function toggleWelcome(id_group){
+async function toggleWelcome(id_group, view){
     return new Promise((resolve, reject) => {
         db.serialize(() => {
             db.all(`SELECT welcome FROM groups WHERE id = ?`, [id_group], (err, rows) => {
@@ -317,6 +318,10 @@ async function toggleWelcome(id_group){
                     reject(err);
                 }
                 let welcome = rows[0].welcome;
+                if(view){
+                    resolve(welcome);
+                    return;
+                }
                 welcome = !welcome;
                 const query = `UPDATE groups SET welcome = ? WHERE id = ?`;
                 db.run(query, [welcome, id_group], (err) => {
