@@ -548,10 +548,13 @@ class AlastorBot {
                             const match_prometido = quotedMsg.body.match(regex_prometido);
                             const regex_propositor = /quieres casarte con ([a-zA-Z]+)\?/;
                             const match_propositor = quotedMsg.body.match(regex_propositor);
+                            console.log(match_prometido);
                             if (match_prometido[1] == contact.id.user){
                                 const nombre_propositor = match_propositor[1]; 
+                                console.log(nombre_propositor);
                                 let phoneNumber = await findContact(nombre_propositor);
                                 phoneNumber = phoneNumber.id.user;
+                                console.log(phoneNumber);
                                 casarse(phoneNumber);
                             }
                         }
