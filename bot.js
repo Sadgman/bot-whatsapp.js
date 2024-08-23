@@ -346,7 +346,7 @@ class AlastorBot {
                                 break;
                         }
                     }else{
-                        await bot_off_on(chat.id._serialized, true);
+                        await bot_off_on(chat.id._serialized);
                         const watch = await watchBot(chat.id._serialized);
                         message.reply(`El bot ha sido ${watch ? 'activado' : 'desactivado'}`);
                     }
