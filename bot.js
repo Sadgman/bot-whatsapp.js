@@ -532,6 +532,12 @@ class AlastorBot {
                         message.reply("Eres imbécil o que, no puedes casarte contigo mismo")
                     }
                 }
+                // creo una funcion de flecha para encontrar el numero de la persona en el grupo por su nombre publico en whatsapp pushname
+                const findContact = async (name) => {
+                    const participants = await chat.participants;
+                    const contact = participants.find(participant => participant.pushname === name);
+                    return contact;
+                }
                 
                 if(message.body.toLocaleLowerCase() === 'si' || message.body.toLocaleLowerCase() === 'sí'){
                     if(message.hasQuotedMsg){
@@ -540,10 +546,12 @@ class AlastorBot {
                         if(quotedMsg.fromMe && contacto.id.user === numero_cliente && quotedMsg.body === mensaje_casado[contact.id.user]){
                             const regex_prometido = /hey @(\d+)/;
                             const match_prometido = quotedMsg.body.match(regex_prometido);
-                            const regex_propositor = /quieres casarte con (\d+)/;
+                            const regex_propositor = /quieres casarte con ([a-zA-Z]+)\?/;
                             const match_propositor = quotedMsg.body.match(regex_propositor);
                             if (match_prometido[1] == contact.id.user){
-                                let phoneNumber = match_propositor[1]; 
+                                const nombre_propositor = match_propositor[1]; 
+                                let phoneNumber = await findContact(nombre_propositor);
+                                phoneNumber = phoneNumber.id.user;
                                 casarse(phoneNumber);
                             }
                         }
