@@ -133,18 +133,23 @@ async function QuitBan(id_group, game){
     });
 }
 /**
- * 
- * @param {string} id_group id del grupo 
- * 
  * Desactiva o activa el bot si esta desactivado o activado en el grupo
+ * @param {string} id_group id del grupo 
  */
-async function bot_off_on(id_group){
+async function bot_off_on(id_group) {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
             db.all(`SELECT bot FROM groups WHERE id = ?`, [id_group], (err, rows) => {
                 if (err) {
                     console.error(err.message);
                     reject(err);
+                    return;
+                }
+                if (!rows[0]) {
+                    const error = new Error(`No se encontró el grupo con id ${id_group}`);
+                    console.error(error.message);
+                    reject(error);
+                    return;
                 }
                 let bot = rows[0].bot;
                 bot = !bot;
@@ -153,6 +158,7 @@ async function bot_off_on(id_group){
                     if (err) {
                         console.error(err.message);
                         reject(err);
+                        return;
                     }
                     resolve();
                 });
