@@ -153,7 +153,7 @@ class AlastorBot {
                     }else if(await esBotAsignado(chat.id._serialized, client.info.wid.user)){
                         return;
                     } 
-                    if(await watchBot(chat.id._serialized)){
+                    if(await watchBot(chat.id._serialized) && await toggleWelcome(chat.id._serialized, true)){
                         const regex = /(?:https?:\/\/)?chat\.whatsapp\.com\/\S*/g;     
                         const descripcion = chat.description || '';
                         notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${descripcion.replace(regex, '')}`, {
