@@ -2,7 +2,7 @@ const { db } = require('./base');
 /**
  * 
  * @param {Number} numero 
- * @returns devuelve true si el bot no esta asignado y false si esta asignado
+ * @returns devuelve true si el bot no se encuentra y false si se encuentra
  */
 async function encontrarBot(numero){
     return new Promise((resolve, reject) => {
