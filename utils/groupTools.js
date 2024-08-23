@@ -306,6 +306,7 @@ async function verAsignadoBot(id_group) {
 }
 /**
  * @param {string} id_group id del grupo
+ * @returns retorna el estado de si esta activado o desactivado el mensaje de bienvenida
  */
 async function toggleWelcome(id_group){
     return new Promise((resolve, reject) => {
