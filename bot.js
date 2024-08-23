@@ -981,8 +981,8 @@ class AlastorBot {
                                 let cantidad = opcion[2];
                                 cantidad = parseInt(cantidad);
                                 if(cantidad > 0){
-                                    if(cantidad > 200){
-                                        message.reply('No puedes apostar mas de 200');
+                                    if(cantidad > 700){
+                                        message.reply('No puedes apostar mas de 700');
                                         return;
                                     }
                                     if(viewPlayer.Dinero >= cantidad){
