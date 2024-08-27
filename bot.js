@@ -335,24 +335,27 @@ class AlastorBot {
                     }else{
                         return false;
                     }
-                }
-                if (chat.isGroup && message.body.toLocaleLowerCase().startsWith('ab') && participantes(contact.id.user)) {
+                }ab
+                if (message.body.toLocaleLowerCase().startsWith('ab')) {
                     let partes = message.body.split(' ');
                     if(partes.length > 2){
                         return;
                     }else if(partes.length === 2){
                         partes = partes[1];
+                        if(chat.isGroup && participantes(contact.id.user)){
+                            switch(partes){
+                                case 'bienvenida':
+                                case 'b':
+                                    await toggleWelcome(chat.id._serialized);
+                                    const bienvenida = await toggleWelcome(chat.id._serialized, true);
+                                    message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
+                                    break;
+                            }
+                        }
                         switch (partes) {
-                            case 'bienvenida':
-                            case 'b':
-                                await toggleWelcome(chat.id._serialized);
-                                const bienvenida = await toggleWelcome(chat.id._serialized, true);
-                                message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
-                                break;
                             case 'ms':
                                 await mc.start();
-                                message.reply(`El servidor esta Online`);
-                                
+                                message.reply(`El servidor esta Online`);          
                         }
                     }else{
                         await bot_off_on(chat.id._serialized);
@@ -584,7 +587,7 @@ class AlastorBot {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     ms = await mc.readStatus();
-                    message.reply(`Estado:${ms}\n\nip: mc.alastorbot.site\n\nport: 51682\n\nversion: La ultima.`);
+                    message.reply("Estado:${ms}\n\nip: mc.alastorbot.site\n\nport: 51682\n\nversion: La ultima.\n\n\n Para activar el servidor escribe `ab ms`");
                 }
                 if (message.body.toLocaleLowerCase().startsWith('dado ')) {
                     let parts = message.body.split(' ');
