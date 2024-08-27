@@ -350,13 +350,9 @@ class AlastorBot {
                                 message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                 break;
                             case 'ms':
-                                ms = await mc.readStatus();
-                                if(ms == 'Online'){
-                                    message.reply('El servidor se encuentra Online');
-                                }else{
-                                    await mc.start();
-                                    message.reply(`El servidor esta Online`);
-                                }
+                                await mc.start();
+                                message.reply(`El servidor esta Online`);
+                                
                         }
                     }else{
                         await bot_off_on(chat.id._serialized);
