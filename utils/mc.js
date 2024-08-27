@@ -255,7 +255,7 @@ async function readStatus(option) {
 
             // Acceder al campo 'ms'
             if(option){
-                config.ms = 'Online';
+                config[0].ms = 'Online';
                 fs.writeFile('./config.json', JSON.stringify(config, null, 4), 'utf8', (err) => {
                     if (err) {
                         console.error('Error al escribir el archivo:', err);
@@ -263,7 +263,7 @@ async function readStatus(option) {
                     }
                 })
             }else{
-                return config.ms;
+                return config[0].ms;
             }
         } catch (err) {
             console.error('Error al parsear el JSON:', err);
