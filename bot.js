@@ -242,7 +242,7 @@ class AlastorBot {
             let dealer = {};
             let mensaje_casado = {};
             let dinero_bj = {};
-            let ms = mc.readStatus();
+            let ms;
             const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770", "595973819264"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
             let requestM = []
@@ -350,6 +350,7 @@ class AlastorBot {
                                 message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                 break;
                             case 'ms':
+                                ms = await mc.readStatus();
                                 if(ms == 'Online'){
                                     message.reply('El servidor se encuentra Online');
                                 }else{
