@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer-extra');
 const ph = require('./puppeteer-helper');
 const fs = require('fs');
+require('dotenv').config();
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 
@@ -262,7 +263,7 @@ async function readStatus(option) {
                 // Acceder al campo 'ms'
                 if (option) {
                     config[0].ms = 'Online';
-                    fs.writeFile(configPath, JSON.stringify(config, null, 4), 'utf8', (err) => {
+                    fs.writeFile('config.json', JSON.stringify(config, null, 4), 'utf8', (err) => {
                         if (err) {
                             console.error('Error al escribir el archivo:', err);
                             reject(err);
