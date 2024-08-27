@@ -335,7 +335,7 @@ class AlastorBot {
                     }else{
                         return false;
                     }
-                }ab
+                }
                 if (message.body.toLocaleLowerCase().startsWith('ab')) {
                     let partes = message.body.split(' ');
                     if(partes.length > 2){
