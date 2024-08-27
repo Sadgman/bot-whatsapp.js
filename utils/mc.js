@@ -3,7 +3,6 @@ const ph = require('./puppeteer-helper');
 const fs = require('fs');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-const { set } = require('express/lib/application');
 
 const hostname = 'https://aternos.org';
 

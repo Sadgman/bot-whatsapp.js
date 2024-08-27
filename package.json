@@ -19,6 +19,9 @@
     "twitter-downloader": "^1.1.8",
     "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js",
     "youtube-sr": "^4.3.10",
-    "ytdp": "1.1.0"
+    "ytdp": "1.1.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-adblocker": "^2.13.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
