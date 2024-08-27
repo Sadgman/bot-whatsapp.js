@@ -243,7 +243,7 @@ async function start(id, wait) {
 }
 
 async function readStatus(option) {
-    fs.readFile('config.json', 'utf8', (err, data) => {
+    fs.readFile('./config.json', 'utf8', async (err, data) => {
         if (err) {
             console.error('Error al leer el archivo:', err);
             return;
@@ -251,12 +251,12 @@ async function readStatus(option) {
 
         try {
             // Parsear el contenido del archivo JSON
-            const config = JSON.parse(data);
+            const config = await JSON.parse(data);
 
             // Acceder al campo 'ms'
             if(option){
                 config.ms = 'Online';
-                fs.writeFile('config.json', JSON.stringify(config, null, 4), 'utf8', (err) => {
+                fs.writeFile('./config.json', JSON.stringify(config, null, 4), 'utf8', (err) => {
                     if (err) {
                         console.error('Error al escribir el archivo:', err);
                         return;
