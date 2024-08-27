@@ -25,7 +25,7 @@ if(fs.existsSync('config.json')){
                         {
                             path: path,
                             pathB: pathB,
-                            ms: false
+                            ms: "apagado"
                         }], null, 4));(path)
                     const { AlastorBot } = require('./bot')
                     new AlastorBot(path).activate();

@@ -203,73 +203,84 @@ async function connect(id, req) {
 }
 
 async function start(id, wait) {
-    return connect(id, async (page, info) => {
-        if (info.status.id !== 0) { 
-            return;
-        }
-    
+    return new Promise(async (resolve, reject) => {
         try {
-            await page.waitForSelector('#start');
-            await page.click('#start');        
+            const info = await connect(id, async (page, info) => {
+                if (info.status.id !== 0) {
+                    return;
+                }
 
-            
-            const confirmStart = 'div.status.online';    
-            await page.waitForSelector(confirmStart, {timeout:120000});
-            let confirmation = await page.$(confirmStart);
-            if (confirmation) {
-                await confirmation.click();
-            }
+                try {
+                    await page.waitForSelector('#start');
+                    await page.click('#start');
 
-            if (!page.url().includes('server')) {
-                await page.goto(hostname+'/server');
-            }
-
-            await ph.waitForFirst(page, to.start, si.started, si.waiting);
-
-            if (wait && await ph.isVisible(si.waiting)) {
-                const queue = await getQueue(page);
-                await page.waitForSelector('#confirm', {timeout:queue.time * 1000, visible:true});
-                await page.click('#confirm');
-                await page.waitForSelector(si.started, {timeout:to.start});
-            }
-            
-            info.status = await getStatus(page);
-            await readStatus(true);
-        }
-        catch(error) {
-            info.error = error.message;
-        }
-    });
-}
-
-async function readStatus(option) {
-    fs.readFile('./config.json', 'utf8', async (err, data) => {
-        if (err) {
-            console.error('Error al leer el archivo:', err);
-            return;
-        }
-
-        try {
-            // Parsear el contenido del archivo JSON
-            const config = await JSON.parse(data);
-
-            // Acceder al campo 'ms'
-            if(option){
-                config[0].ms = 'Online';
-                fs.writeFile('./config.json', JSON.stringify(config, null, 4), 'utf8', (err) => {
-                    if (err) {
-                        console.error('Error al escribir el archivo:', err);
-                        return;
+                    const confirmStart = 'div.status.online';
+                    await page.waitForSelector(confirmStart, { timeout: 120000 });
+                    let confirmation = await page.$(confirmStart);
+                    if (confirmation) {
+                        await confirmation.click();
                     }
-                })
-            }else{
-                return config[0].ms;
-            }
-        } catch (err) {
-            console.error('Error al parsear el JSON:', err);
+
+                    if (!page.url().includes('server')) {
+                        await page.goto(hostname + '/server');
+                    }
+
+                    await ph.waitForFirst(page, to.start, si.started, si.waiting);
+
+                    if (wait && await ph.isVisible(si.waiting)) {
+                        const queue = await getQueue(page);
+                        await page.waitForSelector('#confirm', { timeout: queue.time * 1000, visible: true });
+                        await page.click('#confirm');
+                        await page.waitForSelector(si.started, { timeout: to.start });
+                    }
+
+                    info.status = await getStatus(page);
+                    await readStatus(true);
+                }
+                catch (error) {
+                    info.error = error.message;
+                }
+            });
+            resolve(info);
+        } catch (error) {
+            reject(error);
         }
     });
 }
+async function readStatus(option) {
+    return new Promise((resolve, reject) => {
+        fs.readFile('config.json', 'utf8', async (err, data) => {
+            if (err) {
+                console.error('Error al leer el archivo:', err);
+                reject(err);
+                return;
+            }
+
+            try {
+                // Parsear el contenido del archivo JSON
+                const config = await JSON.parse(data);
+                // Acceder al campo 'ms'
+                if (option) {
+                    config[0].ms = 'Online';
+                    fs.writeFile(configPath, JSON.stringify(config, null, 4), 'utf8', (err) => {
+                        if (err) {
+                            console.error('Error al escribir el archivo:', err);
+                            reject(err);
+                            return;
+                        }
+                        resolve();
+                    });
+                } else {
+                    resolve(config[0].ms);
+                }
+            } catch (err) {
+                console.error('Error al parsear el JSON:', err);
+                reject(err);
+            }
+        });
+    });
+}
+
 
 module.exports = {
     start,

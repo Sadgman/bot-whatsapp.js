@@ -13,15 +13,15 @@
     "languagetool-api": "^1.1.2",
     "preguntas": "^3.2.0",
     "puppeteer-core": "^23.1.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-adblocker": "^2.13.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "qrcode-terminal": "^0.12.0",
     "sqlite3": "^5.1.7",
     "tiktok-downloaders": "^1.0.5",
     "twitter-downloader": "^1.1.8",
     "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js",
     "youtube-sr": "^4.3.10",
-    "ytdp": "1.1.0",
-    "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-adblocker": "^2.13.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "ytdp": "1.1.0"
   }
 }
