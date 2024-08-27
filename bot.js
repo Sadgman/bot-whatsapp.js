@@ -19,6 +19,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const quest = require('preguntas');
+const mc = require('./utils/mc.js');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, esBotAsignado, verAsignadoBot, toggleWelcome} = require('./utils/groupTools.js');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
@@ -241,6 +242,7 @@ class AlastorBot {
             let dealer = {};
             let mensaje_casado = {};
             let dinero_bj = {};
+            let ms = mc.readStatus();
             const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770", "595973819264"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
             let requestM = []
@@ -347,6 +349,13 @@ class AlastorBot {
                                 const bienvenida = await toggleWelcome(chat.id._serialized, true);
                                 message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                 break;
+                            case 'ms':
+                                if(ms == 'Online'){
+                                    message.reply('El servidor se encuentra Online');
+                                }else{
+                                    await mc.start();
+                                    message.reply(`El servidor esta Online`);
+                                }
                         }
                     }else{
                         await bot_off_on(chat.id._serialized);
@@ -577,7 +586,8 @@ class AlastorBot {
                 if (message.body.toLocaleLowerCase() === 'ms') {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
-                    message.reply('esta opcion esta desactida por el momento');
+                    ms = await mc.readStatus();
+                    message.reply(`Estado:${ms}\n\nip: mc.alastorbot.site\n\nport: 51682\n\nversion: La ultima.`);
                 }
                 if (message.body.toLocaleLowerCase().startsWith('dado ')) {
                     let parts = message.body.split(' ');

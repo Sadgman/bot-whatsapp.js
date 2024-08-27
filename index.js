@@ -24,7 +24,8 @@ if(fs.existsSync('config.json')){
                     fs.writeFileSync('config.json', JSON.stringify([
                         {
                             path: path,
-                            pathB: pathB
+                            pathB: pathB,
+                            ms: false
                         }], null, 4));(path)
                     const { AlastorBot } = require('./bot')
                     new AlastorBot(path).activate();
