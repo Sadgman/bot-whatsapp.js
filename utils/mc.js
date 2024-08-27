@@ -202,7 +202,7 @@ async function connect(id, req) {
     }
 }
 
-function start(id, wait) {
+async function start(id, wait) {
     return connect(id, async (page, info) => {
         if (info.status.id !== 0) { 
             return;
@@ -234,7 +234,7 @@ function start(id, wait) {
             }
             
             info.status = await getStatus(page);
-            readStatus(true);
+            await readStatus(true);
         }
         catch(error) {
             info.error = error.message;
