@@ -137,7 +137,7 @@ async function connect(id, req, doend) {
 
     try {
         if(!browser) {         
-            browser = await puppeteer.launch({headless:false});
+            browser = await puppeteer.launch({headless:true});
             
             page = await browser.newPage();
 
