@@ -6,6 +6,8 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 
 const hostname = 'https://aternos.org';
+let browser;
+let page;
 
 const to = {
     default: 10000,
@@ -131,53 +133,55 @@ async function getServerInfo(page) {
 async function connect(id, req, doend) {
     const startPage = hostname + '/go';
 
-    let browser, info = {}, time = new Date();
+    let info = {}, time = new Date();
 
-    try {          
-        browser = await puppeteer.launch({headless:true});
-        
-        const page = await browser.newPage();
+    try {
+        if(!browser) {         
+            browser = await puppeteer.launch({headless:false});
+            
+            page = await browser.newPage();
 
-        if(fs.existsSync('./cookies/cookiemc.json')) {
-            // Leer las cookies del archivo JSON
-            const cookiesString = fs.readFileSync('./cookies/cookiemc.json');
-            const cookies = JSON.parse(cookiesString);
+            if(fs.existsSync('./cookies/cookiemc.json')) {
+                // Leer las cookies del archivo JSON
+                const cookiesString = fs.readFileSync('./cookies/cookiemc.json');
+                const cookies = JSON.parse(cookiesString);
 
-            // Establecer las cookies en la página
-            await page.setCookie(...cookies);
-            await page.goto(startPage);
-        }else{
-            await page.goto(startPage);
-            await page.type('.username', process.env.ATERNOS_USER);
-            await page.type('.password', process.env.ATERNOS_PASSWORD);
-            await page.click('.login-button.btn.btn-main.join-left');
+                // Establecer las cookies en la página
+                await page.setCookie(...cookies);
+                await page.goto(startPage);
+            }else{
+                await page.goto(startPage);
+                await page.type('.username', process.env.ATERNOS_USER);
+                await page.type('.password', process.env.ATERNOS_PASSWORD);
+                await page.click('.login-button.btn.btn-main.join-left');
 
-            await page.waitForFunction(() => {
-                let le = document.querySelector('div.login-error');
-                le = le && le.textContent.trim() !== '';
-                return le || document.querySelector('div.page-content.page-servers');
-            }, {timeout:30000});
+                await page.waitForFunction(() => {
+                    let le = document.querySelector('div.login-error');
+                    le = le && le.textContent.trim() !== '';
+                    return le || document.querySelector('div.page-content.page-servers');
+                }, {timeout:30000});
 
-            const error = await ph.getText(page, 'div.login-error');
-            if (error) {
-                throw error;
+                const error = await ph.getText(page, 'div.login-error');
+                if (error) {
+                    throw error;
+                }
+
+                // Obtener todas las cookies
+                const cookies = await page.cookies();
+                // Guardar las cookies en un archivo JSON
+                const fs = require('fs');
+                fs.writeFileSync('./cookies/cookiemc.json', JSON.stringify(cookies, null, 2));    
             }
 
-            // Obtener todas las cookies
-            const cookies = await page.cookies();
-            // Guardar las cookies en un archivo JSON
-            const fs = require('fs');
-            fs.writeFileSync('./cookies/cookiemc.json', JSON.stringify(cookies, null, 2));    
+            const server = await findServer(page, id);
+            if (!server) {
+                throw `Server ${id} not found`;
+            }
+
+            await server.click();
+            await page.waitForNavigation({ waitUntil: 'networkidle0' });
         }
-
-        const server = await findServer(page, id);
-        if (!server) {
-            throw `Server ${id} not found`;
-        }
-
-        await server.click();
-        await page.waitForNavigation({ waitUntil: 'networkidle0' });
-
+        
         const choices = await page.$('.btn.btn-huge.btn-success');
         if (choices && !doend) {
             await choices.click();
@@ -195,9 +199,6 @@ async function connect(id, req, doend) {
         info.error = error.message;
     }
     finally {
-        if (browser) {            
-            await browser.close();
-        }
         info.elapsed = new Date() - time;
         return info;
     }
