@@ -354,8 +354,13 @@ class AlastorBot {
                         }
                         switch (partes) {
                             case 'ms':
-                                await mc.start();
-                                message.reply(`El servidor esta Online`);          
+                                if(mc.readStatus() === 'Offline'){
+                                    message.reply('Activando servidor...')
+                                    await mc.start();
+                                    message.reply(`El servidor esta Online`);
+                                }else{
+                                    message.reply(`El servidor ya estaba encendido`);
+                                }
                         }
                     }else{
                         await bot_off_on(chat.id._serialized);
@@ -587,7 +592,7 @@ class AlastorBot {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     ms = await mc.readStatus();
-                    message.reply("Estado:${ms}\n\nip: mc.alastorbot.site\n\nport: 51682\n\nversion: La ultima.\n\n\n Para activar el servidor escribe `ab ms`");
+                    message.reply(`Estado: ${ms}\n\nip: mc.alastorbot.site\n\nport: 51682\n\nversion: La ultima.\n\n\n Para activar el servidor escribe\n\`ab ms\``);
                 }
                 if (message.body.toLocaleLowerCase().startsWith('dado ')) {
                     let parts = message.body.split(' ');

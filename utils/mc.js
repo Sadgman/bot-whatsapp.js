@@ -89,8 +89,8 @@ async function getStatus(page) {
     }
     else if (await ph.isVisible(page, si.started)) {
         status.id = 1;
-        status.countdown = await ph.getText(page, 'span.server-status-label-left');
-        status.memory = await ph.getText(page, 'span.server-status-label-right.queue-position');
+        //status.countdown = await ph.getText(page, 'span.server-status-label-left');
+        //status.memory = await ph.getText(page, 'span.server-status-label-right.queue-position');
     }
     else if (await ph.isVisible(page, si.waiting)) {
         status.id = 2;
@@ -128,7 +128,7 @@ async function getServerInfo(page) {
     return info;
 }
 
-async function connect(id, req) {
+async function connect(id, req, doend) {
     const startPage = hostname + '/go';
 
     let browser, info = {}, time = new Date();
@@ -179,7 +179,7 @@ async function connect(id, req) {
         await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
         const choices = await page.$('.btn.btn-huge.btn-success');
-        if (choices) {
+        if (choices && !doend) {
             await choices.click();
         }
 
@@ -236,7 +236,6 @@ async function start(id, wait) {
                     }
 
                     info.status = await getStatus(page);
-                    await readStatus(true);
                 }
                 catch (error) {
                     info.error = error.message;
@@ -248,40 +247,16 @@ async function start(id, wait) {
         }
     });
 }
-async function readStatus(option) {
-    return new Promise((resolve, reject) => {
-        fs.readFile('config.json', 'utf8', async (err, data) => {
-            if (err) {
-                console.error('Error al leer el archivo:', err);
-                reject(err);
-                return;
-            }
-
-            try {
-                // Parsear el contenido del archivo JSON
-                const config = await JSON.parse(data);
-                // Acceder al campo 'ms'
-                if (option) {
-                    config[0].ms = 'Online';
-                    fs.writeFile('config.json', JSON.stringify(config, null, 4), 'utf8', (err) => {
-                        if (err) {
-                            console.error('Error al escribir el archivo:', err);
-                            reject(err);
-                            return;
-                        }
-                        resolve();
-                    });
-                } else {
-                    resolve(config[0].ms);
-                }
-            } catch (err) {
-                console.error('Error al parsear el JSON:', err);
-                reject(err);
-            }
-        });
+async function readStatus() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const info = await connect(null, null, true);
+            resolve(info.status.text);
+        } catch (error) {
+            reject(error);
+        }
     });
 }
-
 
 module.exports = {
     start,

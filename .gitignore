@@ -15,3 +15,5 @@ session
 1722817120688-base.js
 config.json
 .vscode/launch.json
+.env
+cookies/cookiemc.json
