@@ -6,8 +6,6 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 
 const hostname = 'https://aternos.org';
-let browser;
-let page;
 
 const to = {
     default: 10000,
@@ -133,11 +131,11 @@ async function getServerInfo(page) {
 async function connect(id, req, doend) {
     const startPage = hostname + '/go';
 
-    let info = {}, time = new Date();
+    let browser, page, info = {}, time = new Date();
 
     try {
         if(!browser) {         
-            browser = await puppeteer.launch({headless:true});
+            browser = await puppeteer.launch({headless:false});
             
             page = await browser.newPage();
 
@@ -187,7 +185,7 @@ async function connect(id, req, doend) {
             await choices.click();
         }
 
-        await page.waitForSelector('.btn.btn-huge.btn-danger', { hidden:true, timeout:520000});
+        await page.waitForSelector('.btn.btn-huge.btn-danger', { hidden:false, timeout:520000});
 
         info = await getServerInfo(page);
 
@@ -199,6 +197,9 @@ async function connect(id, req, doend) {
         info.error = error.message;
     }
     finally {
+        if(browser){
+            await browser.close();
+        }
         info.elapsed = new Date() - time;
         return info;
     }
