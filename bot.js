@@ -357,7 +357,7 @@ class AlastorBot {
                                 if(await mc.readStatus() === 'Offline'){
                                     message.reply('Activando servidor...')
                                     await mc.start();
-                                    message.reply(`El servidor esta Online`);
+                                    message.reply('El servidor esta Online o se esta iniciando revisa con `ms`');
                                 }else{
                                     message.reply(`El servidor ya estaba encendido`);
                                 }
