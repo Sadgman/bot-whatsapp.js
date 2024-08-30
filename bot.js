@@ -342,7 +342,7 @@ class AlastorBot {
                         return;
                     }else if(partes.length === 2){
                         partes = partes[1];
-                        if(chat.isGroup && participantes(contact.id.user)){
+                        if(chat.isGroup && (participantes(contact.id.user) || contact.id.user === numero_cliente)){
                             switch(partes){
                                 case 'bienvenida':
                                 case 'b':
@@ -362,7 +362,7 @@ class AlastorBot {
                                     message.reply(`El servidor ya estaba encendido`);
                                 }
                         }
-                    }else{
+                    }else if(participantes(contact.id.user) || contact.id.user === numero_cliente){
                         await bot_off_on(chat.id._serialized);
                         const watch = await watchBot(chat.id._serialized);
                         message.reply(`El bot ha sido ${watch ? 'activado' : 'desactivado'}`);
