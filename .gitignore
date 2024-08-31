@@ -17,3 +17,4 @@ config.json
 .vscode/launch.json
 .env
 cookies/cookiemc.json
+data.sql
