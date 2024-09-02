@@ -249,8 +249,9 @@ class AlastorBot {
             let requestM = []
 
             const mensaje =  async (message) => {
+                let chat;
                 try{
-                    const chat = await message.getChat();
+                    chat = await message.getChat();
                     
                 }catch(err){
                     return;
