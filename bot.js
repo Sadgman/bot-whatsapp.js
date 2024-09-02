@@ -1164,11 +1164,7 @@ class AlastorBot {
                 }
                 if(message.body.toLocaleLowerCase() === 'prueba'){
                     const contactf = message.mentionedIds
-                    const id = client.getNumberId(contact.id.user)
-                    const contactfr = await client.getContactById(id);
-                    message.reply(contactfr);
                     message.reply(contactf);
-                    message.reply(id)
                 }
                 if (message.body.toLocaleLowerCase() === 'jugar' && await watchBan(chat.id._serialized, 'todos')) {
                     let tempmenu_game = menu_game;
@@ -1407,11 +1403,10 @@ class AlastorBot {
                             message.reply('No tienes suficiente dinero en el banco');
 
                         }
-                    } else if (opcion === 'transferir' || opcion === "tr") {
+                    } else if ((opcion === 'transferir' || opcion === "tr") && message.mentionedIds.length) {
                         try {
                             let cantidad = parts[2];
-                            let id = parts[3];
-                            id = id.replace('@', '');
+                            const id = message.mentionedIds[0];
                             let tres = await getAllInfoPlayer(id); 
                             const n = await client.getContactById(id + '@c.us');
                             if (!isNaN(cantidad)) {
