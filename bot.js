@@ -249,14 +249,20 @@ class AlastorBot {
             let requestM = []
 
             const mensaje =  async (message) => {
-                
-                const chat = await message.getChat();
-                let contact = await message.getContact();
-                let numero_cliente = client.info.wid.user
-                if(message.body === ''){
+                try{
+                    const chat = await message.getChat();
+                    
+                }catch(err){
+                    return;
+                }
+                finally{
+                    if(message.body === '' || !chat){
                         return;
+                    }
                 }
                 
+                let numero_cliente = client.info.wid.user
+                let contact = await message.getContact();
                 const group = await message.getChat();
 
                 await jsonread(contact.id.user);
@@ -365,7 +371,7 @@ class AlastorBot {
                         }
                     }else if(participantes(contact.id.user) || contact.id.user === numero_cliente){
                         if(contact.id.user === numero_cliente){
-                            db_client = !db_client
+                            db_client = !db_client;
                             message.reply(`El bot ha sido ${db_client ? 'activado' : 'desactivado'} por el huesped`);
                         }else if (db_client === false){
                             await bot_off_on(chat.id._serialized);
