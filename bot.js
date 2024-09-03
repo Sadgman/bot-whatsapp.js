@@ -1162,10 +1162,6 @@ class AlastorBot {
                         chat.sendMessage(messageToSend, { mentions: menciones });
                     }
                 }
-                if(message.body.toLocaleLowerCase() === 'prueba'){
-                    const contactf = message.mentionedIds
-                    message.reply(contactf);
-                }
                 if (message.body.toLocaleLowerCase() === 'jugar' && await watchBan(chat.id._serialized, 'todos')) {
                     let tempmenu_game = menu_game;
                     await chat.sendSeen();
@@ -1352,9 +1348,6 @@ class AlastorBot {
                         message.reply('Este juego solo funciona en grupos');
                     }
                 }
-                const fp = async () => {
-                    
-                }
                 if (message.body.toLocaleLowerCase() === 'fp') {
                     if (chat.isGroup && await watchBan(chat.id._serialized, 'fp') && await watchBan(chat.id._serialized, 'todos') && await watchBan(chat.id._serialized, 'menciones')){
                         if (!participantes(contact.id.user) && !(await watchBan(chat.id._serialized, 'admins'))) {
@@ -1407,12 +1400,13 @@ class AlastorBot {
                         try {
                             let cantidad = parts[2];
                             const id = message.mentionedIds[0];
-                            let tres = await getAllInfoPlayer(id); 
-                            const n = await client.getContactById(id + '@c.us');
+                            const n = await client.getContactById(id);
+                            let tres = await getAllInfoPlayer(n.id.user); 
+                            
                             if (!isNaN(cantidad)) {
                                 if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
-                                    update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
-                                    update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
+                                    update_info_player(n.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
+                                    update_info_player(n.id.user, "Banco", tres.Banco + parseInt(cantidad), true);
                                     message.reply(`Has transferido ${cantidad} a ${n.pushname}`);
                                 } else {
                                     message.reply('No tienes suficiente dinero en el banco');
