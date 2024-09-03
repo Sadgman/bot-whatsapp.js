@@ -85,7 +85,7 @@ class AlastorBot {
                 if(paths.length > 0){
                     await eliminarBot(num);
                     if(fs.existsSync(`${data_session}/session-${num}`, { recursive: true })){
-                        fs.rmSync(`${data_session}/session-${num}`, { recursive: true });
+                        fs.rmSync(`${data_session}/session-${num}`, { recursive: true, force: true });
                     }
                 }
                 client.destroy();
@@ -101,7 +101,7 @@ class AlastorBot {
                     if(num !== null){
                         await eliminarBot(num);
                         if(fs.existsSync(`${data_session}/session-${num}`, { recursive: true })){
-                            fs.rmSync(`${data_session}/session-${num}`, { recursive: true });
+                            fs.rmSync(`${data_session}/session-${num}`, { recursive: true, force: true });
                         }
                         client.destroy()
                     }else{
@@ -1406,23 +1406,23 @@ class AlastorBot {
                     } else if ((opcion === 'transferir' || opcion === "tr") && message.mentionedIds.length) {
                         try {
                             let cantidad = parts[2];
-                            const id = message.mentionedIds[0];
-                            let tres = await getAllInfoPlayer(id); 
-                            
+                            const id = await client.getContactById(message.mentionedIds[0]);
+                            let tres = await getAllInfoPlayer(id.id.user); 
+
                             if (!isNaN(cantidad)) {
-                                const comision = (montoTransferencia) => {   
+                                const comision = () => {   
                                     // Calcular el número de tramos de 100 monedas, redondeando hacia arriba
-                                    const tramosDe100 = montoTransferencia / 100
+                                    const tramosDe100 = cantidad / 100
                                     // Calcular el aumento de la comisión
                                     const comisionTotal = tramosDe100 * 10;
                                     // Calcular el monto total a deducir (transferencia + comisión)
-                                    const montoTotal = Math.round(montoTransferencia + comisionTotal);    
+                                    const montoTotal = Math.round(cantidad + comisionTotal);    
                                     return montoTotal; 
                                 }
-                                if (cantidad > 0 && comision(cantidad) <= viewPlayer.Banco) {
+                                if (cantidad > 0 && comision() <= viewPlayer.Banco) {
                                     update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
-                                    update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
-                                    message.reply(`Has transferido ${cantidad} a ${n.pushname}`);
+                                    update_info_player(id.id.user, "Banco", tres.Banco + parseInt(cantidad), true);
+                                    message.reply(`Has transferido ${cantidad} a ${id.pushname}`);
                                 } else {
                                     message.reply('No tienes suficiente dinero en el banco');
                                 }
@@ -1446,7 +1446,7 @@ class AlastorBot {
                             console.error(err);
                         }
                     }else{
-                        message.reply('> Las opciones del banco son:\n\n>\Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)');
+                        message.reply('> Las opciones del banco son:\n\n> Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)\n\nSe te cobrara 10 monedas por cada trasferencia, por cada 100 monedas se le sumara 10 a tu comision');
                     }
                 }
                 //simplifico lo del banco y saco dp, para que el usuario solo tenga que poner dp (cantidad)
