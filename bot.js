@@ -1410,9 +1410,10 @@ class AlastorBot {
                             let tres = await getAllInfoPlayer(id.id.user); 
 
                             if (!isNaN(cantidad)) {
+                                cantidad = parseInt(cantidad);
                                 const comision = () => {   
-                                    // Calcular el 30% de la cantidad
-                                    const comisionTotal = cantidad * 0.30;
+                                    // Calcular el 10% de la cantidad
+                                    const comisionTotal = cantidad * 0.10;
                                     // Calcular el monto total a deducir (transferencia + comisión)
                                     const montoTotal = Math.round(cantidad + comisionTotal);    
                                     return montoTotal; 
@@ -1422,7 +1423,7 @@ class AlastorBot {
                                     update_info_player(id.id.user, "Banco", tres.Banco + parseInt(cantidad), true);
                                     message.reply(`Has transferido ${cantidad} a ${id.pushname}`);
                                 } else {
-                                    message.reply('No tienes suficiente dinero en el banco');
+                                    message.reply('No tienes suficiente dinero en el banco o no tienes la cantidad suficiente para la comisión del 10%');
                                 }
                             }
                         
