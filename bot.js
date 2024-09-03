@@ -1408,9 +1408,18 @@ class AlastorBot {
                             let cantidad = parts[2];
                             const id = message.mentionedIds[0];
                             let tres = await getAllInfoPlayer(id); 
-                            const n = await client.getContactById(id + '@c.us');
+                            
                             if (!isNaN(cantidad)) {
-                                if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
+                                const comision = (montoTransferencia) => {   
+                                    // Calcular el número de tramos de 100 monedas, redondeando hacia arriba
+                                    const tramosDe100 = montoTransferencia / 100
+                                    // Calcular el aumento de la comisión
+                                    const comisionTotal = tramosDe100 * 10;
+                                    // Calcular el monto total a deducir (transferencia + comisión)
+                                    const montoTotal = Math.round(montoTransferencia + comisionTotal);    
+                                    return montoTotal; 
+                                }
+                                if (cantidad > 0 && comision(cantidad) <= viewPlayer.Banco) {
                                     update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
                                     update_info_player(id, "Banco", tres.Banco + parseInt(cantidad), true);
                                     message.reply(`Has transferido ${cantidad} a ${n.pushname}`);
