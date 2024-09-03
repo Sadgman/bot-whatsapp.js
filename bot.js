@@ -1411,10 +1411,8 @@ class AlastorBot {
 
                             if (!isNaN(cantidad)) {
                                 const comision = () => {   
-                                    // Calcular el número de tramos de 100 monedas, redondeando hacia arriba
-                                    const tramosDe100 = cantidad / 100
-                                    // Calcular el aumento de la comisión
-                                    const comisionTotal = tramosDe100 * 10;
+                                    // Calcular el 30% de la cantidad
+                                    const comisionTotal = cantidad * 0.30;
                                     // Calcular el monto total a deducir (transferencia + comisión)
                                     const montoTotal = Math.round(cantidad + comisionTotal);    
                                     return montoTotal; 
