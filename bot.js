@@ -1420,7 +1420,7 @@ class AlastorBot {
                                     return montoTotal; 
                                 }
                                 if (cantidad > 0 && comision() <= viewPlayer.Banco) {
-                                    update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
+                                    update_info_player(contact.id.user, "Banco", viewPlayer.Banco - comision(), true);
                                     update_info_player(id.id.user, "Banco", tres.Banco + parseInt(cantidad), true);
                                     message.reply(`Has transferido ${cantidad} a ${id.pushname}`);
                                 } else {
