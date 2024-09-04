@@ -1448,7 +1448,7 @@ class AlastorBot {
                             console.error(err);
                         }
                     }else{
-                        message.reply('> Las opciones del banco son:\n\n> Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)\n\nSe te cobrara 10 monedas por cada trasferencia, por cada 100 monedas se le sumara 10 a tu comision');
+                        message.reply('> Las opciones del banco son:\n\n> Depositar (dp)\n> Retirar (rt)\n> Transferir (tr)\n> Cambiar puntos por dinero(cp)\n\nLa comision es del 10% por transferencia');
                     }
                 }
                 //simplifico lo del banco y saco dp, para que el usuario solo tenga que poner dp (cantidad)
