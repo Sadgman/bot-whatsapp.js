@@ -1673,7 +1673,11 @@ class AlastorBot {
                         if (quotedMsg.fromMe) {
                             quotedMsg.delete(true);
                         } else {
-                            participantes(contact.id.user) ? quotedMsg.delete(true) : message.reply('No puedes borrar mensajes de otros si no eres admin.');
+                            if(participantes(contact.id.user)){
+                                quotedMsg.delete(true);
+                            }else if(chat.isGroup){
+                                message.reply('No puedes borrar mensajes de otros si no eres admin.');
+                            }
                         }
                     }
                 }
