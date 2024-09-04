@@ -1670,14 +1670,10 @@ class AlastorBot {
                 if (message.body.toLocaleLowerCase() == 'br') {
                     if (message.hasQuotedMsg) {
                         const quotedMsg = await message.getQuotedMessage();
-                        if (quotedMsg.fromMe) {
+                        if (quotedMsg.fromMe || participantes(contact.id.user)){
                             quotedMsg.delete(true);
-                        } else {
-                            if(participantes(contact.id.user)){
-                                quotedMsg.delete(true);
-                            }else if(chat.isGroup){
-                                message.reply('No puedes borrar mensajes de otros si no eres admin.');
-                            }
+                        }else if(chat.isGroup){
+                            message.reply('No puedes borrar mensajes de otros si no eres admin.');     
                         }
                     }
                 }
