@@ -1737,7 +1737,10 @@ class AlastorBot {
                     
                     if (counterListRequestMusic > 0) {
                         counterListRequestMusic = 0;
-                        const agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
+                        let agent =
+                        if(fs.existsSync("cookie.json")){
+                            agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
+                        }
                         processQueue(agent, mensaje_error);
                     }
                 }
