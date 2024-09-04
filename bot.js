@@ -1169,19 +1169,19 @@ class AlastorBot {
                     const contactf = message.mentionedIds
                     message.reply(contactf);
                 }
-                if (message.body.toLocaleLowerCase() === 'jugar' && await watchBan(chat.id._serialized, 'todos')) {
+                if (message.body.toLocaleLowerCase() === 'jugar') {
                     let tempmenu_game = menu_game;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
-                    if (chat.isGroup) {
+                    if (chat.isGroup && await watchBan(chat.id._serialized, 'todos')) {
                         if (!(await watchBan(chat.id._serialized, 'menciones'))) {
-                            tempmenu_game = tempmenu_game.replace('formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻', '');
+                            tempmenu_game = tempmenu_game.replace(' formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n>', '');
                             message.reply(tempmenu_game);
                         } else {
                             message.reply(tempmenu_game);
                         }
-                    } else {
-                        tempmenu_game = tempmenu_game.replace('formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻', '');
+                    }else if(!chat.isGroup){
+                        tempmenu_game = tempmenu_game.replace(' formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n>', '');
                         message.reply(tempmenu_game);
                     }
                 }
