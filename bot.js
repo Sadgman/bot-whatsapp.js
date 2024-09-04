@@ -1737,7 +1737,7 @@ class AlastorBot {
                     
                     if (counterListRequestMusic > 0) {
                         counterListRequestMusic = 0;
-                        let agent =
+                        let agent = null;
                         if(fs.existsSync("cookie.json")){
                             agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
                         }
