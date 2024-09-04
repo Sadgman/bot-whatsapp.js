@@ -242,7 +242,7 @@ class AlastorBot {
             let dealer = {};
             let mensaje_casado = {};
             let dinero_bj = {};
-            let db_client = false;
+            let db_client = true;
             let ms;
             const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770", "595973819264"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
@@ -370,20 +370,23 @@ class AlastorBot {
                                     message.reply(`El servidor ya estaba encendido`);
                                 }
                         }
-                    }else if(participantes(contact.id.user) || contact.id.user === numero_cliente){
+                    }else if((participantes(contact.id.user) || contact.id.user === numero_cliente) && message.body.toLocaleLowerCase() === 'ab'){
                         if(contact.id.user === numero_cliente){
                             db_client = !db_client;
+                            if(chat.isGroup && !(await watchBot(chat.id._serialized))){
+                                await bot_off_on(chat.id._serialized);
+                            }
                             message.reply(`El bot ha sido ${db_client ? 'activado' : 'desactivado'} por el huesped`);
-                        }else if (db_client === false){
+                        }else if (db_client){
                             await bot_off_on(chat.id._serialized);
                             const watch = await watchBot(chat.id._serialized);
                             message.reply(`El bot ha sido ${watch ? 'activado' : 'desactivado'}`);
                         }else{
-                            message.reply('El bot fue desactivado por el huesped');
+                            message.reply('*El bot fue desactivado por el huesped, hablale para que lo active*');
                         }
                     }
                 }
-                if (chat.isGroup && !(await watchBot(chat.id._serialized)) || db_client) {
+                if (chat.isGroup && !(await watchBot(chat.id._serialized)) || !db_client) {
                     return;
                 }
                 if(chat.isGroup && participantes(numero_cliente)){   
