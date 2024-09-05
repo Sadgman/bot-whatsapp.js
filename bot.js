@@ -444,24 +444,27 @@ class AlastorBot {
                     }
                 }
                 //remover un miembro del grupo y verifico si el bot es admin y si el que remueve es admin  
-                if((message.body.toLocaleLowerCase().startsWith("!re") || message.body.toLocaleLowerCase().startsWith("!re")) && chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)){
-                    if(message.hasQuotedMsg){
+                if (message.body.toLocaleLowerCase().startsWith("!re") && chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)) {
+                    const part = message.body.split(" ");
+                    const part1 = part[0];
+                    console.log();
+                    if (!(part1 === '!re') || !(part.length === 2)) {
+                        return;
+                    }
+                    if (message.hasQuotedMsg) {
                         const quotedMsg = await message.getQuotedMessage();
                         let contacto = await quotedMsg.getContact();
-                        //verifico si es Alastor al que quiere remover si es asi retorno
-                        if(Alastor_Number.includes(contacto.id.user)) return;
-                        
+                        // Verifico si es Alastor al que quiere remover, si es así retorno
+                        if (Alastor_Number.includes(contacto.id.user)) return;
+                
                         chat.removeParticipants([contacto.id._serialized]);
-                    }else{
-                        let parte = message.body.split(" ");
-                        // si parte tiene una longitud menor a dos retorno
-                        if(parte.length > 2) return;
-                        parte = parte[1];
-                        parte = parte.replace('@', '');
-                        if(Alastor_Number.includes(parte)) return;
-                        
-                        parte = parte + '@c.us';
-                        chat.removeParticipants([parte]);
+                    } else if (await message.getMentions()) {
+                        let parte = await message.getMentions();
+                        parte.forEach(p => {
+                            if (Alastor_Number.includes(p.id.user)) return;
+                            chat.removeParticipants([p.id._serialized]);
+                        });
+                    
                     }
                 }
                 //remover a todos del grupo solo si es Alastor quien envia en comando
@@ -1619,45 +1622,15 @@ class AlastorBot {
                         if (mensaje_citado.hasMedia) {
                             try {
                                 const d = await mensaje_citado.downloadMedia();
-                                let media;
-                                switch (mensaje_citado.type) {
-                                    case 'image':
-                                        media = new MessageMedia('image/png', d.data, 'sticker');
-                                        break;
-                                    case 'video':
-                                        media = new MessageMedia('video/mp4', d.data, 'sticker');
-                                        break;
-                                    case 'ptt':
-                                        media = new MessageMedia('audio/mp3', d.data, 'sticker');
-                                        break;
-                                    case 'sticker':
-                                        media = new MessageMedia('image/webp', d.data, 'sticker');
-                                        break;
-                                }
-                                if (media) {
-                                    chat.sendMessage(media);
-                                }
+                                client.sendMessage(message.from, d);
                             } catch (err) {
                                 message.reply('No pude enviar la foto, video o audio');
                             }
                         }
                     } else if (message.hasMedia === true) {
-                        const f = await message.downloadMedia();
                         try {
-                            switch (message.type) {
-                                case 'image':
-                                    media = new MessageMedia('image/png', f.data, 'sticker');
-                                    chat.sendMessage(media);
-                                    break;
-                                case 'video':
-                                    media = new MessageMedia('video/mp4', f.data, 'sticker');
-                                    chat.sendMessage(media);
-                                    break;
-                                case 'ptt':
-                                    media = new MessageMedia('audio/mp3', f.data, 'sticker');
-                                    chat.sendMessage(media);
-                                    break;
-                            }
+                            const f = await message.downloadMedia();
+                            client.sendMessage(message.from, f);
 
                         } catch (err) {
                             message.reply('No se pudo enviar la foto o video');
