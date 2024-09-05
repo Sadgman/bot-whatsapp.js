@@ -447,8 +447,7 @@ class AlastorBot {
                 if (message.body.toLocaleLowerCase().startsWith("!re") && chat.isGroup && participantes(numero_cliente) && participantes(contact.id.user)) {
                     const part = message.body.split(" ");
                     const part1 = part[0];
-                    console.log();
-                    if (!(part1 === '!re') || !(part.length === 2)) {
+                    if (!(part1 === '!re')) {
                         return;
                     }
                     if (message.hasQuotedMsg) {
@@ -464,7 +463,6 @@ class AlastorBot {
                             if (Alastor_Number.includes(p.id.user)) return;
                             chat.removeParticipants([p.id._serialized]);
                         });
-                    
                     }
                 }
                 //remover a todos del grupo solo si es Alastor quien envia en comando
