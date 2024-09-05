@@ -118,6 +118,20 @@ async function asignarCargoBot(numero, cargo){
         });
     });
 }
+async function readRandomAnime(){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT * FROM animes ORDER BY RANDOM() LIMIT 1`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                rows = rows[0];
+                resolve("*Nombre:* " + rows.name + "\n*Genero:* " + rows.genre + "\n*Año:* " + rows.year );
+            });
+        });
+    });
+}
 module.exports = {
     encontrarBot,
     insertarBot,
@@ -125,5 +139,6 @@ module.exports = {
     eliminarBot,
     searchPathbots,
     vercargoBot,
-    asignarCargoBot
+    asignarCargoBot,
+    readRandomAnime
 }

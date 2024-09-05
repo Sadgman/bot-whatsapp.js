@@ -23,7 +23,7 @@ const mc = require('./utils/mc.js');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, esBotAsignado, verAsignadoBot, toggleWelcome} = require('./utils/groupTools.js');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
-const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot } = require('./utils/bots.js');
+const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot, readRandomAnime } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
 
 dayjs.extend(utc);
@@ -600,11 +600,10 @@ class AlastorBot {
                         message.reply(tempMenu);
                     }
                 }
-                if (message.body.toLocaleLowerCase() === 'recomienda un anime' || message.body.toLocaleLowerCase() === 'rnu') {
-                    file = fs.readFileSync('data.json', 'utf-8')
-                    data = JSON.parse(file)
-                    const randomIndex = Math.floor(Math.random() * data.animes.names.length);
-                    message.reply(data.animes.names[randomIndex]);
+                if (message.body.toLocaleLowerCase() === 'rnu') {
+                    readRandomAnime().then((anime) => {
+                        message.reply(anime);
+                    });
                 }
                 if (message.body.toLocaleLowerCase() === 'ms') {
                     await chat.sendSeen();
