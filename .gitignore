@@ -16,5 +16,6 @@ session
 config.json
 .vscode/launch.json
 .env
+package-lock.json
 cookies/cookiemc.json
 data.sql
