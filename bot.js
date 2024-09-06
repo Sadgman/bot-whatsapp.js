@@ -858,7 +858,7 @@ class AlastorBot {
                 } */
                 //-----------------------------------------------------------------------------------------------------------------------
 
-                if (message.body.toLocaleLowerCase().startsWith('cz')) {
+                if (message.body.toLocaleLowerCase().startsWith('cz') && message.body.toLocaleLowerCase().split(' ')[0] === 'cz') {
                     if (chat.isGroup) {
                         if (message.body.toLocaleLowerCase() === 'cz') {
                             message.reply('Usa los siguientes comandos para jugar:\ncz (cantidad) (cara o cruz)\n\n*Nota* la cantidad no puede ser mayor a 7');
