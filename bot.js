@@ -861,14 +861,14 @@ class AlastorBot {
                 if (message.body.toLocaleLowerCase().startsWith('cz')) {
                     if (chat.isGroup) {
                         if (message.body.toLocaleLowerCase() === 'cz') {
-                            message.reply('Usa los siguientes comandos para jugar:\ncz (cantidad) (cara o cruz)');
+                            message.reply('Usa los siguientes comandos para jugar:\ncz (cantidad) (cara o cruz)\n\n*Nota* la cantidad no puede ser mayor a 7');
                             return;
                         }
                         let parts = message.body.split(' ');
                         let cantidad = parts[1];
                         let opcion = parts[2];
 
-                        if(typeof opcion !== 'string'){
+                        if(!(opcion === 'cara' || opcion === 'cruz')){
                             message.reply('La opcion debe ser cara o cruz');
                             return;
                         }
@@ -877,9 +877,7 @@ class AlastorBot {
                         if (isNaN(cantidad)) {
                             message.reply('La cantidad debe ser un numero');
                             return;
-                        }
-                        if(cantidad < 0){
-                            message.reply('No puedes apostar una cantidad negativa');
+                        }else if(parseInt(cantidad) > 100 || parseInt(cantidad) < 0){
                             return;
                         }
                         cantidad = parseInt(cantidad);
@@ -896,14 +894,14 @@ class AlastorBot {
                                 foto = "./assets/cruz.jpg";
                             }
                             if(opcion === respuesta){
-                                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + cantidad, true);
+                                await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + cantidad, true);
                                 message.reply(`Has ganado`);
                                 const media = MessageMedia.fromFilePath(foto)
                                 const medi = new MessageMedia('image/jpg', media.data, 'sticker');
                                 chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
                             }
                             if(opcion !== respuesta){
-                                update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - cantidad, true);
+                                await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
                                 message.reply(`Has perdido`);
                                 const media = MessageMedia.fromFilePath(foto)
                                 const medi = new MessageMedia('image/jpg', media.data, 'sticker');
