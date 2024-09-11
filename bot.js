@@ -1622,7 +1622,7 @@ class AlastorBot {
                         if (mensaje_citado.hasMedia) {
                             try {
                                 const d = await mensaje_citado.downloadMedia();
-                                client.sendMessage(message.from, d);
+                                chat.sendMessage(d);
                             } catch (err) {
                                 message.reply('No pude enviar la foto, video o audio');
                             }
@@ -1630,8 +1630,7 @@ class AlastorBot {
                     } else if (message.hasMedia === true) {
                         try {
                             const f = await message.downloadMedia();
-                            client.sendMessage(message.from, f);
-
+                            chat.sendMessage(f);
                         } catch (err) {
                             message.reply('No se pudo enviar la foto o video');
                         }
