@@ -581,7 +581,7 @@ class AlastorBot {
                     if(message.hasQuotedMsg){
                         const quotedMsg = await message.getQuotedMessage();
                         let contacto = await quotedMsg.getContact();
-                        if(quotedMsg.fromMe && quotedMsg.body === mensaje_casado[contact.id.user][0]){
+                        if(quotedMsg.fromMe && quotedMsg.body === mensaje_casado[contact.id.user]?.[0]){
                             const phoneNumber = mensaje_casado[contact.id.user][1];
                             casarse(phoneNumber);
                         }
