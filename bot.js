@@ -1717,7 +1717,7 @@ class AlastorBot {
                     while (requestM.length > 0) {
                         const petition = requestM[0];
                         try {
-                            await descargarM(ytdl(petition.url, { filter: 'audioonly', agent: agent }), mensaje_error, petition.url);
+                            await descargarM(ytdl(petition.url, { filter: 'audioonly', agent: agent }), petition.url);
                             requestM.shift(); // Elimina la petición procesada
                         } catch (error) {
                             console.error("Error al descargar la canción:", error);
