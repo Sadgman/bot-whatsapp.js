@@ -55,7 +55,7 @@ class AlastorBot {
         await this.activateClientBot(baseDir, true, null, null);
         if(paths.length > 0){
             paths.forEach(async (path) => {
-                if(!(await vercargoBot(path) === 'principal')){
+                if(!(await vercargoBot(path) === null)){
                     await this.activateClientBot(baseDir, true, path, null);
                 }
             })
@@ -81,10 +81,6 @@ class AlastorBot {
                         '--disable-dev-shm-usage',   
                     ],
                     executablePath: this.browserPath
-                },
-                webVersionCache: {
-                    type: 'remote',
-                    remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/refs/heads/main/html/2.3000.1015322559-alpha.html',
                 },
                 ffmpegPath: ffmpegPath
             });
