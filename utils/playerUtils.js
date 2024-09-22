@@ -72,14 +72,15 @@ async function jsonread(player) {
                     reject(err);
                     return;
                 }
-                if (!rows.length > 0) {
-                    const n = `INSERT INTO players (id, Nombre, Casado, Rool, Puntos, Nivel, Dinero, Banco, Mensajes, Objetos, Animales) VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?)`;
+                if (rows.length === 0) {
+                    const n = `INSERT INTO players (id, Nombre, Casado, Rool, Puntos, Nivel, Dinero, Banco, Mensajes, Objetos, Animales) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                     db.run(n, [player, '', 'nadie :(', 'Vagabundo', 0, 0, 0, 0, 0, '{}', '{}'], (err) => {
                         if (err) {
-                            return console.log(err.message);
+                            reject(err);
+                            return;
                         }
+                        resolve(false);
                     });
-                    resolve(false);
                 } else {
                     resolve(true);
                 }
