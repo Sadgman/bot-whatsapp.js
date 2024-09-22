@@ -72,6 +72,7 @@ class AlastorBot {
                     clientId: num,
                     dataPath: data_session
                 }),
+                restartOnAuthFail: true,
                 puppeteer: {
                     headless: true,
                     args: [
@@ -80,6 +81,10 @@ class AlastorBot {
                         '--disable-dev-shm-usage',   
                     ],
                     executablePath: this.browserPath
+                },
+                webVersionCache: {
+                    type: 'remote',
+                    remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/refs/heads/main/html/2.3000.1015322559-alpha.html',
                 },
                 ffmpegPath: ffmpegPath
             });
