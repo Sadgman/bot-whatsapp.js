@@ -1667,6 +1667,7 @@ class AlastorBot {
                             await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
                             resolve();
                         } catch (err) {
+                            console.log(err)
                             console.log("Error YTDL");
 
                             try {
