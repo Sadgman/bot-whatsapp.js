@@ -1196,47 +1196,19 @@ class AlastorBot {
                         await chat.sendSeen();
                         await chat.sendStateTyping();
                         let d, media;
-                        if (message.hasQuotedMsg) {
-                            const mensaje_citado = await message.getQuotedMessage();
+                        if (message.hasQuotedMsg && (await message?.getQuotedMessage())?.hasMedia) {
                             try {
-                                d = await mensaje_citado.downloadMedia();
+                                d = await (await message.getQuotedMessage()).downloadMedia();
+                                media = new MessageMedia(d.mimetype, d.data, 'sticker');
+                                chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
                             } catch (err) {
-                                message.reply('No pude descargar eso');
-                            }
-                            if (mensaje_citado.hasMedia) {
-                                try {
-                                    switch (mensaje_citado.type) {
-                                        case 'image':
-                                            media = new MessageMedia('image/png', d.data, 'sticker');
-                                            chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
-                                            break;
-                                        case 'video':
-                                            media = new MessageMedia('video/mp4', d.data, 'sticker');
-                                            chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
-                                            break;
-                                    }
-
-                                } catch (err) {
-                                    message.reply('No se pudo crear el sticker');
-                                }
+                                message.reply('No se pudo crear el sticker');
                             }
                         } else if (message.hasMedia) {
                             try {
                                 d = await message.downloadMedia();
-                            } catch (err) {
-                                message.reply('No pude descargar eso');
-                            }
-                            try {
-                                switch (message.type) {
-                                    case 'image':
-                                        media = new MessageMedia('image/png', d.data, 'sticker');
-                                        chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: '' });
-                                        break;
-                                    case 'video':
-                                        media = new MessageMedia('video/mp4', d.data, 'sticker');
-                                        chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
-                                        break;
-                                }
+                                media = new MessageMedia(d.mimetype, d.data, 'sticker');
+                                chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: '' });   
                             } catch (err) {
                                 message.reply('No se pudo crear el sticker');
                             }
