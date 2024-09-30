@@ -1200,7 +1200,7 @@ class AlastorBot {
                             try {
                                 d = await (await message.getQuotedMessage()).downloadMedia();
                                 media = new MessageMedia(d.mimetype, d.data, 'sticker');
-                                chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
+                                await chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
                             } catch (err) {
                                 message.reply('No se pudo crear el sticker');
                             }
@@ -1208,7 +1208,7 @@ class AlastorBot {
                             try {
                                 d = await message.downloadMedia();
                                 media = new MessageMedia(d.mimetype, d.data, 'sticker');
-                                chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: '' });   
+                                await chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: '' });   
                             } catch (err) {
                                 message.reply('No se pudo crear el sticker');
                             }
