@@ -1904,7 +1904,7 @@ class AlastorBot {
 
                         let mention = [];
                         //busco dentro del array para introducir el id de todos los usuarios serializados dentro de otro array
-                        chat.participants.forEach(participant => {
+                        await chat.participants.forEach(participant => {
                             mention.push(`${participant.id._serialized}`);
                         });
                     
