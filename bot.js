@@ -23,7 +23,7 @@ const mc = require('./utils/mc.js');
 const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
 const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, esBotAsignado, verAsignadoBot, toggleWelcome} = require('./utils/groupTools.js');
 const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
-const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot, readRandomAnime } = require('./utils/bots.js');
+const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot, cupo, readRandomAnime } = require('./utils/bots.js');
 const { cerrarBase } = require('./utils/base.js');
 
 dayjs.extend(utc);
@@ -412,6 +412,10 @@ class AlastorBot {
                 //agregar otro cliente
                 if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user) && !chat.isGroup) {
                     try {
+                        if(!(await cupo())){
+                            message.reply('No hay cupo para mas bots, si quieres comprar un cupo habla con Alastor');
+                            return;
+                        }
                         if(contadordia[contact.id.user + '!otro']){
                             message.reply(`Debes esperar ${Tiempo_restante(contact.id.user + '!otro')} segundos para volver a volverte bot`);
                             return;

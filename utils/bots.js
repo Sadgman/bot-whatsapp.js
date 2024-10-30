@@ -52,6 +52,23 @@ async function cantidadBots(){
         });
     });
 }
+async function cupo(){
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT * FROM bots`, (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (rows.length < 6) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            });
+        });
+    });
+}
 /**
  * 
  * @param {string} nombre 
@@ -140,5 +157,6 @@ module.exports = {
     searchPathbots,
     vercargoBot,
     asignarCargoBot,
+    cupo,
     readRandomAnime
 }
