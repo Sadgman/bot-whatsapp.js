@@ -233,6 +233,23 @@ class AlastorBot {
             ¡Por ahora estas son todas las opciones que puedes disfrutar! Sigue apoyando.
             `.replace(/^[ \t]+/gm, '');
 
+            const preminum = `
+            🌟 𝑶𝒃𝒕𝒆𝒏 𝒆𝒍 𝒑𝒓𝒆𝒎𝒊𝒖𝒎 🌟
+
+            ᴅᴀʟᴇ ᴄʟɪᴄᴋ ᴀ ᴇꜱᴛᴇ ʟɪɴᴋ ǫᴜᴇ ᴛᴇ ʟʟᴇᴠᴀʀᴀ́ ᴀʟ ᴘᴀᴛʀᴇᴏᴍ ᴏꜰɪᴄɪᴀʟ ʏ ᴘᴏᴅʀᴀ́ꜱ ᴏʙᴛᴇɴᴇʀ ᴜɴ ʙᴏᴛ ᴘᴀʀᴀ ᴛᴜꜱ ɢʀᴜᴘᴏꜱ ᴏ ᴠᴏʟᴠᴇʀᴛᴇ ʙᴏᴛ⬇️
+
+            𝐏𝐚𝐭𝐫𝐞𝐨𝐦
+            https://www.patreon.com/alastor782/membership
+
+            𝐏𝐚𝐲𝐩𝐚𝐥
+
+            Volverse bot:
+            https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-0JS30850HG541060HM4Z7EHI
+
+            Obtener un bot:
+            https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-38J04596E7945440NM4Z7H4A
+            `.replace(/^[ \t]+/gm, '');
+
             let menu_juego;
             const option_game = "*Opciones*\n\n" + "1. Quitar la opción Juego\n" + "2. Quitar los Juegos con menciones\n" + "3. Todos pueden utilizar los juegos con menciones";
             const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n> formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> BlackJack(bj)\n\n> !q crea una pregunta" + "\n\n> cz (cara o cruz)" + "\n\n*Los Roles tienen sus juegos propios*"
@@ -2047,24 +2064,8 @@ class AlastorBot {
                     cerrarBase();
                     process.exit();
                 }
-                if(message.body.toLocaleLowerCase() == 'donacion' || message.body.toLocaleLowerCase() == 'donar'){
-                    message.reply(`
-                    🌟 *Apoya Mi Trabajo* 🌟
-
-                    Cada contribución es un gran apoyo para continuar desarrollando el bot que tanto disfrutas.
-                    
-                    *Opciones de Donación:*
-                    
-                    ☕ Café para el Creador - Con solo $1, puedes ofrecerme un café que me ayudará a mantenerme programando con energía.
-                    
-                    💻 Gastos del Servidor y Desarrollo - Con $10 al mes, apoyas directamente los costos del servidor y el desarrollo continuo del bot.
-                    ¿Quieres contribuir?
-                    
-                    *Si quieres que el Bot entre a tu grupo dona algo*
-
-                    Haz clic aquí y elige cómo quieres apoyar: 
-                    Donar Ahora 💖 https://www.patreon.com/alastor782/membership
-                    `);
+                if(message.body.toLocaleLowerCase() == '!premium' || message.body.toLocaleLowerCase() == 'preg'){
+                    message.reply(preminum);
                 }
                 if (message.body.toLocaleLowerCase() === 'creador') {
                     await chat.sendSeen();
@@ -2079,10 +2080,7 @@ class AlastorBot {
                     
                     wa.me/${Alastor_Number[2]}
                     
-                    𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.
-                    Aquí puedes Contactar con el diseñador del menu:
-
-                    wa.me/5144637126`);
+                    𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.`);
                 } 
             };
 
