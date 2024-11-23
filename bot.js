@@ -1663,14 +1663,14 @@ class AlastorBot {
                                         counterListRequestMusic = 0;
                                         return;
                                     }
-                                    if(fs.existsSync(`${direcMusic}/${x[0].title}.mp3`)){
-                                        const file = fs.readFileSync(`${direcMusic}/${x[0].title}.mp3`);
+                                    if(fs.existsSync(`${direcMusic}/${x[0].url}.mp3`)){
+                                        const file = fs.readFileSync(`${direcMusic}/${x[0].url}.mp3`);
                                         const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                                         chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                                         counterListRequestMusic = 0;
                                         return;
                                     }
-                                    addPetition(x[0].url, mensaje_error, x[0].title);
+                                    addPetition(x[0].url, mensaje_error, x[0].url);
 
                                 } catch (error) {
                                     counterListRequestMusic = 0;
