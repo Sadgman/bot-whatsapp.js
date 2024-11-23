@@ -266,6 +266,7 @@ class AlastorBot {
             let dinero_bj = {};
             let db_client = true;
             let ms;
+            const direcMusic = './assets/audio';
             const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770", "595973819264"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
             let requestM = []
@@ -431,12 +432,8 @@ class AlastorBot {
                     try {
                         if(!(await cupo())){
                             message.reply('No hay cupo para mas bots, si quieres comprar un cupo habla con Alastor');
+                            message.reply(preminum);
                             return;
-                        }
-                        if(contadordia[contact.id.user + '!otro']){
-                            message.reply(`Debes esperar ${Tiempo_restante(contact.id.user + '!otro')} segundos para volver a volverte bot`);
-                            return;
-                            
                         }else{
                             await message.reply(`*Información*\n\nAlastorBot no tiene la capacidad de ver tus mensajes ni la tendrá en el futuro, es decir nadie puede ver tus conversaciones`);
                             message.reply('Activando nuevo bot enviando codigo...');
@@ -815,75 +812,6 @@ class AlastorBot {
                         console.log(err);
                     }
                 }
-            /*  if(message.body.toLocaleLowerCase().startsWith('escribir')){
-                    if(viewPlayer.Rool === "escritor"){
-                        if(getAllInfoPlayer(contact.id.user).objetos.includes("papel") && getAllInfoPlayer(contact.id.user).objetos.includes("lapiz")){
-                            let texto = message.body.split(" ");
-                            texto = texto.slice(1).join(" ");
-                            if(cuentos.includes(texto)){
-                                message.reply("*Ya has escrito esto antes, no puedes escribirlo de nuevo*");
-                            }else{
-                                cuentos.push(texto);
-                                if(texto.length < 20000){
-                                    params = {
-                                        language: 'auto',
-                                        text: texto,
-                                        preferredVariants: ['es-ES', 'es-AR']
-                                    }
-                                    esp.check(params, function (err, res) {
-                                        if (err) {
-                                            console.log(err)
-                                        } else {
-                                            if (res.matches.length > 0) {
-                                                message.reply("*Tienes errores ortograficos en tu texto, por favor corrigelos*")
-                                            }else{
-                                                if(texto.length > 200 && texto.length < 770){
-                                                    message.reply("*Eres bastante vag@ para escribir, te dare 0.2 monedas por tu esfuerzo*");
-                                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 0.2, true);
-                                                }else if(texto.length > 770){
-                                                    message.reply("*UFF eso está bastante bueno, te dare 4 monedas por tu esfuerzo*");
-                                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 4, true);
-                                                }else{
-                                                    message.reply("*Tu texto es una mierda no te dare nada por eso, es mas pagame te quitare dos monedas por hacerme perder el tiempo.*")
-                                                    update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero - 2, true);
-                                                }
-                                            }
-                                        }
-                                    })
-                                }else{
-                                    message.reply("Tu texto es demasiado largo, por favor acortalo");
-                                }
-                            }
-                        }else{
-                            message.reply("No tienes los objetos necesarios para escribir compra un papel y un lapiz");
-                        }
-                    }
-                }
-                if(message.body.toLocaleLowerCase().startsWith('baile sexual')){
-                    console.log(contact.id.user)
-                    if(getAllInfoPlayer(contact.id.user).roles === "stripper"){
-                        let part = message.body.split(" ");
-                        part = part[2];
-                        if(part === undefined){
-                            let respuestas = [
-                                "le paraste el pene y te dio 2 monedas",
-                                "ese baile calento a todos y te lanzaron dos monedas",
-                                "te quitaste el pantalon y te tiraron dos monedas"
-                            ]
-                            let randomIndex = Math.floor(Math.random() * respuestas.length);
-                            update_info_player(contact.id.user, "dinero", getAllInfoPlayer(contact.id.user).dinero + 2, true);
-                            message.reply(respuestas[randomIndex]);
-                        }else{
-                            part = part.replace('@', '');
-                            const usuario = contact.id.user + '@c.us';
-                            let obtenerusuario = await client.getContactById(usuario);
-                            let obtenerpart = await client.getContactById(part + '@c.us');
-                            await client.sendMessage(message.from,`${contact.id.user} te ha bailado sexualmente ${part}, deberias darle dos monedas por su servicio`, { mentions: [obtenerusuario, obtenerpart] });
-                        }
-                    }
-                } */
-                //-----------------------------------------------------------------------------------------------------------------------
-
                 if (message.body.toLocaleLowerCase().startsWith('cz') && message.body.toLocaleLowerCase().split(' ')[0] === 'cz') {
                     if (chat.isGroup) {
                         if (message.body.toLocaleLowerCase() === 'cz') {
@@ -903,8 +831,8 @@ class AlastorBot {
                         if (isNaN(cantidad)) {
                             message.reply('La cantidad debe ser un numero');
                             return;
-                        }else if(parseInt(cantidad) > 100 || parseInt(cantidad) < 0){
-                            return;
+                        }else if(parseInt(cantidad) > 10000000 || parseInt(cantidad) < 0){
+                            message.reply('La cantidad es invalida o la cantidadd es mayor a 1,000,000')
                         }
                         cantidad = parseInt(cantidad);
                         if(viewPlayer.Dinero >= cantidad){
@@ -1039,7 +967,7 @@ class AlastorBot {
                                 let cantidad = opcion[2];
                                 cantidad = parseInt(cantidad);
                                 if(cantidad > 0){
-                                    if(cantidad > 700){
+                                    if(cantidad > 1000000){
                                         message.reply('No puedes apostar mas de 700');
                                         return;
                                     }
@@ -1642,7 +1570,7 @@ class AlastorBot {
                         }
                     }
                 }
-                function descargarM(stream, url) {
+                function descargarM(stream, url, nameM) {
                     return new Promise(async (resolve, reject) => {
                         try {
                             await new Promise((resolve, reject) => {
@@ -1650,25 +1578,24 @@ class AlastorBot {
                                 ffmpeg()
                                     .input(stream)
                                     .audioBitrate(128)
-                                    .save(`${directemp}/audio.mp3`)
+                                    .save(`${direcMusic}/${nameM}.mp3`)
                                     .on('end', resolve)
                                     .on('error', reject);
                             });
                             // lo envio
-                            const file = fs.readFileSync(`${directemp}/audio.mp3`);
+                            const file = fs.readFileSync(`${direcMusic}/${nameM}.mp3`);
                             const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                             await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
                             resolve();
                         } catch (err) {
                             console.log(err)
                             console.log("Error YTDL");
-
                             try {
                                 const n = await YTDownloadMusic(url);
                                 const response = await fetch(n);
                                 const buffer = await response.buffer();
-                                fs.writeFileSync(`${directemp}/audio.mp3`, buffer);
-                                const file = fs.readFileSync(`${directemp}/audio.mp3`);
+                                fs.writeFileSync(`${direcMusic}/${nameM}.mp3`, buffer);
+                                const file = fs.readFileSync(`${direcMusic}/${nameM}.mp3`);
                                 const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                                 await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
                                 resolve();
@@ -1676,15 +1603,10 @@ class AlastorBot {
                                 console.log("\n\n Error my module");
                                 reject(err);
                             }
-                        } finally {
-                            // Limpia el archivo temporal
-                            if (fs.existsSync(`${directemp}/audio.mp3`)) {
-                                fs.unlinkSync(`${directemp}/audio.mp3`);
-                            }
                         }
                     });
                 }
-                function addPetition(url, mensaje_error) {
+                function addPetition(url, mensaje_error, nameM) {
                     if(requestM.length < 1){
                         counterListRequestMusic = 1;
                     }
@@ -1705,14 +1627,14 @@ class AlastorBot {
                         if(fs.existsSync("cookie.json")){
                             agent = ytdl.createAgent(JSON.parse(fs.readFileSync("cookie.json")));
                         }
-                        processQueue(agent, mensaje_error);
+                        processQueue(agent, mensaje_error, nameM);
                     }
                 }
-                async function processQueue(agent, mensaje_error) {
+                async function processQueue(agent, mensaje_error, nameM) {
                     while (requestM.length > 0) {
                         const petition = requestM[0];
                         try {
-                            await descargarM(ytdl(petition.url, { filter: 'audioonly', agent: agent }), petition.url);
+                            await descargarM(ytdl(petition.url, { filter: 'audioonly', agent: agent }), petition.url, nameM);
                             requestM.shift(); // Elimina la petición procesada
                         } catch (error) {
                             console.error("Error al descargar la canción:", error);
@@ -1731,8 +1653,7 @@ class AlastorBot {
                             await chat.sendStateTyping();
 
                             if (search.includes('https://youtu.be/')){
-                                stream = 
-                                addPetition(search, mensaje_error);
+                                stream = addPetition(search, mensaje_error);
                                 return
                             }
                             await youtube.search(search, { limit: 1 }).then(x => {
@@ -1742,7 +1663,14 @@ class AlastorBot {
                                         counterListRequestMusic = 0;
                                         return;
                                     }
-                                    addPetition(x[0].url, mensaje_error);
+                                    if(fs.existsSync(`${direcMusic}/${x[0].title}.mp3`)){
+                                        const file = fs.readFileSync(`${direcMusic}/${x[0].title}.mp3`);
+                                        const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+                                        chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                                        counterListRequestMusic = 0;
+                                        return;
+                                    }
+                                    addPetition(x[0].url, mensaje_error, x[0].title);
 
                                 } catch (error) {
                                     counterListRequestMusic = 0;

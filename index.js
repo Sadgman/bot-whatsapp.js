@@ -5,7 +5,9 @@ process.on('SIGINT', async () => {
     const { AlastorBot } = require('./bot')
     new AlastorBot().closeBot();
 })
-
+if(!fs.existsSync(`./assets/audio`)){
+    fs.mkdirSync(`./assets/audio`);
+}
 if(fs.existsSync('config.json')){
     const browserPath = JSON.parse(fs.readFileSync('config.json'))[0].path;
     if(browserPath){
