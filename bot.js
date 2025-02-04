@@ -1572,6 +1572,7 @@ class AlastorBot {
                 }
                 function descargarM(stream, url, nameM) {
                     return new Promise(async (resolve, reject) => {
+
                         try {
                             await new Promise((resolve, reject) => {
                                 //Comprimo el archivo
@@ -1594,7 +1595,8 @@ class AlastorBot {
                                 const n = await YTDownloadMusic(url);
                                 const response = await fetch(n);
                                 const buffer = await response.buffer();
-                                fs.writeFileSync(`${direcMusic}/${nameM}.mp3`, buffer);
+                                console.log("guardando")
+                                fs.writeFileSync(`${direcMusic}/${nameM}.mp3`, buffer)
                                 const file = fs.readFileSync(`${direcMusic}/${nameM}.mp3`);
                                 const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                                 await requestM[0].chat.sendMessage(media, { quotedMessageId: requestM[0].quotedMessageId });
@@ -1663,14 +1665,15 @@ class AlastorBot {
                                         counterListRequestMusic = 0;
                                         return;
                                     }
-                                    if(fs.existsSync(`${direcMusic}/${x[0].url}.mp3`)){
-                                        const file = fs.readFileSync(`${direcMusic}/${x[0].url}.mp3`);
+                                    const nameM = x[0].url.split('v=')[1];
+                                    if(fs.existsSync(`${direcMusic}/${nameM}.mp3`)){
+                                        const file = fs.readFileSync(`${direcMusic}/${nameM}.mp3`);
                                         const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
                                         chat.sendMessage(media, { quotedMessageId: message.id._serialized });
                                         counterListRequestMusic = 0;
                                         return;
                                     }
-                                    addPetition(x[0].url, mensaje_error, x[0].url);
+                                    addPetition(x[0].url, mensaje_error, nameM);
 
                                 } catch (error) {
                                     counterListRequestMusic = 0;
