@@ -1236,11 +1236,11 @@ class AlastorBot {
                         }
                         googleTTS.getAllAudioBase64(text, { lang: language, slow: false })
                             .then((audio) => {
-                                let result;
+                                let result='';
                                 for(let i=0; i<audio.length; i++){
                                     result += audio[i]?.base64
                                 }
-                                const medi = new MessageMedia('audio/mp3', result.toString('base64'), 'audio');
+                                const medi = new MessageMedia('audio/mp3', result, 'audio');
                                 if (message.hasQuotedMsg) {
                                     chat.sendMessage(medi, { sendAudioAsVoice: true, quotedMessageId: mensaje_citado.id._serialized });
                                 } else {
