@@ -1247,7 +1247,7 @@ class AlastorBot {
                                     chat.sendMessage(medi, { sendAudioAsVoice: true });
                                 }
                             }).catch((err) => {
-                                message.reply(err);
+                                message.reply('Lo siento no puedo enviarlo');
                             });
                     }
 
