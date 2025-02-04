@@ -1243,7 +1243,7 @@ class AlastorBot {
                                     chat.sendMessage(medi, { sendAudioAsVoice: true });
                                 }
                             }).catch((err) => {
-                                message.reply('No pude crear el audio');
+                                message.reply(err);
                             });
                     }
 
