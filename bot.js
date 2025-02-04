@@ -1234,9 +1234,13 @@ class AlastorBot {
                         if (message.hasQuotedMsg) {
                             mensaje_citado = await message.getQuotedMessage();
                         }
-                        googleTTS.getAudioBase64(text, { lang: language, slow: false })
-                            .then((base64) => {
-                                const medi = new MessageMedia('audio/mp3', base64.toString('base64'), 'audio');
+                        googleTTS.getAllAudioBase64(text, { lang: language, slow: false })
+                            .then((audio) => {
+                                let result;
+                                for(let i=0; i<audio.length; i++){
+                                    result += audio[i]?.base64
+                                }
+                                const medi = new MessageMedia('audio/mp3', result.toString('base64'), 'audio');
                                 if (message.hasQuotedMsg) {
                                     chat.sendMessage(medi, { sendAudioAsVoice: true, quotedMessageId: mensaje_citado.id._serialized });
                                 } else {
