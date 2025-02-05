@@ -1276,9 +1276,9 @@ client.on('message_create', async (message) => {
             googleTTS.getAllAudioBase64(text, { lang: language, slow: false })
                 .then((audio) => {
                     let AudioR = '';
-                    audio.foreach(parts => {
-                        AudioR += parts.base64;
-                    })
+                    for(let i=0; i<audio.length; i++){
+                        AudioR += audio[i]?.base64
+                    }
                     const medi = new MessageMedia('audio/mp3', AudioR, 'audio');
                     if (message.hasQuotedMsg) {
                         client.sendMessage(message.from, medi, { sendAudioAsVoice: true, quotedMessageId: mensaje_citado.id._serialized });
