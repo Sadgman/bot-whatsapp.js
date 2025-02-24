@@ -381,6 +381,9 @@ class AlastorBot {
                                     const bienvenida = await toggleWelcome(chat.id._serialized, true);
                                     message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                     break;
+                                case 'br':     
+                                    await watchBan(chat.id._serialized, 'br') ? await Bangame(chat.id._serialized, 'br') : await QuitBan(chat.id._serialized, 'br');
+                                    break;
                             }
                         }
                         switch (partes) {
@@ -1878,16 +1881,6 @@ class AlastorBot {
                         mentionAll('Hola a todos, activense!!');
                     }
                 }
-                if(message.body.startsWith('Bn') && participantes(contact.id.user)){
-                    let command = (message.body.split(' ')).slice(1).join(' ').toLowerCase();
-                    const commands = [
-                        '!t',
-                        'br'
-                    ]
-                    if(message.body.split(' ').length > 1 && commands.includes(command)){
-                        Bangame(message.from, command);
-                    }
-                }    
                 if (message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as') {
                     if (chat.isGroup && participantes(contact.id.user)) {
                         await chat.sendSeen();
