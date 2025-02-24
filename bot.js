@@ -1564,7 +1564,7 @@ class AlastorBot {
                         message.reply('No pusiste una foto o video, nisiquiera citaste una');
                     }
                 }
-                if (message.body.toLocaleLowerCase() == 'br') {
+                if (message.body.toLocaleLowerCase() == 'br' && await watchBan(chat.id._serialized, 'br')) {
                     if (message.hasQuotedMsg) {
                         const quotedMsg = await message.getQuotedMessage();
                         if (quotedMsg.fromMe || participantes(contact.id.user)){
@@ -1876,6 +1876,16 @@ class AlastorBot {
                         mentionAll(parts.slice(1).join(' '));
                     }else{
                         mentionAll('Hola a todos, activense!!');
+                    }
+                }
+                if(message.body.startsWith('Bn') && participantes(contact.id.user)){
+                    let command = (message.body.split(' ')).slice(1).join(' ').toLowerCase();
+                    const commands = [
+                        '!t',
+                        'br'
+                    ]
+                    if(message.body.split(' ').length > 1 && commands.includes(command)){
+                        Bangame(message.from, command);
                     }
                 }    
                 if (message.body.toLocaleLowerCase() == 'ajustes' || message.body.toLocaleLowerCase() == 'as') {
