@@ -1569,7 +1569,7 @@ class AlastorBot {
                         message.reply('No pusiste una foto o video, nisiquiera citaste una');
                     }
                 }
-                if (message.body.toLocaleLowerCase() == 'br' && await watchBan(chat.id._serialized, 'br')) {
+                if (message.body.toLocaleLowerCase() == 'br') {
                     if (message.hasQuotedMsg) {
                         const quotedMsg = await message.getQuotedMessage();
                         if (quotedMsg.fromMe || participantes(contact.id.user)){
