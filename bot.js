@@ -412,7 +412,9 @@ class AlastorBot {
                         }
                     }
                 }
-                if (chat.isGroup && !(await watchBot(chat.id._serialized)) || !db_client) {
+                let p = message.body.split(' ');
+                p = p.length > 2 ? p[1] : 'no baneado';
+                if (chat.isGroup && !(await watchBot(chat.id._serialized)) || !db_client || !(watchBan(chat.id._serialized, p))) {
                     return;
                 }
                 if(chat.isGroup && participantes(numero_cliente)){   
