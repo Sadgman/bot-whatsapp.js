@@ -64,7 +64,6 @@ async function Bangame(id_group, game){
                         console.error(err.message);
                         reject(err);
                     }
-                    console.log('Juego baneado');
                     resolve();
                 });
             });
