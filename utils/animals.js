@@ -1,4 +1,13 @@
-const {db} = require('./base');
+const Database = require('./base');
+
+class animalUtils extends Database{
+    constructor(player, nombreAnimal, tipoAnimal){
+        super();
+        this.nombreAnimal = nombreAnimal;
+        this.tipoAnimal = tipoAnimal;
+    }
+    
+}
 
 /** 
  * @param {string} id_player id del jugador
