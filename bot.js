@@ -287,6 +287,8 @@ class AlastorBot{
                 let numero_cliente = client.info.wid.user
                 let contact = await message.getContact();
                 const group = await message.getChat();
+                const quotedMsg = message.hasQuotedMsg ? (await message.getQuotedMessage()) : null;
+
 
                 const searchParticipante = (userId) => {
                     const groupParticipants = chat.participants;
@@ -418,7 +420,7 @@ class AlastorBot{
                     }
                 }
                 // Verifica si el bot esta activado en el grupo solo si el chat es un grupo
-                const condicionReturnG = chat.isGroup ? !(await watchBot(chat.id._serialized)) || !db_client || !(await watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) : false
+                const condicionReturnG = chat.isGroup ? !(await Gtools.watchBot(chat.id._serialized)) || !db_client || !(await Gtools.watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) : false
                 if (condicionReturnG){
                     return;
                 }
@@ -501,40 +503,15 @@ class AlastorBot{
                     })
                 }
                 if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls' && chat.isGroup) {
-                    let info;
                     try {
-                        if (message.hasQuotedMsg) { 
-                            const quotedMsg = await message.getQuotedMessage();
-                            let contact = await quotedMsg.getContact();
-                            info = await Uplayer.getAllInfoPlayer(contact.id.user);
-                            const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
-                            if (info.Casado === 'nadie :(') {
-                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
-                                    quotedMessageId: quotedMsg.id._serialized
-                                });
-                            } else {
-                                const contacto_casado = await client.getNumberId(info.Casado);
-                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
-                                    mentions: contacto_casado._serialized,
-                                    quotedMessageId: quotedMsg.id._serialized
-                                });
-                            }
-                        }else {
-                            info = await Uplayer.getAllInfoPlayer(contact.id.user);
-                            const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
-                            if (info.Casado === 'nadie :(') {
-                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at}`, {
-                                    quotedMessageId: message.id._serialized
-                                });
-                            } else {
-                                const contacto_casado = await client.getNumberId(info.Casado);
-                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at}`, {
-                                    mentions: contacto_casado._serialized,
-                                    quotedMessageId: message.id._serialized
-                                });
-                            }
-                        }
-                        
+                        let person = message.hasQuotedMsg ? (await quotedMsg.getContact()).id.user : contact.id.user;
+                        const info = await Uplayer.getAllInfoPlayer(person);
+                        const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
+                        const contacto_casado = info.Casado ===  'nadie :(' ? null : (await client.getNumberId(info.Casado))._serialized;
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
+                            mentions: contacto_casado,
+                            quotedMessageId: message.hasQuotedMsg? quotedMsg.id._serialized : message.id._serialized
+                        });
                     } catch (err) {
                         console.log(err);
                         message.reply('La funcion aun esta en desarrollo');
