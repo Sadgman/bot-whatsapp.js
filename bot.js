@@ -288,7 +288,7 @@ class AlastorBot{
                 let contact = await message.getContact();
                 const group = await message.getChat();
                 const quotedMsg = message.hasQuotedMsg ? (await message.getQuotedMessage()) : null;
-                console.log(`Nuevo mensaje ${chat.name} de ${contact.pushname}: ${message.body}`);
+                console.log(`${chat.name} de ${contact.pushname}: ${message.body}`);
 
 
                 const searchParticipante = (userId) => {
