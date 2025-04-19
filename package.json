@@ -3,6 +3,7 @@
     "node": ">=20.15.1"
   },
   "dependencies": {
+    "@distube/ytdl-core": "^4.16.5",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@sasmeee/igdl": "^1.0.0",
     "dayjs": "^1.11.10",

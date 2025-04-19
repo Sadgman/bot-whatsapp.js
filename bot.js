@@ -420,18 +420,16 @@ class AlastorBot {
                 if(chat.isGroup && participantes(numero_cliente)){   
                     let mmsg = message.body.toLocaleLowerCase();
                     addgroup(chat.id._serialized);
-                    chat.getInviteCode().then((linkg) => {
-                        if(linkg){
-                            for (let i = 0; i < links_baneados.length; i++) {
-                                if (!(mmsg.includes(linkg.toLocaleLowerCase())) && mmsg.includes(links_baneados[i])) {
-                                    message.delete(true);
-                                    group.removeParticipants([contact.id._serialized])
-                                    break
-                                }
+                    
+                        for (let i = 0; i < links_baneados.length; i++) {
+                            if (mmsg.includes(links_baneados[i])) {
+                                message.delete(true);
+                                group.removeParticipants([contact.id._serialized])
+                                break
                             }
                         }
-                    })
-                }
+                    }
+                
                 //agregar otro cliente
                 if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user) && !chat.isGroup) {
                     try {
@@ -1650,7 +1648,7 @@ class AlastorBot {
                         } catch (error) {
                             console.error("Error al descargar la canción:", error);
                             requestM[0].chat.sendMessage(mensaje_error, { quotedMessageId: requestM[0].quotedMessageId });
-                            requestM.shift(); 
+                            requestM.shift();
                         }
                     }
                 }
@@ -1663,8 +1661,30 @@ class AlastorBot {
                             await chat.sendSeen();
                             await chat.sendStateTyping();
 
-                            if (search.includes('https://youtu.be/')){
-                                stream = addPetition(search, mensaje_error);
+                            if (ytdl.validateURL(search)) {
+                                console.log('url validA')
+                                const nameM = ytdl.getURLVideoID(search);
+                                const filePath = `${direcMusic}/${nameM}.mp3`;
+                                if (fs.existsSync(filePath)) {
+                                    const file = fs.readFileSync(filePath);
+                                    if (file.length === 0) {
+                                        console.error('El archivo está vacío:', filePath);
+                                        message.reply('El archivo generado está vacío.');
+                                        return;
+                                    }
+                                    const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
+                                    try {
+                                        chat.sendMessage(media, { quotedMessageId: message.id._serialized });
+                                    } catch (err) {
+                                        console.error('Error al enviar el mensaje:', err);
+                                        message.reply('Hubo un problema al enviar el archivo.');
+                                    }
+                                } else {
+                                    console.error('El archivo no existe:', filePath);
+                                    message.reply('No se pudo generar el archivo de audio.');
+                                    stream = addPetition(search, mensaje_error);
+                                }
+                                counterListRequestMusic = 0;
                                 return
                             }
                             await youtube.search(search, { limit: 1 }).then(x => {
@@ -1674,7 +1694,7 @@ class AlastorBot {
                                         counterListRequestMusic = 0;
                                         return;
                                     }
-                                    const nameM = x[0].url.split('v=')[1];
+                                    const nameM = ytdl.getURLVideoID(x[0].url);
                                     if(fs.existsSync(`${direcMusic}/${nameM}.mp3`)){
                                         const file = fs.readFileSync(`${direcMusic}/${nameM}.mp3`);
                                         const media = new MessageMedia('audio/mp3', file.toString('base64'), 'audio');
