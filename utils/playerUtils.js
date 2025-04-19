@@ -1,187 +1,119 @@
-const fs = require('fs');
-const {db} = require('./base');
+const Database  = require('./base');
 
-async function update_dias(player, dias, opcion) {
-    try {
-        if (opcion === 1) {
-            await update_info_player(player, "dias", dias, true);
-        } else if (opcion === 2) {
-            if (await getAllInfoPlayer(player).dias !== dias) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    } catch (err) {
-        console.log(err);
-        return null;
+class playerUtils extends Database {
+    constructor(){
+        super();
     }
-}
-
-function getAllInfoPlayer(id) {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT * FROM players WHERE id = ?`, [id], (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
+    /**
+     *
+     * @param {number} player
+     * @param {number} dias
+     * @param {number} opcion
+     */
+    async update_dias(player, dias, opcion) {
+        try {
+            if (opcion === 1) {
+                await this.update_info_player(player, "dias", dias, true);
+            } else if (opcion === 2) {
+                if (await this.getAllInfoPlayer(player).dias !== dias) {
+                    return false;
+                } else {
+                    return true;
                 }
+            }
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    }
+    async getAllInfoPlayer(id) {
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT * FROM players WHERE id = ?`, [id])
+            .then(async (rows) => {
+                rows[0].Casado = (await dr.ReadDb(`SELECT pareja FROM casados WHERE id = ${id}`)).pareja;
                 resolve(rows[0]);
-            });
+            }).catch((err) => {reject(err)});
         });
-    });
-}
-
-async function update_info_player(player, type, value, rem) {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT * FROM players WHERE id = ?`, [player], (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                if (rows.length === 0) {
-                    reject('No existe el jugador');
-                    return;
-                }
+    }
+    /**
+     * va a actualizar la informacion de un jugador
+     * @param {id del jugador} player
+     * @param {tipo de informacion a actualizar} type
+     * @param {valor a actualizar} value
+     * @param {si es un array} isArray
+    */
+    async update_info_player(player, type, value, isArray) {
+        return new Promise((resolve, reject) => {
+            if(type === "Casado"){
+                this.WriteDb(`UPDATE casados SET pareja = ? WHERE id = ?`, [value, player])
+                .then(() => {resolve()}).catch((err) => {reject(err)});
+                return;
+            }
+            this.ReadDb(`SELECT * FROM players WHERE id = ?`, [player])
+            .then((rows) => {
                 let player = rows[0];
                 if (Array.isArray(player[type])) {
-                    rem ? player[type] = value : player[type].push(value);
+                    isArray ? player[type] = value : player[type].push(value);
                 } else {
                     player[type] = value;
                 }
-
+    
                 const query = `UPDATE players SET ${type} = ? WHERE id = ?`;
-                db.run(query, [player[type], player.id], (err) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    resolve(player);
-                });
-            });
+                this.WriteDb(query, [player[type], player.id])
+                .then(() => {resolve(player)}).catch((err) => {reject(err)});
+            }).catch((err) => {reject(err)});
+        })
+    }
+    /**
+     * 
+     * @param {id del jugador} player 
+     * @param {grupo del jugador} grupo
+     */
+    async jsonread(player, grupo) {
+        return new Promise((resolve, reject) => {
+            this.WriteDb(`INSERT OR IGNORE INTO players (id) VALUES (${player}); 
+                INSERT OR IGNORE INTO casados (id) VALUES (${player}); 
+                INSERT OR IGNORE INTO estadisticas(id) VALUES (${player}) `)
+            .then(() => {resolve(true)}).catch((err) => {reject(err)});
         });
-    })
+    }
+    async topPlayersWithMostMoney() {
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT id, Banco + Dinero as total FROM players ORDER BY total DESC LIMIT 5`)
+            .then((rows) => {resolve(rows.map(row => row.id))}).catch((err) => {reject(err)});
+        });
+    }
+    async moneyTopPlayers() {
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT Banco + Dinero as total FROM players ORDER BY total DESC LIMIT 5`)
+            .then((rows) => {resolve(rows.map(row => row.total))}).catch((err) => {reject(err)});
+        });
+    }
+    async topPlayersWithMostLevel() {
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT id FROM players ORDER BY Nivel DESC LIMIT 5`)
+            .then((rows) => {resolve(rows.map(row => row.id))}).catch((err) => {reject(err)});
+        });
+    }
+    async levelTopPlayers() {
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT Nivel FROM players ORDER BY Nivel DESC LIMIT 5`)
+            .then((rows) => {resolve(rows.map(row => row.Nivel))}).catch((err) => {reject(err)});
+        });
+    }
+    async topUsersMessages() {
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT id FROM players WHERE id not in (SELECT numero FROM bots) order by Mensajes desc limit 5;`)
+            .then((rows) => {resolve(rows.map(row => row.id))}).catch((err) => {reject(err)});
+        });
+    }
+    async messageUsers() {
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT Mensajes FROM players WHERE id not in (SELECT numero FROM bots) order by Mensajes desc limit 5;`)
+            .then((rows) => {resolve(rows.map(row => row.Mensajes))}).catch((err) => {reject(err)});
+        });
+    }
+    
 }
 
-async function jsonread(player) {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT * FROM players WHERE id = ?`, [player], (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                if (rows.length === 0) {
-                    const n = `INSERT INTO players (id, Nombre, Casado, Rool, Puntos, Nivel, Dinero, Banco, Mensajes, Objetos, Animales) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                    db.run(n, [player, '', 'nadie :(', 'Vagabundo', 0, 0, 0, 0, 0, '{}', '{}'], (err) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        resolve(false);
-                    });
-                } else {
-                    resolve(true);
-                }
-            });
-        });
-    });
-}
-
-async function topPlayersWithMostMoney() {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT id, Banco + Dinero as total FROM players ORDER BY total DESC LIMIT 5`, (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(rows.map(row => row.id));
-            });
-        });
-    });
-}
-
-async function moneyTopPlayers() {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT Banco + Dinero as total FROM players ORDER BY total DESC LIMIT 5`, (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(rows.map(row => row.total));
-            });
-        });
-    });
-}
-
-async function topPlayersWithMostLevel() {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT id FROM players ORDER BY Nivel DESC LIMIT 5`, (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(rows.map(row => row.id));
-            });
-        });
-    });
-}
-
-async function levelTopPlayers() {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT Nivel FROM players ORDER BY Nivel DESC LIMIT 5`, (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(rows.map(row => row.Nivel));
-            });
-        });
-    });
-}
-
-async function topUsersMessages() {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT id FROM players WHERE id not in (SELECT numero FROM bots) order by Mensajes desc limit 5;`, (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(rows.map(row => row.id));
-            });
-        });
-    });
-}
-
-async function messageUsers() {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.all(`SELECT Mensajes FROM players WHERE id not in (SELECT numero FROM bots) order by Mensajes desc limit 5;`, (err, rows) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(rows.map(row => row.Mensajes));
-            });
-        });
-    });
-}
-
-module.exports = {
-    jsonread,
-    update_info_player,
-    getAllInfoPlayer,
-    update_dias,
-    topPlayersWithMostMoney,
-    moneyTopPlayers,
-    topPlayersWithMostLevel,
-    levelTopPlayers,
-    topUsersMessages,
-    messageUsers
-};
+module.exports = new playerUtils();

@@ -20,11 +20,10 @@ const timezone = require('dayjs/plugin/timezone');
 const Jimp = require('jimp');
 const quest = require('preguntas');
 const mc = require('./utils/mc.js');
-const { jsonread, update_info_player, getAllInfoPlayer, update_dias, topPlayersWithMostMoney, moneyTopPlayers, topPlayersWithMostLevel, levelTopPlayers, topUsersMessages, messageUsers} = require('./utils/playerUtils.js');
-const { addgroup, bot_off_on, watchBot, watchBan, groupActiveQuestions, Bangame, QuitBan, asignarBot, esBotAsignado, verAsignadoBot, toggleWelcome} = require('./utils/groupTools.js');
-const { addAnimal, modifyAnimalsParameters, getAnimals } = require('./utils/animals.js');
-const { insertarBot, encontrarBot, eliminarBot, searchPathbots, asignarCargoBot, vercargoBot, cupo, readRandomAnime } = require('./utils/bots.js');
-const { cerrarBase } = require('./utils/base.js');
+const Uplayer = require('./utils/playerUtils.js');
+const Gtools = require('./utils/groupTools.js');
+const games = require('./utils/GamesControlDb.js')
+const botUtils = require('./utils/bots.js');
 
 dayjs.extend(utc);
 dayjs.extend(timezone); 
@@ -37,7 +36,7 @@ events.EventEmitter.defaultMaxListeners = 20;
 // Version 4.0.1
 
 
-class AlastorBot {
+class AlastorBot{
     /**
      * 
      * @param {string} browserPath 
@@ -50,19 +49,19 @@ class AlastorBot {
      */
     async activate() {
         const baseDir = './session';
-        
-        const paths = await searchPathbots();
+        const paths = await botUtils.SearchBotPath();
         await this.activateClientBot(baseDir, true, null, null);
         if(paths.length > 0){
             paths.forEach(async (path) => {
-                if(!(await vercargoBot(path) === null)){
+                if(!(await botUtils.SeeBotCargo(path) === null)){
                     await this.activateClientBot(baseDir, true, path, null);
                 }
             })
         }
     }
     async closeBot(){
-        await cerrarBase();
+        const db  = require('./utils/base.js');
+        new db().CloseDb()
         process.exit();
     }
     async activateClientBot(data_session, qqr, num, message) {
@@ -86,9 +85,9 @@ class AlastorBot {
             });
             client.on('disconnected', async (reason) => {
                 console.error('Cliente desconectado:');
-                const paths = await searchPathbots();
+                const paths = await botUtils.SearchBotPath();
                 if(paths.length > 0){
-                    await eliminarBot(num);
+                    await botUtils.DeleteBot(num);
                     if(fs.existsSync(`${data_session}/session-${num}`, { recursive: true })){
                         fs.rmSync(`${data_session}/session-${num}`, { recursive: true, force: true });
                     }
@@ -98,13 +97,13 @@ class AlastorBot {
             });
             client.on('auth_failure', async () => {
                 console.error('Error de autenticación');
-                await eliminarBot(num);
+                await botUtils.DeleteBot(num);
             });
             //client.on('authenticated', async (session) => {})
             client.on('qr', async (qr) => {
                 if (qqr) {
                     if(num !== null){
-                        await eliminarBot(num);
+                        await botUtils.DeleteBot(num);
                         if(fs.existsSync(`${data_session}/session-${num}`, { recursive: true })){
                             fs.rmSync(`${data_session}/session-${num}`, { recursive: true, force: true });
                         }
@@ -133,21 +132,21 @@ class AlastorBot {
             let directemp;
             client.on('ready', async () => {
                 console.log('Todo esta listo!');
-                if(await encontrarBot(client.info.wid.user)){
-                    await insertarBot(client.info.wid.user, data_session);
+                if(await botUtils.BotIsFound(client.info.wid.user)){
+                    await botUtils.InsertBot(client.info.wid.user, data_session);
                 }
                 if(num){
                     directemp = `${data_session}/session-${client.info.wid.user}/Default/temp`;
                     if(!fs.existsSync(directemp)){
                         fs.mkdirSync(directemp, { recursive: true });
                     }
-                    await asignarCargoBot(client.info.wid.user, 'secundario');
+                    await botUtils.AssignBotCargo(client.info.wid.user, 'secundario');
                 }else{
                     directemp = `${data_session}/session/Default/temp`;
                     if(!fs.existsSync(directemp)){
                         fs.mkdirSync(directemp, { recursive: true });
                     }
-                    await asignarCargoBot(num, 'principal');           
+                    await botUtils.AssignBotCargo(num, 'principal');           
                 }
                 client.on('message_create', mensaje)
                 numCodesSent = 0;
@@ -156,13 +155,13 @@ class AlastorBot {
             
             client.on('group_join', (notification) => {
                 notification.getChat().then(async (chat) => {
-                    addgroup(chat.id._serialized);
-                    if(await esBotAsignado(chat.id._serialized, client.info.wid.user ) === 'no asignado'){
-                        await asignarBot(client.info.wid.user, chat.id._serialized);
-                    }else if(await esBotAsignado(chat.id._serialized, client.info.wid.user)){
+                    Gtools.addgroup(chat.id._serialized);
+                    if(await Gtools.esBotAsignado(chat.id._serialized, client.info.wid.user ) === 'no asignado'){
+                        await Gtools.asignarBot(client.info.wid.user, chat.id._serialized);
+                    }else if(await Gtools.esBotAsignado(chat.id._serialized, client.info.wid.user)){
                         return;
                     } 
-                    if(await watchBot(chat.id._serialized) && await toggleWelcome(chat.id._serialized, true)){
+                    if(await Gtools.watchBot(chat.id._serialized) && await Gtools.toggleWelcome(chat.id._serialized, true)){
                         const regex = /(?:https?:\/\/)?chat\.whatsapp\.com\/\S*/g;     
                         const descripcion = chat.description || '';
                         notification.reply(`Bienvenido a ${chat.name}, @${notification.recipientIds[0].replace('@c.us', '')}\n\n${descripcion.replace(regex, '')}`, {
@@ -289,7 +288,6 @@ class AlastorBot {
                 let contact = await message.getContact();
                 const group = await message.getChat();
 
-                await jsonread(contact.id.user);
                 const searchParticipante = (userId) => {
                     const groupParticipants = chat.participants;
                     const participant = groupParticipants.find(part => part.id.user === userId);
@@ -298,15 +296,24 @@ class AlastorBot {
                     }
                     return true;
                 }
+                await Uplayer.jsonread(contact.id.user, chat.id._serialized);
+                const viewPlayer = await Uplayer.getAllInfoPlayer(contact.id.user);
+                chat.isGroup = chat.id.server === 'g.us' ? true : false;
+                // agrego un jugador a la base de datos
                 if(chat.isGroup){
-                    await addgroup(chat.id._serialized);
-                    if(await esBotAsignado(chat.id._serialized, numero_cliente) === 'no asignado' || !searchParticipante(await verAsignadoBot(chat.id._serialized)) || await encontrarBot(await verAsignadoBot(chat.id._serialized))){
-                        await asignarBot(numero_cliente, chat.id._serialized);
-                    }else if(await esBotAsignado(chat.id._serialized, numero_cliente)){
+                    // agrego el grupo a la base de datos
+                    await Gtools.addgroup(chat.id._serialized)
+                    //actualizo la cantidad de mensajes enviados por el jugador
+                    if(botUtils.BotIsFound(contact.id.user)){
+                        await Uplayer.update_info_player(contact.id.user, "Mensajes", viewPlayer.Mensajes + 1, true);
+                    }
+                    //compruebo si el bot esta asignado a un grupo
+                    if(await Gtools.esBotAsignado(chat.id._serialized, numero_cliente) === 'no asignado' || !searchParticipante(await Gtools.verAsignadoBot(chat.id._serialized)) || await botUtils.BotIsFound(await Gtools.verAsignadoBot(chat.id._serialized))){
+                        await Gtools.asignarBot(numero_cliente, chat.id._serialized);
+                    }else if(await Gtools.esBotAsignado(chat.id._serialized, numero_cliente)){
                         return;
                     } 
                 }
-                const viewPlayer = await getAllInfoPlayer(contact.id.user);
 
                 function quitar_acentos(palabra){
                     const palabras_raras = ["á", "é", "í", "ó", "ú", "ñ", "ü"];
@@ -339,15 +346,13 @@ class AlastorBot {
                 if(insultos.includes(message.body.toLocaleLowerCase())){
                     message.reply('Tu madre me dijo otra cosa');
                 }
-                if(encontrarBot(contact.id.user)){
-                    await update_info_player(contact.id.user, "Mensajes", viewPlayer.Mensajes + 1, true);
-                }
+
                 const currentLevel = viewPlayer.Nivel;
                 let winsNeeded = (currentLevel + 1) * 10;
 
                 if(viewPlayer.Puntos >= winsNeeded){
-                    update_info_player(contact.id.user, "Nivel", currentLevel + 1, true);
-                    update_info_player(contact.id.user, "Puntos", 0, true);
+                    Uplayer.update_info_player(contact.id.user, "Nivel", currentLevel + 1, true);
+                    Uplayer.update_info_player(contact.id.user, "Puntos", 0, true);
                     message.reply('Felicidades has subido de nivel');
                 }
                 /**
@@ -377,12 +382,12 @@ class AlastorBot {
                             switch(partes){
                                 case 'bienvenida':
                                 case 'b':
-                                    await toggleWelcome(chat.id._serialized);
-                                    const bienvenida = await toggleWelcome(chat.id._serialized, true);
+                                    await Gtools.toggleWelcome(chat.id._serialized);
+                                    const bienvenida = await Gtools.toggleWelcome(chat.id._serialized, true);
                                     message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                     break;
                                 case 'br':     
-                                    await watchBan(chat.id._serialized, 'br') ? await Bangame(chat.id._serialized, 'br') : await QuitBan(chat.id._serialized, 'br');
+                                    await Gtools.watchBan(chat.id._serialized, 'br') ? await Gtools.Bangame(chat.id._serialized, 'br') : await Gtools.QuitBan(chat.id._serialized, 'br');
                                     break;
                             }
                         }
@@ -398,14 +403,14 @@ class AlastorBot {
                         }
                     }else if((participantes(contact.id.user) || contact.id.user === numero_cliente) && message.body.toLocaleLowerCase() === 'ab'){
                         if(contact.id.user === numero_cliente){
-                            db_client = !db_client;
-                            if(chat.isGroup && !(await watchBot(chat.id._serialized))){
-                                await bot_off_on(chat.id._serialized);
+                            db_client = !db_client; chat
+                            if(chat.isGroup && !(await Gtools.watchBot(chat.id._serialized))){
+                                await Gtools.bot_off_on(chat.id._serialized);
                             }
                             message.reply(`El bot ha sido ${db_client ? 'activado' : 'desactivado'} por el huesped`);
                         }else if (db_client){
-                            await bot_off_on(chat.id._serialized);
-                            const watch = await watchBot(chat.id._serialized);
+                            await Gtools.bot_off_on(chat.id._serialized);
+                            const watch = await Gtools.watchBot(chat.id._serialized);
                             message.reply(`El bot ha sido ${watch ? 'activado' : 'desactivado'}`);
                         }else{
                             message.reply('*El bot fue desactivado por el huesped, hablale para que lo active*');
@@ -419,21 +424,19 @@ class AlastorBot {
                 }
                 if(chat.isGroup && participantes(numero_cliente)){   
                     let mmsg = message.body.toLocaleLowerCase();
-                    addgroup(chat.id._serialized);
-                    
-                        for (let i = 0; i < links_baneados.length; i++) {
-                            if (mmsg.includes(links_baneados[i])) {
-                                message.delete(true);
-                                group.removeParticipants([contact.id._serialized])
-                                break
-                            }
-                        }
-                    }
-                
+                    Gtools.addgroup(chat.id._serialized);
+                            for (let i = 0; i < links_baneados.length; i++) {
+                                if (mmsg.includes(links_baneados[i])) {
+                                    message.delete(true);
+                                    group.removeParticipants([contact.id._serialized])
+                                    break
+                                }
+                            }       
+                }
                 //agregar otro cliente
-                if (message.body.toLocaleLowerCase() === '!otro' && await encontrarBot(contact.id.user) && !chat.isGroup) {
+                if (message.body.toLocaleLowerCase() === '!otro' && await botUtils.BotIsFound(contact.id.user) && !chat.isGroup) {
                     try {
-                        if(!(await cupo())){
+                        if(!(await botUtils.quota())){
                             message.reply('No hay cupo para mas bots, si quieres comprar un cupo habla con Alastor');
                             message.reply(preminum);
                             return;
@@ -450,9 +453,9 @@ class AlastorBot {
                     }
                 }
                 // Añadir un miembro al grupo con solo su número
-                if (message.body.toLocaleLowerCase().startsWith("aña")) {
+                if (message.body.toLocaleLowerCase().startsWith("aña") && chat.isGroup) {
                     // Verifico si el bot es admin y si el que añade es admin 
-                    if ((chat.isGroup && participantes(contact.id.user) || Alastor_Number.includes(contact.id.user)) && participantes(numero_cliente)) {
+                    if (chat.isGroup && participantes(contact.id.user) && participantes(numero_cliente)) {
                         let parte = message.body.split(" ");
                         if(parte.length > 2){
                             return
@@ -497,42 +500,41 @@ class AlastorBot {
                         chat.removeParticipants([participant.id._serialized]); //los remuevo uno a uno
                     })
                 }
-                if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls') {
+                if (message.body.toLocaleLowerCase() === 'io' || message.body.toLocaleLowerCase() === 'ls' && chat.isGroup) {
                     let info;
                     try {
-                        if (chat.isGroup) {
-                            if (message.hasQuotedMsg) { 
-                                const quotedMsg = await message.getQuotedMessage();
-                                let contact = await quotedMsg.getContact();
-                                info = await getAllInfoPlayer(contact.id.user);
-                                const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
-                                if (info.Casado === 'nadie :(') {
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
-                                        quotedMessageId: quotedMsg.id._serialized
-                                    });
-                                } else {
-                                    const contacto_casado = await client.getNumberId(info.Casado);
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
-                                        mentions: contacto_casado._serialized,
-                                        quotedMessageId: quotedMsg.id._serialized
-                                    });
-                                }
-                            }else {
-                                info = await getAllInfoPlayer(contact.id.user);
-                                const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
-                                if (info.Casado === 'nadie :(') {
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at}`, {
-                                        quotedMessageId: message.id._serialized
-                                    });
-                                } else {
-                                    const contacto_casado = await client.getNumberId(info.Casado);
-                                    chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at}`, {
-                                        mentions: contacto_casado._serialized,
-                                        quotedMessageId: message.id._serialized
-                                    });
-                                }
+                        if (message.hasQuotedMsg) { 
+                            const quotedMsg = await message.getQuotedMessage();
+                            let contact = await quotedMsg.getContact();
+                            info = await Uplayer.getAllInfoPlayer(contact.id.user);
+                            const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
+                            if (info.Casado === 'nadie :(') {
+                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
+                                    quotedMessageId: quotedMsg.id._serialized
+                                });
+                            } else {
+                                const contacto_casado = await client.getNumberId(info.Casado);
+                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
+                                    mentions: contacto_casado._serialized,
+                                    quotedMessageId: quotedMsg.id._serialized
+                                });
+                            }
+                        }else {
+                            info = await Uplayer.getAllInfoPlayer(contact.id.user);
+                            const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
+                            if (info.Casado === 'nadie :(') {
+                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at}`, {
+                                    quotedMessageId: message.id._serialized
+                                });
+                            } else {
+                                const contacto_casado = await client.getNumberId(info.Casado);
+                                chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at}`, {
+                                    mentions: contacto_casado._serialized,
+                                    quotedMessageId: message.id._serialized
+                                });
                             }
                         }
+                        
                     } catch (err) {
                         console.log(err);
                         message.reply('La funcion aun esta en desarrollo');
@@ -543,12 +545,12 @@ class AlastorBot {
                         message.reply('No estas casad@');
                     } else {
                         if (viewPlayer.Puntos > 0 && viewPlayer.Mensajes >= 20) {
-                            let casadoPlayer = await getAllInfoPlayer(viewPlayer.Casado);
-                            update_info_player(viewPlayer.Casado, "Puntos", casadoPlayer.Puntos + 1, true);
-                            update_info_player(viewPlayer.Casado, "Casado", "nadie :(", true);
-                            update_info_player(contact.id.user, "Casado", "nadie :(", true);
-                            update_info_player(contact.id.user, "Mensajes", viewPlayer.Mensajes - 20, true);
-                            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
+                            let casadoPlayer = await Uplayer.getAllInfoPlayer(viewPlayer.Casado);
+                            Uplayer.update_info_player(viewPlayer.Casado, "Puntos", casadoPlayer.Puntos + 1, true);
+                            Uplayer.update_info_player(viewPlayer.Casado, "Casado", "nadie :(", true);
+                            Uplayer.update_info_player(contact.id.user, "Casado", "nadie :(", true);
+                            Uplayer.update_info_player(contact.id.user, "Mensajes", viewPlayer.Mensajes - 20, true);
+                            Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
                             message.reply('Ahora estas divorciad@');
                         } else {
                             message.reply('No tienes suficientes mensajes o puntuacion para divorciarte');
@@ -559,13 +561,11 @@ class AlastorBot {
                     const regex = /^\d+$/;
                     if (regex.test(prometido)) {
                         try {
-                            if (chat.isGroup) {
-                                jsonread(prometido);
-                                if (viewPlayer.Casado === "nadie :(") {
-                                    update_info_player(contact.id.user, "Casado", prometido, true);
-                                    update_info_player(prometido, "Casado", contact.id.user, true);
-                                    message.reply("*🎉Felicidades ahora estas casad@!!*");
-                                }
+                            Uplayer.jsonread(prometido);
+                            if (viewPlayer.Casado === "nadie :(") {
+                                Uplayer.update_info_player(contact.id.user, "Casado", prometido, true);
+                                Uplayer.update_info_player(prometido, "Casado", contact.id.user, true);
+                                message.reply("*🎉Felicidades ahora estas casad@!!*");
                             }
                         } catch (err) {
                             message.reply('hubo un error y no te puedes casar');
@@ -615,7 +615,7 @@ class AlastorBot {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     if (chat.isGroup) {
-                        if (await watchBan(chat.id._serialized, 'todo') === false) {
+                        if (await Gtools.watchBan(chat.id._serialized, 'todo') === false) {
                             tempMenu = tempMenu.replace('🎮 👾🎧| Jugar.\n', '');
                             message.reply(tempMenu);
                         } else {
@@ -628,7 +628,7 @@ class AlastorBot {
                     }
                 }
                 if (message.body.toLocaleLowerCase() === 'rnu') {
-                    readRandomAnime().then((anime) => {
+                    games.readRandomAnime().then((anime) => {
                         message.reply(anime);
                     });
                 }
@@ -668,10 +668,10 @@ class AlastorBot {
                 
                         if (diferenciaJugador < diferenciaMaquina) {
                             ganador = 'ganó el Jugador';
-                            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
+                            Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
                         } else if (diferenciaMaquina < diferenciaJugador) {
                             ganador = 'ganó la Máquina';
-                            update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
+                            Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
                         } else {
                             ganador = 'quedó Empate';
                         }
@@ -703,6 +703,7 @@ class AlastorBot {
                     }
                 }
                 if(message.body.toLocaleLowerCase().startsWith('pp ')){
+                    return
                     //pp es pelea de pollos por apuestas el jugador introduce una cantidad de dinero a apostar y el bot elige un numero de probabilidad de ganar basandose en las estadisticas del animal
                     let parts = message.body.split(' ');
                     let cantidad = parts[1];
@@ -731,8 +732,8 @@ class AlastorBot {
                         "ppt papel\n" +
                         "ppt tijera\n";
                     if (chat.isGroup) {
-                        if (addgroup(chat.id._serialized) && await watchBan(chat.id._serialized, 'ppt') && await watchBan(chat.id._serialized, 'todos')) {
-                            ppt_menu = await watchBan(chat.id._serialized, 'ppt') ? ppt_menu : ppt_menu = 'Lo siento Banearon este juego del grupo';
+                        if (Gtools.addgroup(chat.id._serialized) && await Gtools.watchBan(chat.id._serialized, 'ppt') && await Gtools.watchBan(chat.id._serialized, 'todos')) {
+                            ppt_menu = await Gtools.watchBan(chat.id._serialized, 'ppt') ? ppt_menu : ppt_menu = 'Lo siento Banearon este juego del grupo';
                             message.reply(ppt_menu);
                         }
                     } else {
@@ -743,10 +744,10 @@ class AlastorBot {
                 if (message.body.toLocaleLowerCase() === "robar" && message.hasQuotedMsg && viewPlayer.Rool == 'ladron'){
                     const quotedMsg = await message.getQuotedMessage();
                     let contacto = await quotedMsg.getContact();
-                    let infoContacto = await getAllInfoPlayer(contacto.id.user);
+                    let infoContacto = await Uplayer.getAllInfoPlayer(contacto.id.user);
                     if (infoContacto.Dinero > 0) {
-                        await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + infoContacto.Dinero, true);
-                        await update_info_player(contacto.id.user, "Dinero", 0, true);
+                        await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + infoContacto.Dinero, true);
+                        await Uplayer.update_info_player(contacto.id.user, "Dinero", 0, true);
                         message.reply('lograste robarle todo el dinero a ' + contacto.pushname);
                     } else {
                         message.reply("No hay nada que robar");
@@ -754,11 +755,11 @@ class AlastorBot {
                 }
                 if(viewPlayer.Rool === "ama"){
                     let day = parseInt(dayjs().tz("America/Santo_Domingo").format('D'))
-                    if(update_dias(contact.id.user,day, 2) === false){
-                        update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
-                        let casado = await getAllInfoPlayer(viewPlayer.Casado)
-                        update_info_player(viewPlayer.Casado, "Dinero", casado.Dinero - 10, true);
-                        update_dias(contact.id.user,day, 1);
+                    if(Uplayer.update_dias(contact.id.user,day, 2) === false){
+                        Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
+                        let casado = await Uplayer.getAllInfoPlayer(viewPlayer.Casado)
+                        Uplayer.update_info_player(viewPlayer.Casado, "Dinero", casado.Dinero - 10, true);
+                        Uplayer.update_dias(contact.id.user,day, 1);
                         message.reply("Has recibido 10 monedas por ser ama de casa");
                     }
                 }
@@ -767,14 +768,14 @@ class AlastorBot {
                         if(message.hasQuotedMsg){
                             const quotedMsg = await message.getQuotedMessage();
                             let contacto = await quotedMsg.getContact();
-                            let contacto_info = await getAllInfoPlayer(contacto.id.user);
+                            let contacto_info = await Uplayer.getAllInfoPlayer(contacto.id.user);
                             if(contacto_info.Rool === "ladron"){
-                                await update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 3, true);
-                                await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
+                                await Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 3, true);
+                                await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 10, true);
                                 if(contacto_info.Dinero > 0){
                                     message.reply("este ladron no tenia dinero deberias golpearlo con un palo");
                                 }
-                                await update_info_player(contacto.id.user, "Rool", "vagabundo", true);
+                                await Uplayer.update_info_player(contacto.id.user, "Rool", "vagabundo", true);
                                 message.reply("Has arrestado al ladron el jefe te dio 10 monedas y 3 puntos por tu buen trabajo");
                             }else{
                                 message.reply("No puedes arrestar a alguien que no es un ladron y que no lo hayas golpeado");
@@ -790,12 +791,12 @@ class AlastorBot {
                             let parte = await message.getQuotedMessage();
                             parte = await parte.getContact();
                             const parte_id = parte.id.user;
-                            const persona_golpeada = await getAllInfoPlayer(parte_id);
+                            const persona_golpeada = await Uplayer.getAllInfoPlayer(parte_id);
                             if(persona_golpeada.Rool === "policia"){
                                 message.reply("No puedes golpear a un policia");
                             }else if(persona_golpeada.Rool === "ladron"){
-                                await update_info_player(parte_id, "Dinero", 0, true);
-                                await update_info_player(parte_id, "Banco", 0, true);
+                                await Uplayer.update_info_player(parte_id, "Dinero", 0, true);
+                                await Uplayer.update_info_player(parte_id, "Banco", 0, true);
                                 let respuestas = [
                                 "le diste en un riñon", 
                                 "le diste en la cabeza", 
@@ -851,14 +852,14 @@ class AlastorBot {
                                 foto = "./assets/cruz.jpg";
                             }
                             if(opcion === respuesta){
-                                await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + cantidad, true);
+                                await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + cantidad, true);
                                 message.reply(`Has ganado`);
                                 const media = MessageMedia.fromFilePath(foto)
                                 const medi = new MessageMedia('image/jpg', media.data, 'sticker');
                                 chat.sendMessage(medi, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
                             }
                             if(opcion !== respuesta){
-                                await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
+                                await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
                                 message.reply(`Has perdido`);
                                 const media = MessageMedia.fromFilePath(foto)
                                 const medi = new MessageMedia('image/jpg', media.data, 'sticker');
@@ -976,7 +977,7 @@ class AlastorBot {
                                     }
                                     if(viewPlayer.Dinero >= cantidad){
                                         dinero_bj[contact.id.user] = cantidad;
-                                        await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
+                                        await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - cantidad, true);
                                         message.reply("Tu carta es: " + repartir(contact.id.user));
                                     }else{
                                         message.reply('No tienes suficiente dinero para apostar esa cantidad');
@@ -1000,12 +1001,12 @@ class AlastorBot {
                             if(cartas_jugador[contact.id.user]){
                                 const ganador_juego = ganador(contact.id.user);
                                 if(ganador_juego === 'jugador'){
-                                    await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + dinero_bj[contact.id.user] * 2, true);
+                                    await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + dinero_bj[contact.id.user] * 2, true);
                                     message.reply('Has ganado' + " las cartas del deler son: " + dealer[contact.id.user]);
                                 }else if(ganador_juego === 'dealer'){
                                     message.reply('Has perdido' + " las cartas del deler son: " + dealer[contact.id.user]);
                                 }else{
-                                    await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + dinero_bj[contact.id.user]); 
+                                    await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + dinero_bj[contact.id.user]); 
                                     message.reply('Empate');
                                 }
                                 delete cartas_jugador[contact.id.user];
@@ -1034,10 +1035,10 @@ class AlastorBot {
                         message.reply('Empate el bot escogio piedra');
                     } else if (options[randomIndex] === 'papel') {
                         message.reply('Perdiste el bot escogio papel');
-                        update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
+                        Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
                     } else {
                         message.reply('Ganaste el bot escogio tijera');
-                        update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
+                        Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
                     }
                 }
                 if (message.body.toLocaleLowerCase() === 'ppt papel') {
@@ -1049,10 +1050,10 @@ class AlastorBot {
                         message.reply('Empate el bot escogio papel');
                     } else if (options[randomIndex] === 'tijera') {
                         message.reply('Perdiste el bot escogio tijera');
-                        update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
+                        Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
                     } else {
                         message.reply('Ganaste el bot escogio piedra');
-                        update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
+                        Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
                     }
                 }
                 if (message.body.toLocaleLowerCase() === 'ppt tijera') {
@@ -1064,16 +1065,16 @@ class AlastorBot {
                         message.reply('Empate el bot escogio tijera');
                     } else if (options[randomIndex] === 'piedra') {
                         message.reply('Perdiste el bot escogio piedra');
-                        update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
+                        Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 1, true);
                     } else {
-                        update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
+                        Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
                         message.reply('Ganaste el bot escogio papel');
                     }
                 }
                 if(message.body.toLocaleLowerCase() === 'top ricos'){
                     if(chat.isGroup){
-                        const los_ricos = await topPlayersWithMostMoney();
-                        const dinero_ricos = await moneyTopPlayers();
+                        const los_ricos = await Uplayer.Uplayer.topPlayersWithMostMoney();
+                        const dinero_ricos = await Uplayer.moneyTopPlayers();
                         let menciones = []
                         
                         let messageToSend = "*Los Ricos*\n\n";
@@ -1090,8 +1091,8 @@ class AlastorBot {
                 }
                 if(message.body.toLocaleLowerCase() === 'top nivel'){
                     if(chat.isGroup){
-                        const los_niveles = await topPlayersWithMostLevel();
-                        const niveles = await levelTopPlayers();
+                        const los_niveles = await Uplayer.topPlayersWithMostLevel();
+                        const niveles = await Uplayer.levelTopPlayers();
                         let menciones = []
                         let messageToSend = "*Los Mejores*\n\n";
 
@@ -1107,8 +1108,8 @@ class AlastorBot {
                 }
                 if(message.body.toLocaleLowerCase() === 'top mensajes'){
                     if(chat.isGroup){
-                        const personas = await topUsersMessages();
-                        const mensajes = await messageUsers();
+                        const personas = await Uplayer.topUsersMessages();
+                        const mensajes = await Uplayer.messageUsers();
                         let menciones = []
                         let messageToSend = "*Los mas habladores*\n\n";
                         for(let mention of personas){
@@ -1128,8 +1129,8 @@ class AlastorBot {
                     let tempmenu_game = menu_game;
                     await chat.sendSeen();
                     await chat.sendStateTyping();
-                    if (chat.isGroup && await watchBan(chat.id._serialized, 'todos')) {
-                        if (!(await watchBan(chat.id._serialized, 'menciones'))) {
+                    if (chat.isGroup && await Gtools.watchBan(chat.id._serialized, 'todos')) {
+                        if (!(await Gtools.watchBan(chat.id._serialized, 'menciones'))) {
                             tempmenu_game = tempmenu_game.replace(' formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n>', '');
                             message.reply(tempmenu_game);
                         } else {
@@ -1197,7 +1198,7 @@ class AlastorBot {
                         return;
                     }else if(chat.isGroup){
                         message.reply('Uff trabajaste duro, alguien te pagó 1 moneda');
-                        update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 1, true);
+                        Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + 1, true);
                         ContadorDeUnDia(contact.id.user);
                     }
                 }
@@ -1263,7 +1264,7 @@ class AlastorBot {
                     }
 
                     groupTimes[id_group] = setTimeout(async() => {
-                        await groupActiveQuestions(2, id_group, false);
+                        await games.quest(2, id_group, false);
                         chat.sendMessage('La pregunta ha expirado');
 
                         delete groupTimes[id_group];
@@ -1271,12 +1272,12 @@ class AlastorBot {
                 }
                 if(message.body.toLocaleLowerCase() === '!q'){
                     if(chat.isGroup){
-                        if(!(await groupActiveQuestions(1 ,chat.id._serialized)) && await watchBan(chat.id._serialized, 'todos')){
+                        if(!(await games.quest(1 ,chat.id._serialized))){
                             let indexp = quest.newIndexP();
-                            await groupActiveQuestions(8, chat.id._serialized, quest.readTitle());
-                            await groupActiveQuestions(6, chat.id._serialized, indexp);
-                            await groupActiveQuestions(2, chat.id._serialized, true);
-                            await groupActiveQuestions(3, chat.id._serialized ,quest.correctAnswerIndex());
+                            await games.quest(8, chat.id._serialized, quest.readTitle());
+                            await games.quest(6, chat.id._serialized, indexp);
+                            await games.quest(2, chat.id._serialized, true);
+                            await games.quest(3, chat.id._serialized ,quest.correctAnswerIndex());
                             message.reply(quest.readTitle() + "\n\n" + quest.readResponse());
                             TempQuest(chat.id._serialized);
                         }else{
@@ -1290,8 +1291,8 @@ class AlastorBot {
                     
                 }
                 if (message.body.toLocaleLowerCase() === 'fp') {
-                    if (chat.isGroup && await watchBan(chat.id._serialized, 'fp') && await watchBan(chat.id._serialized, 'todos') && await watchBan(chat.id._serialized, 'menciones')){
-                        if (!participantes(contact.id.user) && !(await watchBan(chat.id._serialized, 'admins'))) {
+                    if (chat.isGroup && await Gtools.watchBan(chat.id._serialized, 'fp') && await Gtools.watchBan(chat.id._serialized, 'todos') && await Gtools.watchBan(chat.id._serialized, 'menciones')){
+                        if (!participantes(contact.id.user) && !(await Gtools.watchBan(chat.id._serialized, 'admins'))) {
                             message.reply('*No puedes participar en este juego solo los administradores pueden*');
                         }else{
                             await chat.sendSeen();
@@ -1321,8 +1322,8 @@ class AlastorBot {
                     if (opcion === 'depositar' || opcion === 'dp') {
                         let cantidad = parts[2];
                         if (cantidad > 0 && cantidad <= viewPlayer.Dinero) {
-                            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - parseInt(cantidad), true);
-                            update_info_player(contact.id.user, "Banco", viewPlayer.Banco + parseInt(cantidad), true);
+                            Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - parseInt(cantidad), true);
+                            Uplayer.update_info_player(contact.id.user, "Banco", viewPlayer.Banco + parseInt(cantidad), true);
                             message.reply(`Has depositado ${cantidad} a tu cuenta bancaria`);
                         } else {
                             message.reply('No tienes suficiente dinero');
@@ -1330,8 +1331,8 @@ class AlastorBot {
                     } else if (opcion === 'retirar' || opcion === 'rt') {
                         let cantidad = parts[2];
                         if (cantidad > 0 && cantidad <= viewPlayer.Banco) {
-                            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + parseInt(cantidad), true);
-                            update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
+                            Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + parseInt(cantidad), true);
+                            Uplayer.update_info_player(contact.id.user, "Banco", viewPlayer.Banco - parseInt(cantidad), true);
                             message.reply(`Has retirado ${cantidad} de tu cuenta bancaria`);
                         } else {
                             message.reply('No tienes suficiente dinero en el banco');
@@ -1341,7 +1342,7 @@ class AlastorBot {
                         try {
                             let cantidad = parts[2];
                             const id = await client.getContactById(message.mentionedIds[0]);
-                            let tres = await getAllInfoPlayer(id.id.user); 
+                            let tres = await Uplayer.getAllInfoPlayer(id.id.user); 
 
                             if (!isNaN(cantidad)) {
                                 cantidad = parseInt(cantidad);
@@ -1353,8 +1354,8 @@ class AlastorBot {
                                     return montoTotal; 
                                 }
                                 if (cantidad > 0 && comision() <= viewPlayer.Banco) {
-                                    update_info_player(contact.id.user, "Banco", viewPlayer.Banco - comision(), true);
-                                    update_info_player(id.id.user, "Banco", tres.Banco + parseInt(cantidad), true);
+                                    Uplayer.update_info_player(contact.id.user, "Banco", viewPlayer.Banco - comision(), true);
+                                    Uplayer.update_info_player(id.id.user, "Banco", tres.Banco + parseInt(cantidad), true);
                                     message.reply(`Has transferido ${cantidad} a ${id.pushname}`);
                                 } else {
                                     message.reply('No tienes suficiente dinero en el banco o no tienes la cantidad suficiente para la comisión del 10%');
@@ -1369,8 +1370,8 @@ class AlastorBot {
                             let cantidad = parts[2];
                             cantidad = parseInt(cantidad);
                             if(cantidad > 0 && cantidad <= viewPlayer.Puntos){
-                                update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - parseInt(cantidad), true);
-                                update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + parseInt(cantidad), true);
+                                Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - parseInt(cantidad), true);
+                                Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero + parseInt(cantidad), true);
                                 message.reply(`Has cambiado ${cantidad} puntos por dinero`);
                             }else{
                                 message.reply('No tienes suficientes puntos');
@@ -1391,8 +1392,8 @@ class AlastorBot {
                         //verifico que tenga el dinero suficiente
                         if (viewPlayer.Dinero >= dinero) {
                             //actualizo el dinero y el banco
-                            update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - dinero, true);
-                            update_info_player(contact.id.user, "Banco", viewPlayer.Banco + dinero, true);
+                            Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - dinero, true);
+                            Uplayer.update_info_player(contact.id.user, "Banco", viewPlayer.Banco + dinero, true);
                             message.reply(`Has depositado ${dinero} a tu cuenta bancaria`);
                         } else {
                             message.reply('No tienes suficiente dinero');
@@ -1493,8 +1494,8 @@ class AlastorBot {
                             if (viewPlayer.Rool !== articulo) {
                                 if(articulo === 'ama') return;
                                 if (viewPlayer.Dinero >= rol) {
-                                    await update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - rol, true);
-                                    await update_info_player(contact.id.user, "Rool", articulo, true);
+                                    await Uplayer.update_info_player(contact.id.user, "Dinero", viewPlayer.Dinero - rol, true);
+                                    await Uplayer.update_info_player(contact.id.user, "Rool", articulo, true);
                                     message.reply('Has comprado el articulo');
                                 } else {
                                     message.reply('No tienes suficiente dinero');
@@ -1516,8 +1517,8 @@ class AlastorBot {
                         let pareja2 = parts[2];
                         pareja1 = pareja1.replace('@', '');
                         pareja2 = pareja2.replace('@', '');
-                        const pareja1_info = await getAllInfoPlayer(pareja1); 
-                        const pareja2_info = await getAllInfoPlayer(pareja2);
+                        const pareja1_info = await Uplayer.getAllInfoPlayer(pareja1); 
+                        const pareja2_info = await Uplayer.getAllInfoPlayer(pareja2);
                         if(!isNaN(pareja1) && !isNaN(pareja2)){
                             if(pareja1 === pareja2){
                                 message.reply('No puedes tener sexo contigo mismo');
@@ -1925,16 +1926,16 @@ class AlastorBot {
                                 option.juego = 1;
                                 option.ajustes = 0;
                                 menu_juego = option_game;message.hasQuotedMsg
-                                if (!(await watchBan(chat.id._serialized, 'todos'))) {
+                                if (!(await Gtools.watchBan(chat.id._serialized, 'todos'))) {
                                     menu_juego = menu_juego.replace('1. Quitar la opción Juego\n', '1. Devolver la opción Juego\n');
                                     menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '');
                                     menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '');
                                 }
-                                if (!(await watchBan(chat.id._serialized, 'menciones'))) {
+                                if (!(await Gtools.watchBan(chat.id._serialized, 'menciones'))) {
                                     menu_juego = menu_juego.replace('2. Quitar los Juegos con menciones\n', '2. Devolver los Juegos con menciones\n');
                                     menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '');
                                 }
-                                if (!(await watchBan(chat.id._serialized, 'admins'))) {
+                                if (!(await Gtools.watchBan(chat.id._serialized, 'admins'))) {
                                     menu_juego = menu_juego.replace('3. Todos pueden utilizar los juegos con menciones', '3. Solo los administradores pueden utilizar los juegos con menciones');
                                 }
                                 message.reply(menu_juego);
@@ -1943,41 +1944,41 @@ class AlastorBot {
                     }
                 }
                 async function comp(resp){ 
-                    const title = await groupActiveQuestions(7, chat.id._serialized)
+                    const title = await games.quest(7, chat.id._serialized)
                     const quotedMsg = await message.getQuotedMessage();
                     if(quotedMsg.fromMe && quotedMsg.body.toLocaleLowerCase().includes(title.toLocaleLowerCase())){
-                        await groupActiveQuestions(2, chat.id._serialized, false);
+                        await games.quest(2, chat.id._serialized, false);
                         if (groupTimes[chat.id._serialized]) {
                             clearTimeout(groupTimes[chat.id._serialized]);
                             delete groupTimes[chat.id._serialized];
                         }
-                        groupActiveQuestions(4, chat.id._serialized).then(async (queste) => {
+                        games.quest(4, chat.id._serialized).then(async (queste) => {
                             if(resp == queste){
                                 message.reply("Respuesta correcta ganaste 1 punto 👍 ");
-                                update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
+                                Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos + 1, true);
                             }else{
-                                message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(await groupActiveQuestions(5, chat.id._serialized), await groupActiveQuestions(4, chat.id._serialized))} perdiste dos puntos 👎👎`);
-                                update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 2, true);
+                                message.reply(`Respuesta incorrecta, la respuesta correcta es: ${quest.correctAnswerselected(await games.quest(5, chat.id._serialized), await games.quest(4, chat.id._serialized))} perdiste dos puntos 👎👎`);
+                                Uplayer.update_info_player(contact.id.user, "Puntos", viewPlayer.Puntos - 2, true);
                             }
                         })
                     
                     }
                 }
                 if (message.body.toLocaleLowerCase() == '1') {
-                    if(message.hasQuotedMsg && (await groupActiveQuestions(1, chat.id._serialized))){      
+                    if(message.hasQuotedMsg && (await games.quest(1, chat.id._serialized))){      
                         comp(1);     
                     }
                     if (option.juego == 1 && participantes(contact.id.user) && message.hasQuotedMsg) {
                         const quotedMsg = await message.getQuotedMessage();
                         if(quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLowerCase()) && quotedMsg.fromMe){
-                            watchBan(chat.id._serialized, 'todos').then(async res => {
+                            Gtools.watchBan(chat.id._serialized, 'todos').then(async res => {
                                 if (res) {
                                     message.reply("Se ha quitado la opción Juego");
-                                    Bangame(message.from, 'todos');
+                                    Gtools.Bangame(message.from, 'todos');
                                     option.juego = 0;
                                 } else {
                                     message.reply("Se ha devuelto la opción Juego");
-                                    QuitBan(chat.id._serialized, 'todos');
+                                    Gtools.QuitBan(chat.id._serialized, 'todos');
                                     option.juego = 0;
                                 }
                             })
@@ -1985,34 +1986,34 @@ class AlastorBot {
                     }
                 }
                 if (message.body.toLocaleLowerCase() == '2') {
-                    if(message.hasQuotedMsg && (await groupActiveQuestions(1, chat.id._serialized))){
+                    if(message.hasQuotedMsg && (await games.quest(1, chat.id._serialized))){
                         comp(2);
                     }
                     if (option.juego == 1 && participantes(contact.id.user) && message.hasQuotedMsg) {
                         const quotedMsg = await message.getQuotedMessage();
-                        if (await watchBan(chat.id._serialized, 'menciones') && await watchBan(chat.id._serialized, 'todos') && quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLocaleLowerCase()) && quotedMsg.fromMe) {
-                            Bangame(message.from, 'menciones');
+                        if (await Gtools.watchBan(chat.id._serialized, 'menciones') && await Gtools.watchBan(chat.id._serialized, 'todos') && quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLocaleLowerCase()) && quotedMsg.fromMe) {
+                            Gtools.Bangame(message.from, 'menciones');
                             option.juego = 0;
                             message.reply("Se han quitado los juegos con menciones");
                         } else {
-                            QuitBan(chat.id._serialized, 'menciones');
+                            Gtools.QuitBan(chat.id._serialized, 'menciones');
                             option.juego = 0;
                             message.reply("Se han devuelto los juegos con menciones");
                         }
                     }
                 }
                 if (message.body.toLocaleLowerCase() == '3') {
-                    if(message.hasQuotedMsg && (await groupActiveQuestions(1, chat.id._serialized))){
+                    if(message.hasQuotedMsg && (await games.quest(1, chat.id._serialized))){
                         comp(3);
                     }
                     if (option.juego == 1 && participantes(contact.id.user) && message.hasQuotedMsg) {
                         const quotedMsg = await message.getQuotedMessage();
-                        if ((await watchBan(chat.id._serialized, 'admins')) && (await watchBan(chat.id._serialized, 'todos')) && quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLocaleLowerCase()) && quotedMsg.fromMe) {
-                            Bangame(message.from, 'admins');
+                        if ((await Gtools.watchBan(chat.id._serialized, 'admins')) && (await Gtools.watchBan(chat.id._serialized, 'todos')) && quotedMsg.body.toLocaleLowerCase().includes(menu_juego.toLocaleLowerCase()) && quotedMsg.fromMe) {
+                            Gtools.Bangame(message.from, 'admins');
                             option.juego = 0;
                             message.reply("Ahora solo los administradores pueden utilizar los juegos con menciones");
                         } else {
-                            QuitBan(chat.id._serialized, 'admins');
+                            Gtools.QuitBan(chat.id._serialized, 'admins');
                             option.juego = 0;
                             message.reply("Ahora todos pueden utilizar los juegos con menciones");
                         }
