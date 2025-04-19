@@ -590,7 +590,20 @@ class AlastorBot{
                         }
                     }
                 }
-
+                // cambia el genero por el que elija el jugador
+                if(message.body.toLocaleLowerCase().startsWith('genero: ')){
+                    let partes = message.body.split(' ');
+                    if(partes.length > 2){
+                        return
+                    }
+                    partes = partes[1];
+                    if(partes === 'hombre' || partes === 'mujer'){
+                        Uplayer.update_info_player(contact.id.user, "sexo", partes, true);
+                        message.reply(`Tu genero ha sido cambiado a ${partes}`);
+                    }else{
+                        message.reply('Introduce un genero valido');
+                    }
+                }
                 if (message.body.toLocaleLowerCase() === 'menu' || message.body.toLocaleLowerCase() === 'menú') {
                     let tempMenu = menu;
                     await chat.sendSeen();
