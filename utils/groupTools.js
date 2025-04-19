@@ -91,6 +91,39 @@ class groupTools extends Database {
         });
     }
     /**
+     * 
+     * @param {string} id_group id del grupo
+     * @param {boolean} view ver si esta activado o desactivado el modo admin
+     * @returns retorna el estado de si esta activado o desactivado el modo admin
+     **/
+    ToogleModoAdmin(id_group, view){
+        return new Promise((resolve, reject) => {
+            this.ReadDb(`SELECT modo_admin FROM groups WHERE id = ?`, [id_group])
+            .then((rows) => {
+                let modo_admin = rows[0].modo_admin;
+                if(view){
+                    resolve(modo_admin);
+                    return;
+                }
+                modo_admin = !modo_admin;
+                const query = `UPDATE groups SET modo_admin = ? WHERE id = ?`;
+                this.WriteDb(query, [modo_admin, id_group]).then(() => {resolve(modo_admin)}).catch((err) => {reject(err)});
+            }).catch((err) => {reject(err)});
+        });
+    }
+        
+    /**
+     * 
+     * @param {string} id_group id del grupo
+     * @param {string} ban nombre del juego o opcion a banear
+     */
+    Ban(id_group, ban){
+        return new Promise((resolve, reject) => {
+            this.watchBan(id_group, ban) ? this.Bangame(id_group, ban) : this.QuitBan(id_group, ban);
+            resolve();
+        })
+    }
+    /**
      * Desactiva o activa el bot si esta desactivado o activado en el grupo
      * @param {string} id_group id del grupo 
      */

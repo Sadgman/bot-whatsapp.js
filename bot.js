@@ -385,9 +385,13 @@ class AlastorBot{
                                     const bienvenida = await Gtools.toggleWelcome(chat.id._serialized, true);
                                     message.reply(`Bienvenida a sido ${bienvenida ? 'activada' : 'desactivada'}`);
                                     break;
-                                case 'br':     
-                                    await Gtools.watchBan(chat.id._serialized, 'br') ? await Gtools.Bangame(chat.id._serialized, 'br') : await Gtools.QuitBan(chat.id._serialized, 'br');
+                                case 'br': 
+                                    await Gtools.Ban(chat.id._serialized, 'br');    
                                     break;
+                                case 'adm':
+                                    await Gtools.ToogleModoAdmin(chat.id._serialized);
+                                    break;
+
                             }
                         }
                         switch (partes) {
@@ -417,7 +421,8 @@ class AlastorBot{
                     }
                 }
                 // Verifica si el bot esta activado en el grupo solo si el chat es un grupo
-                const condicionReturnG = chat.isGroup ? !(await Gtools.watchBot(chat.id._serialized)) || !db_client || !(await Gtools.watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) : false
+                const condicionReturnG = chat.isGroup ? !(await Gtools.watchBot(chat.id._serialized)) || !db_client || 
+                !(await Gtools.watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) || (await Gtools.ToogleModoAdmin(chat.id._serialized, true)) : false
                 if (condicionReturnG){
                     return;
                 }
