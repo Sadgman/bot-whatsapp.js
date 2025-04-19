@@ -254,8 +254,6 @@ class AlastorBot{
             const menu_game = "estos son los juegos disponibles por el momento:\n\n" + "> Piedra 🪨, papel 🧻 o tiejeras ✂️(ppt)\n\n> formar pareja (fp) 👩🏻‍❤️‍💋‍👨🏻\n\n> Dado 🎲 (pon un numero del 1 al 6)\n\n> BlackJack(bj)\n\n> !q crea una pregunta" + "\n\n> cz (cara o cruz)" + "\n\n*Los Roles tienen sus juegos propios*"
             const links_baneados = ["is.gd", "chat.whatsapp.com", "5ne.co", "t.me", "in.ru", "ln.ru", "https://xxnx", "https://pornhub", "https://xvideos", "https://xnxx", "xnxx", "xhamster", "redtube", "youporn", "te odio baba", "odio baba", "odio a baba"]
             let golpear;
-            let counterListRequestMusic = 1;
-            let counterListRequestVideo = 0;
             let groupTimes = {};
             let contadordia = {};
             let cartas_jugador = {};
@@ -265,10 +263,8 @@ class AlastorBot{
             let dinero_bj = {};
             let db_client = true;
             let ms;
-            const direcMusic = './assets/audio';
             const Alastor_Number = ["32466905630", "18098972404", "573170633386", "22941159770", "595973819264"]
             const insultos = ['bot de mierda', 'mierda de bot', 'alastor de mierda']
-            let requestM = []
 
             const mensaje =  async (message) => {
                 let chat;
