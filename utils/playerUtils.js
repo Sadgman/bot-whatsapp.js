@@ -30,7 +30,7 @@ class playerUtils extends Database {
         return new Promise((resolve, reject) => {
             this.ReadDb(`SELECT * FROM players WHERE id = ?`, [id])
             .then(async (rows) => {
-                rows[0].Casado = (await dr.ReadDb(`SELECT pareja FROM casados WHERE id = ${id}`)).pareja;
+                rows[0].Casado = (await this.ReadDb(`SELECT pareja FROM casados WHERE id = ${id}`)).pareja;
                 resolve(rows[0]);
             }).catch((err) => {reject(err)});
         });
