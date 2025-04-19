@@ -424,7 +424,7 @@ class AlastorBot{
                 }
                 // Verifica si el bot esta activado en el grupo solo si el chat es un grupo
                 const condicionReturnG = chat.isGroup ? !(await Gtools.watchBot(chat.id._serialized)) || !db_client || 
-                !(await Gtools.watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) || (await Gtools.ToogleModoAdmin(chat.id._serialized, true)) : false
+                !(await Gtools.watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) || ((await Gtools.ToogleModoAdmin(chat.id._serialized, true)) ? participantes(contact.id.user) : false) : false
                 if (condicionReturnG){
                     return;
                 }
