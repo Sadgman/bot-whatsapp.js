@@ -390,6 +390,8 @@ class AlastorBot{
                                     break;
                                 case 'adm':
                                     await Gtools.ToogleModoAdmin(chat.id._serialized);
+                                    const modo = await Gtools.ToogleModoAdmin(chat.id._serialized, true);
+                                    message.reply(`Modo admin ${modo ? 'activado' : 'desactivado'}`);
                                     break;
 
                             }
