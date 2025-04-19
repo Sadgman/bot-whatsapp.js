@@ -417,7 +417,9 @@ class AlastorBot{
                         }
                     }
                 }
-                if (chat.isGroup ? !(await Gtools.watchBot(chat.id._serialized)) || !db_client || !(await Gtools.watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) : false) {
+                // Verifica si el bot esta activado en el grupo solo si el chat es un grupo
+                const condicionReturnG = chat.isGroup ? !(await watchBot(chat.id._serialized)) || !db_client || !(await watchBan(chat.id._serialized, message.body.toLocaleLowerCase())) : false
+                if (condicionReturnG){
                     return;
                 }
                 if(chat.isGroup && participantes(numero_cliente)){   
