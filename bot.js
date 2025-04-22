@@ -5,6 +5,7 @@ const { TwitterDL } = require("twitter-downloader");
 const fetch = require("node-fetch");
 const ytdp = require('ytdp')
 const instagramDl = require("@sasmeee/igdl");
+const axios = require('axios');
 const tk = require('tiktok-downloaders');
 const googleTTS = require('google-tts-api');
 const youtube = require('youtube-sr').default;
@@ -279,7 +280,9 @@ class AlastorBot{
                         return;
                     }
                 }
-                
+
+                const Message = message.body;
+                const Mpart = message.body.toLowerCase().split(' ');
                 let numero_cliente = client.info.wid.user
                 let contact = await message.getContact();
                 const group = await message.getChat();
@@ -1538,29 +1541,47 @@ class AlastorBot{
                     }
 
                 }  
-                if (message.body.toLocaleLowerCase() == 'sf') {
+                if (Message.toLocaleLowerCase().includes('sf')) {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
+                    console.log('entro')
+                    let media;
                     if (message.hasQuotedMsg) {
                         const mensaje_citado = await message.getQuotedMessage();
                         if (mensaje_citado.hasMedia) {
                             try {
-                                const d = await mensaje_citado.downloadMedia();
-                                chat.sendMessage(d);
+                                media = await mensaje_citado.downloadMedia();
                             } catch (err) {
                                 message.reply('No pude enviar la foto, video o audio');
                             }
+                        }else{
+                            const Fcontact = await quotedMsg.getContact();
+                            const profile = await Fcontact.getProfilePicUrl();
+                            const file = await axios.get(profile, { responseType: 'arraybuffer' });
+                            media = new MessageMedia('image/jpeg', file.data.toString('base64'), 'image.jpeg');
                         }
-                    } else if (message.hasMedia === true) {
+                    }else if(Mpart.length > 1){
+                        try{
+                            const numTelefono = message.body.split(' ').slice(1).join(' ').replace(/[- + ()]/g, ''); 
+                            const Fcontact = await client.getContactById(numTelefono + '@c.us');
+                            const profile = await Fcontact.getProfilePicUrl();
+                            const file = await axios.get(profile, { responseType: 'arraybuffer' });
+                            media = new MessageMedia('image/jpeg', file.data.toString('base64'), 'image.jpeg');
+                        }catch(err){
+                            console.error(err);
+                            message.reply('No te puedo mandar su foto tuve un error al obtenerla');
+                            return;
+                        }
+                    }else if (message.hasMedia === true) {
                         try {
-                            const f = await message.downloadMedia();
-                            chat.sendMessage(f);
+                            media = await message.downloadMedia();
                         } catch (err) {
                             message.reply('No se pudo enviar la foto o video');
                         }
                     } else {
                         message.reply('No pusiste una foto o video, nisiquiera citaste una');
                     }
+                    chat.sendMessage(media? media : 'No se pudo enviar la foto o video');
                 }
                 if (message.body.toLocaleLowerCase() == 'br') {
                     if (message.hasQuotedMsg) {
