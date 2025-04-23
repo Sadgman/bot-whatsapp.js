@@ -1541,45 +1541,34 @@ class AlastorBot{
                     }
 
                 }  
-                if (Message.toLocaleLowerCase().includes('sf')) {
+                if(Message.toLocaleLowerCase().startsWith('sf')) {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
                     console.log('entro')
                     let media;
-                    if (message.hasQuotedMsg) {
-                        const mensaje_citado = await message.getQuotedMessage();
-                        if (mensaje_citado.hasMedia) {
-                            try {
+                    try{
+                        if (message.hasQuotedMsg) {
+                            const mensaje_citado = await message.getQuotedMessage();
+                            if (mensaje_citado.hasMedia) {
                                 media = await mensaje_citado.downloadMedia();
-                            } catch (err) {
-                                message.reply('No pude enviar la foto, video o audio');
+                            }else{
+                                const Fcontact = await quotedMsg.getContact();
+                                const profile = await Fcontact.getProfilePicUrl();
+                                const file = await axios.get(profile, { responseType: 'arraybuffer' });
+                                media = new MessageMedia('image/jpeg', file.data.toString('base64'), 'image.jpeg');
                             }
-                        }else{
-                            const Fcontact = await quotedMsg.getContact();
-                            const profile = await Fcontact.getProfilePicUrl();
-                            const file = await axios.get(profile, { responseType: 'arraybuffer' });
-                            media = new MessageMedia('image/jpeg', file.data.toString('base64'), 'image.jpeg');
-                        }
-                    }else if(Mpart.length > 1){
-                        try{
-                            const numTelefono = message.body.split(' ').slice(1).join(' ').replace(/[- + ()]/g, ''); 
-                            const Fcontact = await client.getContactById(numTelefono + '@c.us');
-                            const profile = await Fcontact.getProfilePicUrl();
-                            const file = await axios.get(profile, { responseType: 'arraybuffer' });
-                            media = new MessageMedia('image/jpeg', file.data.toString('base64'), 'image.jpeg');
-                        }catch(err){
-                            console.error(err);
-                            message.reply('No te puedo mandar su foto tuve un error al obtenerla');
-                            return;
-                        }
-                    }else if (message.hasMedia === true) {
-                        try {
+                        }else if(Mpart.length > 1){
+                            
+                                const numTelefono = Message.split(' ').slice(1).join(' ').replace(/[- + ()]/g, ''); 
+                                const Fcontact = await client.getContactById(numTelefono + '@c.us');
+                                const profile = await Fcontact.getProfilePicUrl();
+                                const file = await axios.get(profile, { responseType: 'arraybuffer' });
+                                media = new MessageMedia('image/jpeg', file.data.toString('base64'), 'image.jpeg'); 
+                        }else if (message.hasMedia === true) {
                             media = await message.downloadMedia();
-                        } catch (err) {
-                            message.reply('No se pudo enviar la foto o video');
                         }
-                    } else {
-                        message.reply('No pusiste una foto o video, nisiquiera citaste una');
+                    }catch(err){
+                        return;
                     }
                     chat.sendMessage(media? media : 'No se pudo enviar la foto o video');
                 }
