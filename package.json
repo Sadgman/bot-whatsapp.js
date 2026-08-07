@@ -5,7 +5,6 @@
   "dependencies": {
     "@distube/ytdl-core": "^4.16.5",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@sasmeee/igdl": "^1.0.0",
     "axios": "^1.8.4",
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
@@ -22,7 +21,7 @@
     "sqlite3": "^5.1.7",
     "tiktok-downloaders": "^1.0.5",
     "twitter-downloader": "^1.1.8",
-    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js",
+    "whatsapp-web.js": "github:lindionez/whatsapp-web.js#feat/fix-_serialized-id-fallback",
     "youtube-sr": "^4.3.10",
     "ytdl-core": "^4.11.5",
     "ytdp": "2.4.4"

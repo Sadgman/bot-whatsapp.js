@@ -1,10 +1,8 @@
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const https = require('https');
-const { TwitterDL } = require("twitter-downloader");
 const fetch = require("node-fetch");
 const ytdp = require('ytdp')
-const instagramDl = require("@sasmeee/igdl");
 const axios = require('axios');
 const tk = require('tiktok-downloaders');
 const googleTTS = require('google-tts-api');
@@ -25,6 +23,8 @@ const Uplayer = require('./utils/playerUtils.js');
 const Gtools = require('./utils/groupTools.js');
 const games = require('./utils/GamesControlDb.js')
 const botUtils = require('./utils/bots.js');
+const dotenv  = require('dotenv')
+dotenv.config()
 
 dayjs.extend(utc);
 dayjs.extend(timezone); 
@@ -282,11 +282,13 @@ class AlastorBot{
                 }
 
                 const Message = message.body;
-                const Mpart = message.body.toLowerCase().split(' ');
+                const Mpart = message.body?.toLowerCase()?.split(' ');
                 let numero_cliente = client.info.wid.user
                 let contact = await message.getContact();
                 const group = await message.getChat();
                 const quotedMsg = message.hasQuotedMsg ? (await message.getQuotedMessage()) : null;
+
+
                 console.log(`${chat.name} de ${contact.pushname}: ${message.body}`);
 
 
@@ -513,9 +515,10 @@ class AlastorBot{
                     try {
                         let person = message.hasQuotedMsg ? (await quotedMsg.getContact()).id.user : contact.id.user;
                         const info = await Uplayer.getAllInfoPlayer(person);
-                        const casado = info.Casado !== 'nadie :(' ? `@${info.Casado}` : info.Casado;
-                        const contacto_casado = info.Casado ===  'nadie :(' ? null : (await client.getNumberId(info.Casado))._serialized;
-                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(contact.id.user)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
+                        const casado = info?.Casado !== 'nadie :(' || info?.Casado ? `@${info?.Casado}` : 'nadie :(';
+                        const contacto_casado = info?.Casado == 'nadie :(' || !info?.Casado || info?.Casado == ' :( nadie' ? null : (await client.getNumberId(info.Casado))._serialized;
+                                             
+                        chat.sendMessage(`*Casad@ con:* ${casado}\n*nivel* ${info.Nivel}\n*sexo* ${info.sexo}\n*Puntuacion:* ${info.Puntos}\n*Rool:* ${info.Rool}\n*Pais:* ${obtenerPais(person)}\n*Dinero:* ${info.Dinero}\n*Dinero en el banco:* ${info.Banco}\n*Total de mensajes enviados:* ${info.Mensajes}\n*Con AlastorBot desde:*\n${info.create_at} `, {
                             mentions: contacto_casado,
                             quotedMessageId: message.hasQuotedMsg? quotedMsg.id._serialized : message.id._serialized
                         });
@@ -559,19 +562,17 @@ class AlastorBot{
                     }
                 }
                 if (message.body.toLocaleLowerCase().startsWith('casar ') || message.body.toLocaleLowerCase().startsWith('cr ')) {
-                    let parts = message.body.split(' ');
-                    let prometido = parts[1];
-                    prometido = prometido.replace('@', '');
-                    prometido = prometido + '@c.us';
+                    let prometido = message.mentionedIds[0];
+                    console.log(prometido);
                     if(prometido.replace('@c.us', '') != contact.id.user){
                         if(viewPlayer.Casado === "nadie :("){
                             client.getContactById(prometido).then((c) => {
-                                mensaje_casado[prometido.replace('@c.us', '')] = [
-                                    `*¿hey @${prometido.replace('@c.us', '')} quieres casarte con ${contact.pushname}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`,
+                                mensaje_casado[c.id.user.replace('@c.us', '')] = [
+                                    `*¿hey ${c.pushname} quieres casarte con ${contact.pushname}?*\n\n> Si tu respuesta es sí responde a este mensaje con un sí`,
                                     contact.id.user
 
                                 ]
-                                chat.sendMessage(mensaje_casado[prometido.replace('@c.us', '')][0], { mentions: prometido })
+                                chat.sendMessage(mensaje_casado[c.id.user.replace('@c.us', '')][0], { mentions: prometido })
                             }).catch(error => {
                                 message.reply('Esta persona no existe en Whatsapp, deja de hacerme perder el tiempo');
                             })
@@ -632,8 +633,7 @@ class AlastorBot{
                 if (message.body.toLocaleLowerCase() === 'ms') {
                     await chat.sendSeen();
                     await chat.sendStateTyping();
-                    ms = await mc.readStatus();
-                    message.reply(`Estado: ${ms}\n\nip: mc.alastorbot.site\n\nport: 51682\n\nversion: La ultima.\n\n\n Para activar el servidor escribe\n\`ab ms\``);
+                    message.reply(`Estado: ${ms}\n\nip: mc.alastorbot.site\n\nport: 19132\n\nversion: La ultima Bedrock`);
                 }
                 if (message.body.toLocaleLowerCase().startsWith('dado ')) {
                     let parts = message.body.split(' ');
@@ -1152,6 +1152,7 @@ class AlastorBot{
                                 media = new MessageMedia(d.mimetype, d.data, 'sticker');
                                 await chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: 'Alastor Bot' });
                             } catch (err) {
+				console.log(err)
                                 message.reply('No se pudo crear el sticker');
                             }
                         } else if (message.hasMedia) {
@@ -1160,6 +1161,7 @@ class AlastorBot{
                                 media = new MessageMedia(d.mimetype, d.data, 'sticker');
                                 await chat.sendMessage(media, { sendMediaAsSticker: true, stickerAuthor: 'Por Alastor', stickerName: '' });   
                             } catch (err) {
+				console.log(err)
                                 message.reply('No se pudo crear el sticker');
                             }
                         } else if(part.length > 0){
@@ -1584,7 +1586,7 @@ class AlastorBot{
                 }
                 async function SendMediaFile(type){
                     const mensaje_error = "*Lo siento, no pude descargar la canción 😞*";
-                    let nameM = './assets/audio/';
+                    let nameM = process.env.AUDIO_VIDEO_DIRECTORY;
                     try {
                         const parts = message.body.split(' ');
                         const search = parts.slice(1).join(' ');
@@ -1771,7 +1773,7 @@ class AlastorBot{
                     ¡Hola! ◡̈
                     Puedes comunicarte con mi creador desde este link:
                     
-                    wa.me/${Alastor_Number[2]}
+                    wa.me/${Alastor_Number[1]}
                     
                     𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.𖥧.𖡼.⚘𖤣.`);
                 } 
